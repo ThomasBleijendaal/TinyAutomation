@@ -16,7 +16,7 @@ allow partial range (eg. 600 - 900 instead of 0 - 1023)
 
 class AI {
 public:
-	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA);
+	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
 
 	bool lolo();
 	bool lo();
@@ -36,12 +36,15 @@ public:
 	void loop(bool t100ms, bool b1s);
 private:
 	int _pin;
+
 	int _raw;
+	int _rawLow;
+	int _rawHigh;
 
 	float _value;
-
 	float _rangeLow;
 	float _rangeHigh;
+
 	float _lolo;
 	float _lo;
 	float _hi;
