@@ -1,6 +1,7 @@
 #include <DI.h>
 #include <DO.h>
 #include <AI.h>
+#include <AO.h>
 
 #include <General.h>
 
@@ -11,11 +12,15 @@
 #define LEDhihi 3
 #define POT 0
 #define TOUCH 1
+#define REDled 0
+#define GREENled 1
+#define BLUEled 2
 
 General general;
 DI DIs[] = {DI(2,false)};
 DO DOs[] = {DO(3),DO(4),DO(5),DO(6)};
-AI AIs[] = {AI(0,0.0,5.0,0.5,1.0,4.0,4.5,true),AI(1,0.0,5.0,0.5,1.0,4.0,4.5,true)};
+AI AIs[] = {AI(0,0.0,5.0,0.5,1.0,4.0,4.5,true,0,1023),AI(1,0.0,5.0,0.5,1.0,4.0,4.5,true,0,511)};
+AO AOs[] = {AO(9,0.0,100.0,6.0),AO(10,0.0,100.0,2.0),AO(11,0.0,100.0,10.0)};
 
 bool enable = true;
 int red = 0;
@@ -46,6 +51,13 @@ void loop() {
     DOs[LEDhi].activate(enable && AIs[TOUCH].hi() && !AIs[TOUCH].bta());
     DOs[LEDhihi].activate(enable && AIs[TOUCH].hihi() && !AIs[TOUCH].bta());
     
+   // AOs[REDled].output(100.0);
+   // AOs[REDled].activate(true);
+   // AOs[GREENled].output(100.0);
+   // AOs[GREENled].activate(true);
+    AOs[BLUEled].output(100.0);
+    AOs[BLUEled].activate(enable);
+    
     Serial.println(AIs[TOUCH].value());
 }
 
@@ -61,5 +73,9 @@ void loopTypicals() {
     maxObjects = sizeof(AIs) / sizeof(AIs[0]);
     for(int i = 0; i < maxObjects; i++) {
         AIs[i].loop(general.t100ms,general.b1s);
+    }
+    maxObjects = sizeof(AOs) / sizeof(AOs[0]);
+    for(int i = 0; i < maxObjects; i++) {
+        AOs[i].loop(general.t100ms,general.b1s);
     }
 }
