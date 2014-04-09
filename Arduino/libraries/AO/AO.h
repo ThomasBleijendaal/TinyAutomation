@@ -8,6 +8,7 @@ Writes an analog output (PWM). Recieves a 0 - 100 % input which is converted to 
 #define AO_h
 
 #include <AO.h>
+#include <General.h>
 
 class AO {
 public:
@@ -16,10 +17,11 @@ public:
 	void output(float output);
 	void activate(bool activate);
 
+	float output();
 	float average();
 	float activeTime();
 
-	void loop(bool t100ms, bool b1s);
+	void loop(General &general);
 
 private:
 	int _pin;

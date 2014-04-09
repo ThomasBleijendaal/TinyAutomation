@@ -43,7 +43,7 @@ float DI::activeTime() {
 	return ((float) _activeTime) / 10.0;
 }
 
-void DI::loop(bool t100ms, bool b1s) {
+void DI::loop(General &general) {
 	int pinValue = digitalRead(_pin);
 	_activated = false;
 	_deActivated = false;
@@ -54,7 +54,7 @@ void DI::loop(bool t100ms, bool b1s) {
 			_switchCount++;
 			_active = true;
 		}
-		if (t100ms) {
+		if (general.t100ms) {
 			_activeTime++;
 		}
 	}

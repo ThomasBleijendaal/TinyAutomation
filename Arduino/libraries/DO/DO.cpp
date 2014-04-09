@@ -23,7 +23,7 @@ void DO::blink(bool blink) {
 }
 
 bool DO::isActive() {
-	return _active;
+	return _active && _wasActive;
 }
 
 unsigned int DO::switchCount() {
@@ -34,12 +34,12 @@ float DO::activeTime() {
 	return ((float)_activeTime) / 10.0;
 }
 
-void DO::loop(bool t100ms, bool b1s) {
+void DO::loop(General &general) {
 	if (_active) {
-		if (!_blinks || (_blinks && b1s)) {
+		if (!_blinks || (_blinks && general.b1s)) {
 			digitalWrite(_pin, HIGH);
 		}
-		else if(_blinks && !b1s) {
+		else if (_blinks && !general.b1s) {
 			digitalWrite(_pin, LOW);
 		}
 
@@ -47,7 +47,7 @@ void DO::loop(bool t100ms, bool b1s) {
 			_switchCount++;
 			_wasActive = true;
 		}
-		if (t100ms) {
+		if (general.t100ms) {
 			_activeTime++;
 		}
 	}

@@ -13,6 +13,7 @@ allow partial range (eg. 600 - 900 instead of 0 - 1023)
 #define AI_h
 
 #include <AI.h>
+#include <General.h>
 
 class AI {
 public:
@@ -24,6 +25,8 @@ public:
 	bool hihi();
 	bool bta();
 
+	void enable(bool enable);
+
 	float value();
 	float average();
 	float minimum();
@@ -33,7 +36,7 @@ public:
 	float rangeLow();
 	float rangeHigh();
 
-	void loop(bool t100ms, bool b1s);
+	void loop(General &general);
 private:
 	int _pin;
 
@@ -54,6 +57,7 @@ private:
 	float _min;
 	float _max;
 
+	bool _enable;
 	bool _enableLolo;
 	bool _enableLo;
 	bool _enableHi;

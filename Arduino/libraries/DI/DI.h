@@ -8,6 +8,7 @@ Reads a digital input. Counts the times the input is turned on and the duration 
 #define DI_h
 
 #include <DI.h>
+#include <General.h>
 
 class DI {
 public:
@@ -23,7 +24,7 @@ public:
 	void simulate(bool activate);
 	void simulation(bool activate);
 
-	void loop(bool t100ms, bool b1s);
+	void loop(General &general);
 private:
 	int _pin;
 	

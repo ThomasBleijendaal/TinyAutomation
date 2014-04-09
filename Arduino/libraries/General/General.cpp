@@ -15,6 +15,12 @@ General::General() {
 	t5s = false;
 	_t5s = 0U;
 
+	t1m = false;
+	_t1m = 0U;
+
+	t5m = false;
+	_t5m = 0U;
+
 	cyclicLoad = 0;
 }
 
@@ -50,4 +56,16 @@ void General::time() {
     if(t5s) { 
 		_t5s = t5s_new;
 	}
+
+	if (t1s)
+		_t1m += 1U;
+	t1m = _t1m == 60U;
+	if (t1m)
+		_t1m = 0U;
+	
+	if (t1s)
+		_t5m += 1U;
+	t5m = _t5m == 300U;
+	if (t5m)
+		_t5m = 0U;
 }

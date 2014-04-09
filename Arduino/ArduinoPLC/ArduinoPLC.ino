@@ -5,77 +5,71 @@
 
 #include <General.h>
 
-#define BUTTON 0
-#define LEDlolo 0
-#define LEDlo 1
-#define LEDhi 2
-#define LEDhihi 3
-#define POT 0
-#define TOUCH 1
-#define REDled 0
-#define GREENled 1
-#define BLUEled 2
+#define SENSOR 0
+#define PROBE 0
+#define LED 1
 
 General general;
-DI DIs[] = {DI(2,false)};
-DO DOs[] = {DO(3),DO(4),DO(5),DO(6)};
-AI AIs[] = {AI(0,0.0,5.0,0.5,1.0,4.0,4.5,true,0,1023),AI(1,0.0,5.0,0.5,1.0,4.0,4.5,true,0,511)};
-AO AOs[] = {AO(9,0.0,100.0,6.0),AO(10,0.0,100.0,2.0),AO(11,0.0,100.0,10.0)};
+DI DIs[] = {};
+DO DOs[] = {DO(2),DO(3)};
+AI AIs[] = {AI(0,0.0,100.0,5.0,10.0,90.0,95.0,true,0,1023)};
+AO AOs[] = {};
 
-bool enable = true;
-int red = 0;
-int gre = 64;
-int blu = 128;
+bool test = false;
 
 void setup() {
     Serial.begin(9600);
-    
 }
 
 void loop() {
     general.time();
-    loopTypicals();
     
-    
-    if(DIs[BUTTON].activated()) {
-        enable = !enable;
+    if(test && general.t100ms) {
+        test = false;
     }
     
-    DOs[LEDlolo].blink(enable && AIs[TOUCH].bta());
-    DOs[LEDlo].blink(enable && AIs[TOUCH].bta());
-    DOs[LEDhi].blink(enable && AIs[TOUCH].bta());
-    DOs[LEDhihi].blink(enable && AIs[TOUCH].bta());
+    if(general.t1m) {
+        test = true;
+    }
     
-    DOs[LEDlolo].activate(enable && AIs[TOUCH].lolo() && !AIs[TOUCH].bta());
-    DOs[LEDlo].activate(enable && AIs[TOUCH].lo() && !AIs[TOUCH].bta());
-    DOs[LEDhi].activate(enable && AIs[TOUCH].hi() && !AIs[TOUCH].bta());
-    DOs[LEDhihi].activate(enable && AIs[TOUCH].hihi() && !AIs[TOUCH].bta());
+    AIs[SENSOR].enable(test);
+    DOs[PROBE].activate(test);
+    DOs[LED].activate(test);
     
-   // AOs[REDled].output(100.0);
-   // AOs[REDled].activate(true);
-   // AOs[GREENled].output(100.0);
-   // AOs[GREENled].activate(true);
-    AOs[BLUEled].output(100.0);
-    AOs[BLUEled].activate(enable);
+    if(DOs[PROBE].isActive()) {
+        Serial.print(AIs[SENSOR].average());
+        Serial.print("\t");
+        Serial.println(AIs[SENSOR].value());
+    }
     
-    Serial.println(AIs[TOUCH].value());
+    loopTypicals();
+    
 }
 
 void loopTypicals() {
-    int maxObjects = sizeof(DIs) / sizeof(DIs[0]);
-    for(int i = 0; i < maxObjects; i++) {
-        DIs[i].loop(general.t100ms,general.b1s);
+    int maxObjects = 0;
+    if(sizeof(DIs) > 0) {
+        maxObjects = sizeof(DIs) / sizeof(DIs[0]);
+        for(int i = 0; i < maxObjects; i++) {
+            DIs[i].loop(general);
+        }
     }
-    maxObjects = sizeof(DOs) / sizeof(DOs[0]);
-    for(int i = 0; i < maxObjects; i++) {
-        DOs[i].loop(general.t100ms,general.b1s);
+    if(sizeof(DOs) > 0) {
+        maxObjects = sizeof(DOs) / sizeof(DOs[0]);
+        for(int i = 0; i < maxObjects; i++) {
+            DOs[i].loop(general);
+        }
     }
-    maxObjects = sizeof(AIs) / sizeof(AIs[0]);
-    for(int i = 0; i < maxObjects; i++) {
-        AIs[i].loop(general.t100ms,general.b1s);
+    if(sizeof(AIs) > 0) {
+        maxObjects = sizeof(AIs) / sizeof(AIs[0]);
+        for(int i = 0; i < maxObjects; i++) {
+            AIs[i].loop(general);
+        }
     }
-    maxObjects = sizeof(AOs) / sizeof(AOs[0]);
-    for(int i = 0; i < maxObjects; i++) {
-        AOs[i].loop(general.t100ms,general.b1s);
+    if(sizeof(AOs) > 0) {
+        maxObjects = sizeof(AOs) / sizeof(AOs[0]);
+        for(int i = 0; i < maxObjects; i++) {
+            AOs[i].loop(general);
+        }
     }
 }

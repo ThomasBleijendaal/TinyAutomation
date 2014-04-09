@@ -15,6 +15,7 @@ AI::AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi,
 	_hi = hi;
 	_hihi = hihi;
 
+	_enable = true;
 	_enableLolo = (lolo > rangeLow);
 	_enableLo = (lo > lolo);
 	_enableHi = (hi < hihi);
@@ -31,8 +32,10 @@ AI::AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi,
 	_firstCycle = true;
 }
 
-void AI::loop(bool t100ms, bool b1s) {
-	_raw = analogRead(_pin);
+void AI::loop(General &general) {
+	if (_enable)
+		_raw = analogRead(_pin);
+	
 	_value = ((float) (_raw - _rawLow)) * ((_rangeHigh - _rangeLow) / ((float) (_rawHigh - _rawLow))) + _rangeLow;
 
 	if (_firstCycle) {
@@ -43,7 +46,7 @@ void AI::loop(bool t100ms, bool b1s) {
 		_firstCycle = false;
 	}
 	else {
-		if (t100ms) {
+		if (general.t100ms) {
 			_avg = ((_avg * 99.0) + _value) / 100.0;
 		}
 
@@ -60,6 +63,8 @@ void AI::loop(bool t100ms, bool b1s) {
 	_isBTA = _enableBTA && (_isBTA || _value <= _rangeLow || _value >= _rangeHigh) && (_value <= _rangeLow + delta || _value >= _rangeHigh - delta);
 
 }
+
+void AI::enable(bool enable) { _enable = enable; }
 
 float AI::rangeLow() { return _rangeLow; }
 float AI::rangeHigh() { return _rangeHigh; }

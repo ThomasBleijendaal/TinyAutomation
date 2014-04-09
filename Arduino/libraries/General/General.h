@@ -18,6 +18,8 @@ class General {
         bool t250ms;
         bool t1s;
         bool t5s;
+		bool t1m;
+		bool t5m;
 
 		bool b1s;
         
@@ -30,6 +32,9 @@ class General {
         unsigned int _t250ms;
         unsigned int _t1s;
         unsigned int _t5s;
+		unsigned int _t1m;
+		unsigned int _t5m;
+
 		unsigned int _cps;
 };
 
