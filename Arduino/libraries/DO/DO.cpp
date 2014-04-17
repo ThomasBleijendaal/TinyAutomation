@@ -34,13 +34,13 @@ float DO::activeTime() {
 	return ((float)_activeTime) / 10.0;
 }
 
-void DO::loop(General &general) {
+void DO::loop(General &general, IO &io) {
 	if (_active) {
 		if (!_blinks || (_blinks && general.b1s)) {
-			digitalWrite(_pin, HIGH);
+			io.writeBit(_pin, HIGH);
 		}
 		else if (_blinks && !general.b1s) {
-			digitalWrite(_pin, LOW);
+			io.writeBit(_pin, LOW);
 		}
 
 		if (!_wasActive) {
@@ -52,7 +52,7 @@ void DO::loop(General &general) {
 		}
 	}
 	else {
-		digitalWrite(_pin, LOW);
+		io.writeBit(_pin, LOW);
 
 		_wasActive = false;
 	}

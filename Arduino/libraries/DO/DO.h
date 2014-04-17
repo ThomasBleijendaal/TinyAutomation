@@ -9,6 +9,7 @@ Writes a digitial output. Set the output according to its active state, counts t
 
 #include <DO.h>
 #include <General.h>
+#include <IO.h>
 
 class DO {
 public:
@@ -21,7 +22,7 @@ public:
 	void activate(bool activate);
 	void blink(bool blink);
 
-	void loop(General &general);
+	void loop(General &general, IO &io);
 private:
 	int _pin;
 
