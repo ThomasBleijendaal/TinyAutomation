@@ -1,7 +1,12 @@
 /*
 IO
 
+IO abstraction layer.
 
+Currently supports
+- Arduino UNO
+- Output Shift Registers (Clock and Latch have to be on 0-7 and Data has to be on 8 - 13)
+- Digital output
 
 */
 #ifndef IO_h

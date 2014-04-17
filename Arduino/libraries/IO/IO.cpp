@@ -1,9 +1,6 @@
 #include "Arduino.h"
 #include "IO.h"
 
-// B = 8 - 13
-// D = 0 - 7
-
 IO::IO() {
 
 }
@@ -14,9 +11,9 @@ void IO::setRegisterOut(int dataWritePin, int clockPin, int latchPin, int writeB
 	_clockPin = clockPin;
 	_latchPin = latchPin;
 
-	_dataWritePinMask = 0x01 << (dataWritePin);
-	_clockPinMask = 0x01 << (clockPin);
-	_latchPinMask = 0x01 << (latchPin);
+	_dataWritePinMask = 0x01 << dataWritePin - 8;
+	_clockPinMask = 0x01 << clockPin;
+	_latchPinMask = 0x01 << latchPin;
 
 	pinMode(dataWritePin, OUTPUT);
 	pinMode(clockPin, OUTPUT);
@@ -47,9 +44,9 @@ void IO::write() {
 
 	for (int b = (_writeBytes * 8) - 1; b >= 0; b--) {
 		if (_writeData[b])
-			PORTD |= _dataWritePinMask;
+			PORTB |= _dataWritePinMask;
 		else
-			PORTD &= (unsigned char)~_dataWritePinMask;
+			PORTB &= (unsigned char)~_dataWritePinMask;
 
 		PORTD |= _clockPinMask;
 		PORTD &= (unsigned char)~_clockPinMask;
