@@ -28,6 +28,7 @@ public:
 	void enable(bool enable);
 
 	float value();
+	void setValue(float value);
 	float average();
 	float minimum();
 	float maximum();
