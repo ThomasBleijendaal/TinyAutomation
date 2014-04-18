@@ -48,7 +48,7 @@ void DI::loop(General &general) {
 	_activated = false;
 	_deActivated = false;
 
-	if (pinValue == HIGH || (_simulation && _simulationActive)) {
+	if (((pinValue == HIGH && !_NC) || (pinValue == LOW && _NC)) || (_simulation && _simulationActive)) {
 		if (!_active) {
 			_activated = true;
 			_switchCount++;
