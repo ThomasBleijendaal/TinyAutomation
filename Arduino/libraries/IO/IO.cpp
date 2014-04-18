@@ -11,7 +11,7 @@ void IO::setRegisterOut(int dataWritePin, int clockPin, int latchPin, int writeB
 	_clockPin = clockPin;
 	_latchPin = latchPin;
 
-	_dataWritePinMask = 0x01 << dataWritePin - 8;
+	_dataWritePinMask = 0x01 << dataWritePin;
 	_clockPinMask = 0x01 << clockPin;
 	_latchPinMask = 0x01 << latchPin;
 
@@ -44,9 +44,9 @@ void IO::write() {
 
 	for (int b = (_writeBytes * 8) - 1; b >= 0; b--) {
 		if (_writeData[b])
-			PORTB |= _dataWritePinMask;
+			PORTD |= _dataWritePinMask;
 		else
-			PORTB &= (unsigned char)~_dataWritePinMask;
+			PORTD &= (unsigned char)~_dataWritePinMask;
 
 		PORTD |= _clockPinMask;
 		PORTD &= (unsigned char)~_clockPinMask;
