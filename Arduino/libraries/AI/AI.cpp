@@ -73,7 +73,7 @@ void AI::setValue(float value) { if(_pin == -1) _value = value; }
 float AI::rangeLow() { return _rangeLow; }
 float AI::rangeHigh() { return _rangeHigh; }
 float AI::value() { return _value; }
-float AI::voltage() { return ((float)_raw) * (5.0 / 1024.0); }
+float AI::voltage() { return ((float)_raw) * (5.0 / 1023.0); }
 float AI::average() { return _avg; }
 float AI::minimum() { return _min; }
 float AI::maximum() { return _max; }
