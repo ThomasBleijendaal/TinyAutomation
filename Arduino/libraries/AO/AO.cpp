@@ -35,6 +35,9 @@ float AO::output() {
 		return 0.0;
 	}
 }
+float AO::voltage() {
+	return output() * (5.0 / 100.0);
+}
 
 float AO::average() {
 	return _avg;

@@ -20,6 +20,7 @@ public:
 	float output();
 	float average();
 	float activeTime();
+	float voltage();
 
 	void loop(General &general);
 
