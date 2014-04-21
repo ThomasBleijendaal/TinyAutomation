@@ -23,7 +23,7 @@ class General {
 
 		bool b1s;
         
-		int cyclicLoad;
+		float cyclicLoad;
 
 		void time();
     

@@ -22,8 +22,8 @@ General::General() {
 	_t5m = 0U;
 
 	cyclicLoad = 0;
+	_cps = 10000;
 }
-
 void General::time() {
     unsigned int t100ms_new = millis();
     unsigned int t250ms_new = millis();
@@ -48,7 +48,7 @@ void General::time() {
 		b1s = !b1s;
 
 		// 10 cycles per second = 100% load: the minimum at which the typicals may run //
-		cyclicLoad = 1000 / _cps;
+		cyclicLoad = 1000.0 / _cps;
 		_cps = 0;
 	}
     
