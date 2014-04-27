@@ -1,10 +1,16 @@
 #include "Arduino.h"
 #include "PID.h"
 
-PID::PID(float min, float max, int AI, int AO) {
+PID::PID(float min, float max, int AI, int AO, float P, float I, float D, float deviationLimit) {
 	_min = min;
 	_max = max;
 
+	_deviationLimit = deviationLimit / 100.0;
+
+	_P = P;
+	_I = I;
+	_D = D;
+	
 	_AI = AI;
 	_AO = AO;
 	
@@ -43,14 +49,30 @@ float PID::sp() {
 	return _sp;
 }
 
+bool PID::isDeviated() {
+	return _deviated;
+}
+
 void PID::loop(General &general) {
 	if (_active) {
 		if (general.t100ms) {
-			float delta = _sp - _value;
-			float rDelta = 100.0 * delta / (_max - _min);
-			float newOutput = _output + (rDelta / 10.0);
+			float error = _sp - _value;
+			float prevError = error - _previousError;
+			_previousError = error;
 
-			_output = max(_min, min(_max, newOutput));
+			_totalError = max(_min, min(_max, (_totalError + error)));
+
+			float newOutput = _output + (error * _P) + (_totalError * _I) + (prevError * _D);
+
+			_output = max(_min, min(_max, newOutput));	
+		}
+		if (abs(_sp - _value) >= (_max - _min) * _deviationLimit) {
+			if (general.t1s)
+				_deviated = ++_devDelay >= 5;
+		}
+		else {
+			_deviated = false;
+			_devDelay = 0;
 		}
 	}
 	else {
