@@ -2,70 +2,100 @@
 #include "General.h"
 
 General::General() {
+	t2_5ms = false;
+	_t2_5ms = micros();
+
 	t100ms = false;
-	_t100ms = 0U;
+	_t100ms = 0;
 
 	t250ms = false;
-	_t250ms = 0U;
+	_t250ms = 0;
 	
 	t1s = false;
 	b1s = false;
-	_t1s = 0U;
+	_t1s = 0;
 	
 	t5s = false;
-	_t5s = 0U;
+	_t5s = 0;
 
 	t1m = false;
-	_t1m = 0U;
+	_t1m = 0;
 
 	t5m = false;
-	_t5m = 0U;
+	_t5m = 0;
 
-	cyclicLoad = 0;
-	_cps = 10000;
+	cps = 0;
+	_cps = 0;
+
+	_customTimer[0] = 0;
+	_customTimer[1] = 0;
+	_customTimer[2] = 0;
 }
 void General::time() {
-    unsigned int t100ms_new = millis();
-    unsigned int t250ms_new = millis();
-    unsigned int t1s_new = millis();
-    unsigned int t5s_new = millis();
+	unsigned long u = micros();
 
-	_cps++;
+	++_cps;
 
-    t100ms = (max(t100ms_new,_t100ms) - min(t100ms_new,_t100ms)) > 100U;
-    if(t100ms) {
-		_t100ms = t100ms_new;
+	t100ms = false;
+	t250ms = false;
+	t1s = false;
+	t5s = false;
+	t1m = false;
+	t5m = false;
+
+	t2_5ms = u - _t2_5ms >= 2500U;
+	if (t2_5ms || u < _t2_5ms) {
+		_t2_5ms = u;
+
+		int id = -1;
+		while (_customTimer[++id] > 0)
+			_customTimerActive[id] = ++_customTimerCounter[id] == _customTimer[id];
+
+		t100ms = ++_t100ms == 40;
+		if (t100ms) {
+			_t100ms = 0;
+
+			t1s = ++_t1s == 10;
+			if (t1s) {
+				_t1s = 0;
+				b1s = !b1s;
+
+				cps = _cps;
+				_cps = 0;
+
+				t5s = ++_t5s == 5;
+				if (t5s)
+					_t5s = 0;
+
+				t1m = ++_t1m == 60;
+				if (t1m)
+					_t1m = 0;
+
+				t5m = ++_t5m == 300;
+				if (t5m)
+					_t5m = 0;
+			}
+		}
+
+		t250ms = ++_t250ms > 100;
+		if (t250ms)
+			_t250ms = 0;
+	}
+}
+
+
+int General::registerTimer(int millis) {
+	int id = -1;
+
+	while (_customTimer[++id] != 0) {
+		if (id == 3)
+			return -1;
 	}
 
-    t250ms = (max(t250ms_new,_t250ms) - min(t250ms_new,_t250ms)) > 250U;
-    if(t250ms) { 
-		_t250ms = t250ms_new;
-	}
-    
-	t1s = (max(t1s_new,_t1s) - min(t1s_new,_t1s)) > 1000U;
-    if(t1s) { 
-		_t1s = t1s_new;
-		b1s = !b1s;
+	_customTimer[id] = int(float(millis) / 2.5);
 
-		// 10 cycles per second = 100% load: the minimum at which the typicals may run //
-		cyclicLoad = 1000.0 / _cps;
-		_cps = 0;
-	}
-    
-	t5s = (max(t5s_new,_t5s) - min(t5s_new,_t5s)) > 5000U;
-    if(t5s) { 
-		_t5s = t5s_new;
-	}
-
-	if (t1s)
-		_t1m += 1U;
-	t1m = _t1m == 60U;
-	if (t1m)
-		_t1m = 0U;
-	
-	if (t1s)
-		_t5m += 1U;
-	t5m = _t5m == 300U;
-	if (t5m)
-		_t5m = 0U;
+	return id;
+}
+bool General::timer(int id) {
+	return _customTimerActive[id % 3] && _t2_5ms;
 }
