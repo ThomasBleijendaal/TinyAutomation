@@ -12,6 +12,7 @@ Reads a digital input. Counts the times the input is turned on and the duration 
 
 class DI {
 public:
+	DI(int pin);
 	DI(int pin, bool NC);
 
 	bool isActive();
@@ -26,6 +27,8 @@ public:
 
 	void loop(General &general);
 private:
+	void _init(int pin, bool NC);
+
 	int _pin;
 	
 	bool _NC;

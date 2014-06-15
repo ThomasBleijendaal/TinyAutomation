@@ -1,7 +1,13 @@
 #include "Arduino.h"
 #include "DI.h"
 
+DI::DI(int pin) {
+	_init(pin, false);
+}
 DI::DI(int pin, bool NC) {
+	_init(pin, NC);
+}
+void DI::_init(int pin, bool NC) {
 	if (NC) {
 		pinMode(_pin, INPUT_PULLUP);
 	}

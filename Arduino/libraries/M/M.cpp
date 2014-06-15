@@ -2,9 +2,12 @@
 #include "M.h"
 
 M::M() {
-	M(-1);
+	_init(-1);
 }
 M::M(int customTimerId) {
+	_init(customTimerId);
+}
+void M::_init(int customTimerId) {
 	_active = false;
 	_maxPins = 0;
 	_seq = 0;

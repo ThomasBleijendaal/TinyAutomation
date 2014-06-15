@@ -12,6 +12,8 @@ Writes an analog output (PWM). Recieves a 0 - 100 % input which is converted to 
 
 class AO {
 public:
+	AO(int pin);
+	AO(int pin, float min, float max);
 	AO(int pin, float min, float max, float rate);
 
 	void output(float output);
@@ -22,12 +24,17 @@ public:
 	float activeTime();
 	float voltage();
 
+	void interlock(bool i0, bool i1, bool i2);
+
 	void loop(General &general);
 
 private:
+	void _init(int pin, float min, float max, float rate);
+
 	int _pin;
 	int _raw;
 
+	bool _interlock;
 	bool _active;
 
 	float _output;

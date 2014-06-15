@@ -4,9 +4,6 @@ Analog Input
 Reads an analog input. Maps the raw input to the configured range and determines if the input is out of range (bta, broken transmitter), 
 too high (hihi), high (hi), low (lo) or too low (lolo). Also computes a rolling average per 100ms.
 
-TODO:
-
-allow partial range (eg. 600 - 900 instead of 0 - 1023)
 
 */
 #ifndef AI_h
@@ -17,6 +14,9 @@ allow partial range (eg. 600 - 900 instead of 0 - 1023)
 
 class AI {
 public:
+	AI(int pin);
+	AI(int pin, float rangeLow, float rangeHigh);
+	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
 	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
 
 	bool lolo();
@@ -39,6 +39,8 @@ public:
 
 	void loop(General &general);
 private:
+	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
+
 	int _pin;
 
 	int _raw;
@@ -72,6 +74,7 @@ private:
 	bool _isBTA;
 
 	bool _firstCycle;
+	bool _firstValueSet;
 };
 
 #endif

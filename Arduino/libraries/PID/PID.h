@@ -12,7 +12,9 @@ Basic implementation of a very naive PID controller.
 
 class PID {
 public:
-	PID(float min, float max, int AI, int AO, float P, float I, float D, float deviationLimit);
+	PID(int AI, float min, float max, int AO, float P, float I, float D);
+	PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit);
+	PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
 
 	float value();
 	void value(float value);
@@ -32,8 +34,12 @@ public:
 	void loop(General &general);
 
 private:
+	void _init(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
+
 	float _min;
 	float _max;
+
+	bool _fast;
 
 	float _deviationLimit;
 	bool _deviated;

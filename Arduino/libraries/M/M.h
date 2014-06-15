@@ -35,6 +35,8 @@ public:
 
 	void loop(General &general, IO &io);
 private:
+	void _init(int customTimerId);
+
 	int _pin[4];
 	int _seq;
 	int _maxPins;

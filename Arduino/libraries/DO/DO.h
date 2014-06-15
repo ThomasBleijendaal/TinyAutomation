@@ -22,10 +22,13 @@ public:
 	void activate(bool activate);
 	void blink(bool blink);
 
+	void interlock(bool i0, bool i1, bool i2);
+
 	void loop(General &general, IO &io);
 private:
 	int _pin;
 
+	bool _interlock;
 	bool _active;
 	bool _blinks;
 	bool _wasActive;

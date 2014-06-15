@@ -1,10 +1,20 @@
 #include "Arduino.h"
 #include "AO.h"
 
-AO::AO(int pin, float min, float max, float rate) {
-	pinMode(_pin, OUTPUT);
 
+AO::AO(int pin) {
+	_init(pin, 0.0, 100.0, -1);
+}
+AO::AO(int pin, float min, float max) {
+	_init(pin, min, max, -1);
+}
+AO::AO(int pin, float min, float max, float rate) {
+	_init(pin, min, max, rate);
+}
+void AO::_init(int pin, float min, float max, float rate) {
 	_pin = pin;
+
+	pinMode(_pin, OUTPUT);
 
 	_min = min;
 	_max = max;
@@ -45,6 +55,12 @@ float AO::average() {
 
 float AO::activeTime() {
 	return ((float)_activeTime) / 10.0;
+}
+
+void AO::interlock(bool i0, bool i1, bool i2) {
+	_interlock = i0 || i1 || i2;
+	if (_interlock)
+		_active = false;
 }
 
 void AO::loop(General &general) {

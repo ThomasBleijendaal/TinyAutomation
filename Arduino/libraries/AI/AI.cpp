@@ -1,7 +1,20 @@
 #include "Arduino.h"
 #include "AI.h"
 
+AI::AI(int pin) {
+	_init(pin, 0.0, 100.0, -1.0, -1.0, 101.0, 101.0, false, 0, 1023);
+}
+AI::AI(int pin, float rangeLow, float rangeHigh) {
+	_init(pin, rangeLow, rangeHigh, rangeLow - 1.0, rangeLow - 1.0, rangeHigh + 1.0, rangeHigh + 1.0, false, 0, 1023);
+}
+AI::AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi) {
+	_init(pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, false, 0, 1023);
+}
 AI::AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh) {
+	_init(pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, enableBTA, rawLow, rawHigh);
+}
+
+void AI::_init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh) {
 	_pin = pin;
 
 	_rangeLow = rangeLow;
@@ -30,6 +43,7 @@ AI::AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi,
 	_max = rangeLow;
 
 	_firstCycle = true;
+	_firstValueSet = false;
 }
 
 void AI::loop(General &general) {
@@ -40,12 +54,13 @@ void AI::loop(General &general) {
 		_value = ((float)(_raw - _rawLow)) * ((_rangeHigh - _rangeLow) / ((float)(_rawHigh - _rawLow))) + _rangeLow;
 	}
 
-	if (_firstCycle) {
+	if (_firstCycle || (_pin == -1 && !_firstValueSet)) {
 		_avg = _value;
 		_min = _value;
 		_max = _value;
 
-		_firstCycle = false;
+		if (!(_pin == -1 && !_firstValueSet))
+			_firstCycle = false;
 	}
 	else {
 		if (general.t100ms) {
@@ -54,21 +69,20 @@ void AI::loop(General &general) {
 
 		_min = min(_min, _value);
 		_max = max(_max, _value);
+
+		float delta = (_rangeHigh - _rangeLow) * 0.01;
+
+		_isLolo = _enableLolo && (_isLolo || _value < _lolo) && _value <= _lolo + delta;
+		_isLo = _enableLo && (_isLo || _value < _lo) && _value <= _lo + delta;
+		_isHi = _enableHi && (_isHi || _value > _hi) && _value >= _hi - delta;
+		_isHihi = _enableHihi && (_isHihi || _value > _hihi) && _value >= _hihi - delta;
+		_isBTA = _enableBTA && (_isBTA || _value <= _rangeLow || _value >= _rangeHigh) && (_value <= _rangeLow + delta || _value >= _rangeHigh - delta);
 	}
-
-	float delta = (_rangeHigh - _rangeLow) * 0.01;
-
-	_isLolo = _enableLolo && (_isLolo || _value < _lolo) && _value <= _lolo + delta;
-	_isLo = _enableLo && (_isLo || _value < _lo) && _value <= _lo + delta;
-	_isHi = _enableHi && (_isHi || _value > _hi) && _value >= _hi - delta;
-	_isHihi = _enableHihi && (_isHihi || _value > _hihi) && _value >= _hihi - delta;
-	_isBTA = _enableBTA && (_isBTA || _value <= _rangeLow || _value >= _rangeHigh) && (_value <= _rangeLow + delta || _value >= _rangeHigh - delta);
-
 }
 
 void AI::enable(bool enable) { _enable = enable; }
 
-void AI::setValue(float value) { if(_pin == -1) _value = value; }
+void AI::setValue(float value) { if (_pin == -1) { _value = max(_rangeLow, min(_rangeHigh, value)); _firstValueSet = true; } }
 
 float AI::rangeLow() { return _rangeLow; }
 float AI::rangeHigh() { return _rangeHigh; }

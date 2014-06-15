@@ -1,9 +1,20 @@
 #include "Arduino.h"
 #include "PID.h"
 
-PID::PID(float min, float max, int AI, int AO, float P, float I, float D, float deviationLimit) {
+PID::PID(int AI, float min, float max, int AO, float P, float I, float D) {
+	_init(AI, min, max, AO, P, I, D, 0.0, false);
+}
+PID::PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit) {
+	_init(AI, min, max, AO, P, I, D, deviationLimit, false);
+}
+PID::PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
+	_init(AI, min, max, AO, P, I, D, deviationLimit, fast);
+}
+void PID::_init(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
 	_min = min;
 	_max = max;
+
+	_fast = fast;
 
 	_deviationLimit = deviationLimit / 100.0;
 
@@ -55,7 +66,7 @@ bool PID::isDeviated() {
 
 void PID::loop(General &general) {
 	if (_active) {
-		if (general.t100ms) {
+		if (general.t100ms || _fast) {
 			float error = _sp - _value;
 			float prevError = error - _previousError;
 			_previousError = error;

@@ -34,6 +34,14 @@ float DO::activeTime() {
 	return ((float)_activeTime) / 10.0;
 }
 
+void DO::interlock(bool i0, bool i1, bool i2) {
+	_interlock = i0 || i1 || i2;
+	if (_interlock) {
+		_active = false;
+		_blinks = false;
+	}
+}
+
 void DO::loop(General &general, IO &io) {
 	if (_active) {
 		if (!_blinks || (_blinks && general.b1s)) {
