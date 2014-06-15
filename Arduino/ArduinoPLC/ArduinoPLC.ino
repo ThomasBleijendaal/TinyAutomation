@@ -51,13 +51,17 @@ M Ms[] = {
 #define TT_outside 3
 #define PT_atmosphere 4
 #define TT_atmosphere 5
+#define QT_light 6
+#define QT_light2 7
 AI AIs[] = {
     AI(-1, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0, false, 0, 1023),
     AI(-1, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0),
     AI(-1, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0),
     AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
     AI(-1, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0),
-    AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0)
+    AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
+    AI(0, 0.0, 100.0),
+    AI(1, 0.0, 100.0)
 };
 
 /* **************************************** */
@@ -132,10 +136,13 @@ void interruptProgram() {
         }
     }
     
-    Serial.println(AIs[TT_atmosphere].value());
-    Serial.println(AIs[TT_outside].value());
-    Serial.println(AIs[PT_atmosphere].value());
-    Serial.println(AIs[QT_outsideHumidity].value());
+//    Serial.println(AIs[TT_inside].value());
+//    Serial.println(AIs[TT_outside].value());
+//    Serial.println(AIs[TT_atmosphere].value());
+//    Serial.println(AIs[QT_outsideHumidity].value());
+
+//    Serial.println(AIs[QT_light].value());
+//    Serial.println(AIs[QT_light2].value());
 }
 
 void interlocks() {
