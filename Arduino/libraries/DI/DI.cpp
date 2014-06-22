@@ -71,4 +71,11 @@ void DI::loop(General &general) {
 		}
 		_active = false;
 	}
+
+	if (_activated || _deActivated)
+		general.stageSend(1,0,short((_active) ? 1 : 0),0.0,0.0,0.0);
+}
+
+void DI::recieveData(short cmd, float data1, float data2, float data3) {
+	
 }

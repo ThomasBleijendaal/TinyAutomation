@@ -83,6 +83,37 @@ void General::time() {
 	}
 }
 
+void General::send() {
+	if (_send) {
+		char buffer[18];
+		memcpy(buffer, &_sendBuffer[0], 18);
+
+		Serial.write(buffer, 18);
+
+		_send = false;
+	}
+}
+void General::read() {
+	//char buffer[18];
+
+//	if (Serial.available() > 0)
+	//	Serial.readBytes(buffer, 18);
+	
+//	memcpy(&readBuffer, buffer, 18);
+}
+void General::stageSend(int type, int nr, short status, float data1, float data2, float data3) {
+	dataSend newItem;
+	newItem.type = type;
+	newItem.nr = nr;
+	newItem.status = status;
+	newItem.data1 = data1;
+	newItem.data2 = data2;
+	newItem.data3 = data3;
+
+	_sendBuffer[0] = newItem;
+	_send = true;
+}
+
 
 int General::registerTimer(int millis) {
 	int id = -1;

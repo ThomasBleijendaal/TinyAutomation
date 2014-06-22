@@ -26,6 +26,7 @@ public:
 	void simulation(bool activate);
 
 	void loop(General &general);
+	void recieveData(short cmd, float data1, float data2, float data3);
 private:
 	void _init(int pin, bool NC);
 
