@@ -12,12 +12,49 @@ too high (hihi), high (hi), low (lo) or too low (lolo). Also computes a rolling 
 #include <AI.h>
 #include <General.h>
 
+struct AIdataStruct {
+	struct status {
+		bool lolo : 1;
+		bool lo : 1;
+		bool hi : 1;
+		bool hihi : 1;
+		bool bta : 1;
+		char spare : 3;
+		status() {
+			lolo = false;
+			lo = false;
+			hi = false;
+			hihi = false;
+			bta = false;
+			spare = 0;
+		}
+	} status;
+	struct cmd {
+		char spare : 8;
+		cmd() {
+			spare = 0;
+		}
+	} cmd;
+	float value;
+	float min;
+	float max;
+	char spare[2];
+
+	AIdataStruct() {
+		value = 0.0;
+		min = 0.0;
+		max = 0.0;
+		spare[0] = 0;
+		spare[1] = 0;
+	}
+};
+
 class AI {
 public:
-	AI(int pin);
-	AI(int pin, float rangeLow, float rangeHigh);
-	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
-	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
+	AI(int id, int pin);
+	AI(int id, int pin, float rangeLow, float rangeHigh);
+	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
+	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
 
 	bool lolo();
 	bool lo();
@@ -39,8 +76,9 @@ public:
 
 	void loop(General &general);
 private:
-	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
+	void _init(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
 
+	int _id;
 	int _pin;
 
 	int _raw;

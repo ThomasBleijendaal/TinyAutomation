@@ -27,9 +27,8 @@ General::General() {
 	cps = 0;
 	_cps = 0;
 
-	_customTimer[0] = 0;
-	_customTimer[1] = 0;
-	_customTimer[2] = 0;
+	_sendBufferI = -1;
+	_readBufferI = -1;
 }
 void General::time() {
 	unsigned long u = micros();
@@ -46,10 +45,6 @@ void General::time() {
 	t2_5ms = u - _t2_5ms >= 2500U;
 	if (t2_5ms || u < _t2_5ms) {
 		_t2_5ms = u;
-
-		int id = -1;
-		while (_customTimer[++id] > 0)
-			_customTimerActive[id] = ++_customTimerCounter[id] == _customTimer[id];
 
 		t100ms = ++_t100ms == 40;
 		if (t100ms) {
@@ -84,49 +79,39 @@ void General::time() {
 }
 
 void General::send() {
-	if (_send) {
-		char buffer[18];
-		memcpy(buffer, &_sendBuffer[0], 18);
+	while (_sendBufferI >= 0) {
+		char buffer[20];
 
-		Serial.write(buffer, 18);
+		memcpy(buffer, &_sendBuffer[_sendBufferI--], 20);
 
-		_send = false;
+		Serial.write(buffer, 20);
+
+		//commStruct empty;
+		//_sendBuffer[_sendBufferI--] = empty;
 	}
 }
 void General::read() {
-	//char buffer[18];
+	//char buffer[20];
+	//commStruct readItem;
 
 //	if (Serial.available() > 0)
-	//	Serial.readBytes(buffer, 18);
-	
-//	memcpy(&readBuffer, buffer, 18);
+	//	Serial.readBytes(buffer, 20);
+
+//	memcpy(&readItem, buffer, 20);
+
+	//_readBuffer[0] = readItem;
 }
-void General::stageSend(int type, int nr, short status, float data1, float data2, float data3) {
-	dataSend newItem;
+
+dataStruct General::readData(int type, int nr) {
+	dataStruct nothing;
+	return nothing;
+}
+void General::stageSend(int type, int nr, dataStruct data) {
+	commStruct newItem;
+
 	newItem.type = type;
 	newItem.nr = nr;
-	newItem.status = status;
-	newItem.data1 = data1;
-	newItem.data2 = data2;
-	newItem.data3 = data3;
+	newItem.data = data;
 
-	_sendBuffer[0] = newItem;
-	_send = true;
-}
-
-
-int General::registerTimer(int millis) {
-	int id = -1;
-
-	while (_customTimer[++id] != 0) {
-		if (id == 3)
-			return -1;
-	}
-
-	_customTimer[id] = int(float(millis) / 2.5);
-
-	return id;
-}
-bool General::timer(int id) {
-	return _customTimerActive[id % 3] && _t2_5ms;
+	_sendBuffer[++_sendBufferI] = newItem;
 }

@@ -1,13 +1,13 @@
 #include "Arduino.h"
 #include "DI.h"
 
-DI::DI(int pin) {
-	_init(pin, false);
+DI::DI(int id,int pin) {
+	_init(id, pin, false);
 }
-DI::DI(int pin, bool NC) {
-	_init(pin, NC);
+DI::DI(int id,int pin, bool NC) {
+	_init(id, pin, NC);
 }
-void DI::_init(int pin, bool NC) {
+void DI::_init(int id, int pin, bool NC) {
 	if (NC) {
 		pinMode(_pin, INPUT_PULLUP);
 	}
@@ -15,20 +15,13 @@ void DI::_init(int pin, bool NC) {
 	{
 		pinMode(_pin, INPUT);
 	}
+	_id = id;
 	_pin = pin;
 	_NC = NC;
 
 	_active = false;
 	_switchCount = 0U;
 	_activeTime = 0U;
-}
-
-void DI::simulate(bool activate) {
-	_simulation = activate;
-}
-
-void DI::simulation(bool activate) {
-	_simulationActive = activate;
 }
 
 bool DI::isActive() {
@@ -46,15 +39,16 @@ unsigned int DI::switchCount() {
 }
 
 float DI::activeTime() {
-	return ((float) _activeTime) / 10.0;
+	return float(_activeTime) / 10.0;
 }
 
 void DI::loop(General &general) {
 	int pinValue = digitalRead(_pin);
+
 	_activated = false;
 	_deActivated = false;
 
-	if (((pinValue == HIGH && !_NC) || (pinValue == LOW && _NC)) || (_simulation && _simulationActive)) {
+	if (((pinValue == HIGH && !_NC) || (pinValue == LOW && _NC))) {
 		if (!_active) {
 			_activated = true;
 			_switchCount++;
@@ -72,10 +66,14 @@ void DI::loop(General &general) {
 		_active = false;
 	}
 
-	if (_activated || _deActivated)
-		general.stageSend(1,0,short((_active) ? 1 : 0),0.0,0.0,0.0);
-}
+	if (_activated || _deActivated || general.t250ms) {
+		DIdataStruct data;
 
-void DI::recieveData(short cmd, float data1, float data2, float data3) {
-	
+		data.status.active = _active;
+
+		data.switchCount = _switchCount;
+		data.activeTime = activeTime();
+
+		general.stageSend(1, _id, *((dataStruct *)&data));
+	}
 }

@@ -1,56 +1,65 @@
 #!/usr/bin/python
 
+import DI
+import AI
+
 import serial
 import time
 import struct
+from tkinter import *
 
 print("Starting")
-
-def packInts(intList):
-    return struct.pack('h' * len(intList), *intList)
-def unpackInts(bytes):
-    return struct.unpack('3h', bytes)
-
-def packFloats(floatList):
-    return struct.pack('f' * len(floatList), *floatList)
-def unpackFloats(bytes):
-    return struct.unpack('3f', bytes)
 
 ser = serial.Serial('COM3', 115200)
 
 objectType = 0
-objectNr = 0
-cmd = 0
-status = 0
-previousStatus = 0
-clicks = 0
 
-data1 = 10.0
-data2 = 20.0
-data3 = 30.0
+master = Tk()
+w = Canvas(master, width=800, height=600)
+w.pack()
 
-intBytes = 6
-realBytes = 12
+button = DI.DigitalInput("Button",0,1,1)
+pressure = AI.AnalogInput("Pressure","mbar",0,5,1)
+temperature = AI.AnalogInput("Temperature","C",1,12,1)
+
+
+print(struct.calcsize('=3h3f'))
+
+print(struct.calcsize('3f'))
+
+print(struct.calcsize('3h'))
+
 
 time.sleep(5)
 
-while 1:
-    #intData = packInts([objectType, objectNr, cmd])
-    #realData = packFloats([data1, data2, data3])
+def cycle():
 
-    #intBytes = ser.write(intData)
-    #realBytes = ser.write(realData)
+    i = 0
 
-    #try:
-    objectType, objectNr, status = unpackInts(ser.read(intBytes))
-    data1, data2, data3 = unpackFloats(ser.read(realBytes))
-    #except:
-    #    print("Failure")
-    #    continue
+    while(ser.inWaiting() > 0 and ++i < 10):
+        allBytes = ser.read(20)
 
-    if previousStatus != status:
-        print("BUTTON ")
-        clicks += 1
-        print(clicks)
-        previousStatus = status
+
+        allBytesSplit = struct.unpack('10h',allBytes)
+        objectType = allBytesSplit[0]
+
+        if objectType == 1:
+            button.handleData(allBytes)
+        if objectType == 2:
+            pressure.handleData(allBytes)
+            temperature.handleData(allBytes)
+
+    w.delete(ALL)
+
+    button.draw(w)
+    pressure.draw(w)
+    temperature.draw(w)
+
+    master.after(100,cycle)
+
+try:
+    master.after(100,cycle)
+    mainloop()
+except:
+    exit()
 

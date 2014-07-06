@@ -11,23 +11,19 @@ Includes
 
 #include <General.h>
 
-
-struct dataRead {
-	int type;
-	int nr;
-	short cmd;
-	float data1;
-	float data2;
-	float data3;
+struct dataStruct {
+	char data[16];
 };
 
-struct dataSend {
+struct commStruct {
 	int type;
 	int nr;
-	short status;
-	float data1;
-	float data2;
-	float data3;
+	dataStruct data;
+
+	commStruct() {
+		type = 0;
+		nr = 0;
+	}
 };
 
 class General {
@@ -44,18 +40,15 @@ class General {
 
 		bool b1s;
 
-		int registerTimer(int millis);
-		bool timer(int id);
-
 		unsigned long cps;
 
 		void time();
 
 		void send();
 		void read();
-		void stageSend(int type, int nr, short cmd, float data1, float data2, float data3);
 
-		dataRead readBuffer;
+		dataStruct readData(int type, int nr);
+		void stageSend(int type, int nr, dataStruct data);
     
 	private:
 		unsigned long _t2_5ms;
@@ -66,12 +59,13 @@ class General {
 		int _t1m;
 		int _t5m;
 		
-		int _customTimer[3];
-		int _customTimerCounter[3];
-		bool _customTimerActive[3];
+		int _sendBufferI;
+		int _readBufferI;
 
 		bool _send;
-		dataSend _sendBuffer[10];
+
+		commStruct _sendBuffer[5];
+		commStruct _readBuffer[5];
 
 		unsigned long _cps;
 };

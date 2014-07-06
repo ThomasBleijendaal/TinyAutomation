@@ -10,10 +10,42 @@ Reads a digital input. Counts the times the input is turned on and the duration 
 #include <DI.h>
 #include <General.h>
 
+struct DIdataStruct {
+	struct status {
+		bool active : 1;
+		char spare : 7;
+		status() {
+			active = false;
+			spare = 0;
+		}
+	} status;
+	struct cmd {
+		char spare : 8;
+		cmd() {
+			spare = 0;
+		}
+	} cmd;
+	int switchCount;
+	float activeTime;
+	char spare[8];
+
+	DIdataStruct() {
+		switchCount = 0;
+		activeTime = 100.0;
+		spare[0] = 0;
+		spare[1] = 0;
+		spare[2] = 0;
+		spare[3] = 0;
+		spare[4] = 0;
+		spare[5] = 0;
+		spare[6] = 0;
+		spare[7] = 0;
+	}
+};
 class DI {
 public:
-	DI(int pin);
-	DI(int pin, bool NC);
+	DI(int id, int pin);
+	DI(int id, int pin, bool NC);
 
 	bool isActive();
 	bool activated();
@@ -22,24 +54,18 @@ public:
 	unsigned int switchCount();
 	float activeTime();
 		
-	void simulate(bool activate);
-	void simulation(bool activate);
-
 	void loop(General &general);
-	void recieveData(short cmd, float data1, float data2, float data3);
 private:
-	void _init(int pin, bool NC);
+	void _init(int id, int pin, bool NC);
 
 	int _pin;
+	int _id;
 	
 	bool _NC;
 		
 	bool _active;
 	bool _activated;
 	bool _deActivated;
-
-	bool _simulation;
-	bool _simulationActive;
 
 	unsigned int _switchCount;
 	unsigned int _activeTime;

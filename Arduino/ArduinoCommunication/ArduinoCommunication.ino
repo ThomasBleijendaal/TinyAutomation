@@ -5,44 +5,63 @@
 #include <M.h>
 #include <PID.h>
 #include <General.h>
+#include <Wire.h>
+#include <SFE_BMP180.h>
 #include <IO.h>
 
 /* **************************************** */
 General general;
 IO io;
 
+SFE_BMP180 PT_barometricPressureSensor;
+
 #define button 0
 DI DIs[] = {
-    DI(11,true)
+    DI(button,11,true)
 };
 
 DO DOs[] = {};
-AI AIs[] = {};
+
+#define PT_atmosphere 0
+#define TT_atmosphere 1
+AI AIs[] = {
+    AI(PT_atmosphere,-1, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0),
+    AI(TT_atmosphere,-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0)
+};
 AO AOs[] = {};
 PID PIDs[] = {};
 M Ms[] = {};
 
 void setup() {
     Serial.begin(115200);
+    PT_barometricPressureSensor.begin();
     
 }
+
+float value = 0.0;
 
 void loop() {
     general.time();
     
     if(general.t5s) {
-    //    interruptProgram();
+        interruptProgram();
     }
+    if(general.t100ms) {
     
+    //Serial.println(AIs[0].value());
+    //Serial.println(AIs[1].value());
+    }
     program();
     interlocks();
     
+    
+    //AIs[PT_atmosphere].setValue(++value);
     
     loopTypicals();
     
     
     general.send();
-    io.write();
+    //io.write();
     
     /*
     if(Serial.available() > 0) {
@@ -67,6 +86,28 @@ void program() {
 }
 void interlocks() {
     
+}
+void interruptProgram() {
+    char status;
+    double T, P;
+    
+    status = PT_barometricPressureSensor.startTemperature();
+    if (status != 0) {
+        delay(status);
+        status = PT_barometricPressureSensor.getTemperature(T);
+        if (status != 0) {
+            AIs[TT_atmosphere].setValue(T);
+            status = PT_barometricPressureSensor.startPressure(3);
+            if (status != 0) {
+                delay(status);
+
+                status = PT_barometricPressureSensor.getPressure(P,T);
+                if (status != 0) {
+                    AIs[PT_atmosphere].setValue(P);
+                }
+            }
+        }
+    }
 }
 
 
