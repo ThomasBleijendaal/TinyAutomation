@@ -18,7 +18,6 @@ TODO:
 class M {
 public:
 	M();
-	M(int customTimerId);
 	
 	void singleCoil(int pin0, int pin1);
 	void doubleCoil(int pin0, int pin1, int pin2, int pin3);
@@ -35,8 +34,6 @@ public:
 
 	void loop(General &general, IO &io);
 private:
-	void _init(int customTimerId);
-
 	int _pin[4];
 	int _seq;
 	int _maxPins;
@@ -46,8 +43,6 @@ private:
 	bool _wasActive;
 	bool _interlock1;
 	bool _interlock2;
-
-	int _customTimerId;
 
 	unsigned int _startCount;
 	unsigned int _activeTime;

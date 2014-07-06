@@ -2,19 +2,12 @@
 #include "M.h"
 
 M::M() {
-	_init(-1);
-}
-M::M(int customTimerId) {
-	_init(customTimerId);
-}
-void M::_init(int customTimerId) {
 	_active = false;
 	_maxPins = 0;
 	_seq = 0;
 	_wasActive = false;
 	_startCount = 0U;
 	_activeTime = 0U;
-	_customTimerId = customTimerId;
 }
 
 void M::singleCoil(int pin0, int pin1) {
@@ -69,7 +62,7 @@ float M::activeTime() {
 
 void M::loop(General &general, IO &io) {
 	if (_active) {
-		if (general.t2_5ms) { //_customTimerId == -1 && general.t2_5ms || _customTimerId > -1 && general.timer(_customTimerId)) {
+		if (general.t2_5ms) {
 			if (!_reverse) {
 				_seq = (_seq + 1) % _maxPins;
 			}
