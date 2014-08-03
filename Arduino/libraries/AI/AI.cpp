@@ -78,7 +78,9 @@ void AI::loop(General &general) {
 		if (general.t100ms) {
 			_avg = ((_avg * 99.0) + _value) / 100.0;
 		}
-		if (general.t250ms) {
+		if ((_pin != -1 && general.t250ms) || (_pin == -1 and general.t1s)) {
+			_previousValue = _value;
+
 			AIdataStruct data;
 
 			data.status.lolo = _isLolo;
@@ -91,14 +93,14 @@ void AI::loop(General &general) {
 			data.min = _min;
 			data.max = _max;
 
-			general.stageSend(2, _id, *((dataStruct *)&data));
+			general.stageSend(typeAI, _id, *((dataStruct *)&data));
 		}
 	}
 }
 
 void AI::enable(bool enable) { _enable = enable; }
 
-void AI::setValue(float value) { if (_pin == -1) { _value = max(_rangeLow, min(_rangeHigh, value)); _firstValueSet = true; } }
+void AI::setValue(float value) { if (_pin == -1 && value == value) { _value = max(_rangeLow, min(_rangeHigh, value)); _firstValueSet = true; } }
 
 float AI::rangeLow() { return _rangeLow; }
 float AI::rangeHigh() { return _rangeHigh; }

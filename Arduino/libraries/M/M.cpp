@@ -1,13 +1,14 @@
 #include "Arduino.h"
 #include "M.h"
 
-M::M() {
+M::M(int id) {
 	_active = false;
 	_maxPins = 0;
 	_seq = 0;
 	_wasActive = false;
 	_startCount = 0U;
 	_activeTime = 0U;
+	_id = id;
 }
 
 void M::singleCoil(int pin0, int pin1) {
@@ -81,6 +82,20 @@ void M::loop(General &general, IO &io) {
 	else {
 		_seq = -1;
 		_wasActive = false;
+	}
+
+	if (general.t100ms) {
+		MdataStruct data;
+
+		data.status.active = _active;
+		data.status.reverse = _reverse;
+		data.status.interlock = _interlock1;
+		data.status.interlockReverse = _interlock2;
+
+		data.startCount = _startCount;
+		data.activeTime = _activeTime;
+
+		general.stageSend(typeM, _id, *((dataStruct *)&data));
 	}
 
 	for (int i = 0; i < _maxPins; ++i) {

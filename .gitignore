@@ -1,0 +1,4 @@
+*.sublime-project
+*.sublime-workspace
+RaspberryPi/SCADA/sftp-config.json
+*.idea

@@ -15,9 +15,47 @@ TODO:
 #include <General.h>
 #include <IO.h>
 
+struct MdataStruct {
+	struct status {
+		bool active : 1;
+		bool reverse : 1;
+		bool interlock : 1;
+		bool interlockReverse : 1;
+		char spare : 4;
+		status() {
+			active = false;
+			reverse = false;
+			interlock = false;
+			interlockReverse = false;
+			spare = 0;
+		}
+	} status;
+	struct cmd {
+		char spare : 8;
+		cmd() {
+			spare = 0;
+		}
+	} cmd;
+	int startCount;
+	float activeTime;
+	char spare[8];
+
+	MdataStruct() {
+		startCount = 0;
+		activeTime = 0.0;
+		spare[0] = 0;
+		spare[1] = 0;
+		spare[2] = 0;
+		spare[3] = 0;
+		spare[4] = 0;
+		spare[5] = 0;
+		spare[6] = 0;
+		spare[7] = 0;
+	}
+};
 class M {
 public:
-	M();
+	M(int id);
 	
 	void singleCoil(int pin0, int pin1);
 	void doubleCoil(int pin0, int pin1, int pin2, int pin3);
@@ -34,6 +72,7 @@ public:
 
 	void loop(General &general, IO &io);
 private:
+	int _id;
 	int _pin[4];
 	int _seq;
 	int _maxPins;

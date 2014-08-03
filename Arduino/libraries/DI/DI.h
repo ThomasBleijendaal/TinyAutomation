@@ -31,7 +31,7 @@ struct DIdataStruct {
 
 	DIdataStruct() {
 		switchCount = 0;
-		activeTime = 100.0;
+		activeTime = 0.0;
 		spare[0] = 0;
 		spare[1] = 0;
 		spare[2] = 0;

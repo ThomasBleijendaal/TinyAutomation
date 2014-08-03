@@ -24,23 +24,25 @@ SFE_BMP180 PT_barometricPressureSensor;
 /* **************************************** */
 #define LS_open 0
 #define LS_closed 1
-#define button 2
+#define LS_lidClosed 2
 DI DIs[] = {
-    DI(12,true),DI(13,true),DI(11,true)
+    DI(LS_open,12,true),DI(LS_closed,13,true),DI(LS_lidClosed,3,true)
 };
 
 /* **************************************** */
 #define M_evacuator 0
 #define M_agitator 1
+#define X_generalFailure 2
 DO DOs[] = {
     DO(100),
-    DO(101)
+    DO(101),
+    DO(102)
 };
 
 /* **************************************** */
 #define M_hatch 0
 M Ms[] = {
-    M()
+    M(M_hatch)
 };
 
 /* **************************************** */
@@ -54,14 +56,14 @@ M Ms[] = {
 #define QT_light 6
 #define QT_light2 7
 AI AIs[] = {
-    AI(-1, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0, false, 0, 1023),
-    AI(-1, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0),
-    AI(-1, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0),
-    AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
-    AI(-1, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0),
-    AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
-    AI(0, 0.0, 100.0),
-    AI(1, 0.0, 100.0)
+    AI(QT_insideHumidity, -1, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0, false, 0, 1023),
+    AI(QT_outsideHumidity, -1, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0),
+    AI(TT_inside, -1, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0),
+    AI(TT_outside, -1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
+    AI(PT_atmosphere, -1, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0),
+    AI(TT_atmosphere, -1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
+    AI(QT_light, 0, 0.0, 100.0),
+    AI(QT_light2, 1, 0.0, 100.0)
 };
 
 /* **************************************** */
@@ -74,7 +76,7 @@ PID PIDs[] = {
 };
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     
     io.setRegisterOut(2,7,4,1);
     
@@ -95,6 +97,7 @@ void loop() {
     
     loopTypicals();
     
+    general.send();   
     io.write();
 }
 
@@ -102,7 +105,8 @@ void loop() {
 
 bool vent = false;
 void program() {
-    vent = DIs[button].isActive();
+    vent = DIs[LS_lidClosed].isActive();
+    DOs[X_generalFailure].activate(vent);
     
     ventilate(vent);
     
@@ -122,27 +126,19 @@ void interruptProgram() {
     if (status != 0) {
         delay(status);
         status = PT_barometricPressureSensor.getTemperature(T);
-        if (status != 0) {
+        if (status != 0 && T == T) {
             AIs[TT_atmosphere].setValue(T);
             status = PT_barometricPressureSensor.startPressure(3);
             if (status != 0) {
                 delay(status);
 
                 status = PT_barometricPressureSensor.getPressure(P,T);
-                if (status != 0) {
+                if (status != 0 && P == P) {
                     AIs[PT_atmosphere].setValue(P);
                 }
             }
         }
     }
-    
-//    Serial.println(AIs[TT_inside].value());
-//    Serial.println(AIs[TT_outside].value());
-//    Serial.println(AIs[TT_atmosphere].value());
-//    Serial.println(AIs[QT_outsideHumidity].value());
-
-//    Serial.println(AIs[QT_light].value());
-//    Serial.println(AIs[QT_light2].value());
 }
 
 void interlocks() {
@@ -154,7 +150,7 @@ void ventilate(bool ventilate) {
     bool endPosition = (ventilate && DIs[LS_open].isActive()) || (!ventilate && DIs[LS_closed].isActive());
     
     Ms[M_hatch].activate(!endPosition,!ventilate);
-    DOs[M_evacuator].activate(endPosition && ventilate);
+    //DOs[M_evacuator].activate(endPosition && ventilate);
 }
 
 /* **************************************** */

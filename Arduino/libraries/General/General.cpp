@@ -27,8 +27,8 @@ General::General() {
 	cps = 0;
 	_cps = 0;
 
-	_sendBufferI = -1;
-	_readBufferI = -1;
+	//_sendBufferI = -1;
+	//_readBufferI = -1;
 }
 void General::time() {
 	unsigned long u = micros();
@@ -79,7 +79,7 @@ void General::time() {
 }
 
 void General::send() {
-	while (_sendBufferI >= 0) {
+	/*while (_sendBufferI >= 0) {
 		char buffer[20];
 
 		memcpy(buffer, &_sendBuffer[_sendBufferI--], 20);
@@ -88,7 +88,7 @@ void General::send() {
 
 		//commStruct empty;
 		//_sendBuffer[_sendBufferI--] = empty;
-	}
+	}*/
 }
 void General::read() {
 	//char buffer[20];
@@ -107,11 +107,19 @@ dataStruct General::readData(int type, int nr) {
 	return nothing;
 }
 void General::stageSend(int type, int nr, dataStruct data) {
+	//if (_sendBufferI > 9)
+	//	return;
+	
 	commStruct newItem;
 
 	newItem.type = type;
 	newItem.nr = nr;
 	newItem.data = data;
 
-	_sendBuffer[++_sendBufferI] = newItem;
+	char buffer[24];
+	memcpy(buffer, &newItem, 24);
+
+	Serial.write(buffer, 24);
+	
+	//_sendBuffer[++_sendBufferI] = newItem;
 }

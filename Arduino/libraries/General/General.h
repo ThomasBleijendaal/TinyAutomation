@@ -16,15 +16,23 @@ struct dataStruct {
 };
 
 struct commStruct {
+	int header;
 	int type;
 	int nr;
 	dataStruct data;
+	int footer;
 
 	commStruct() {
+		header = 1234;
 		type = 0;
 		nr = 0;
+		footer = 4321;
 	}
 };
+
+const int typeDI = 1;
+const int typeAI = 2;
+const int typeM = 3;
 
 class General {
     public:
@@ -64,8 +72,8 @@ class General {
 
 		bool _send;
 
-		commStruct _sendBuffer[5];
-		commStruct _readBuffer[5];
+		//commStruct _sendBuffer[];
+		//commStruct _readBuffer[1];
 
 		unsigned long _cps;
 };

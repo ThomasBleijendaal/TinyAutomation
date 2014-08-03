@@ -66,7 +66,7 @@ void DI::loop(General &general) {
 		_active = false;
 	}
 
-	if (_activated || _deActivated || general.t250ms) {
+	if (_activated || _deActivated || general.t1s) {
 		DIdataStruct data;
 
 		data.status.active = _active;
@@ -74,6 +74,6 @@ void DI::loop(General &general) {
 		data.switchCount = _switchCount;
 		data.activeTime = activeTime();
 
-		general.stageSend(1, _id, *((dataStruct *)&data));
+		general.stageSend(typeDI, _id, *((dataStruct *)&data));
 	}
 }

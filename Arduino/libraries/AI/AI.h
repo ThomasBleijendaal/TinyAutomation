@@ -86,6 +86,7 @@ private:
 	int _rawHigh;
 
 	float _value;
+	float _previousValue;
 	float _rangeLow;
 	float _rangeHigh;
 
