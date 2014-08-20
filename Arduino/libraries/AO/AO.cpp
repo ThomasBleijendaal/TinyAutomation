@@ -2,16 +2,17 @@
 #include "AO.h"
 
 
-AO::AO(int pin) {
-	_init(pin, 0.0, 100.0, -1);
+AO::AO(int id, int pin) {
+	_init(id, pin, 0.0, 100.0, -1.0);
 }
-AO::AO(int pin, float min, float max) {
-	_init(pin, min, max, -1);
+AO::AO(int id, int pin, float min, float max) {
+	_init(id, pin, min, max, -1.0);
 }
-AO::AO(int pin, float min, float max, float rate) {
-	_init(pin, min, max, rate);
+AO::AO(int id, int pin, float min, float max, float rate) {
+	_init(id, pin, min, max, rate);
 }
-void AO::_init(int pin, float min, float max, float rate) {
+void AO::_init(int id, int pin, float min, float max, float rate) {
+	_id = id;
 	_pin = pin;
 
 	pinMode(_pin, OUTPUT);
@@ -65,6 +66,7 @@ void AO::interlock(bool i0, bool i1, bool i2) {
 
 void AO::loop(General &general) {
 	int sp = max(_min, min(_max, _output));
+	bool stateChanged = false;
 
 	if (_active) {
 		if (_rate != -1 && general.t100ms) {
@@ -90,12 +92,32 @@ void AO::loop(General &general) {
 		}
 
 		analogWrite(_pin, (int)(_currentOutput * 2.55));
+
+		if (!_wasActive) {
+			_startCount++;
+			stateChanged = true;
+			_wasActive = true;
+		}
 	}
-	else{
+	else if (_wasActive) {
+		stateChanged = true;
+		_wasActive = false;
+
 		_currentOutput = _min;
 
 		analogWrite(_pin, 0);
 	}
 	
+	if (stateChanged || general.t1s) {
+		AOdataStruct data;
 
+		data.status.active = _active;
+		data.status.interlock = _interlock;
+
+		data.startCount = _startCount;
+		data.activeTime = activeTime();
+		data.output = _currentOutput;
+
+		general.stageSend(typeAO, _id, *((dataStruct *)&data));
+	}
 }

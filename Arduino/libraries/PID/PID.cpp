@@ -1,16 +1,18 @@
 #include "Arduino.h"
 #include "PID.h"
 
-PID::PID(int AI, float min, float max, int AO, float P, float I, float D) {
-	_init(AI, min, max, AO, P, I, D, 0.0, false);
+PID::PID(int id, int AI, float min, float max, int AO, float P, float I, float D) {
+	_init(id, AI, min, max, AO, P, I, D, 1000.0, false);
 }
-PID::PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit) {
-	_init(AI, min, max, AO, P, I, D, deviationLimit, false);
+PID::PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit) {
+	_init(id, AI, min, max, AO, P, I, D, deviationLimit, false);
 }
-PID::PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
-	_init(AI, min, max, AO, P, I, D, deviationLimit, fast);
+PID::PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
+	_init(id, AI, min, max, AO, P, I, D, deviationLimit, fast);
 }
-void PID::_init(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
+void PID::_init(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
+	_id = id;
+	
 	_min = min;
 	_max = max;
 
@@ -65,8 +67,13 @@ bool PID::isDeviated() {
 }
 
 void PID::loop(General &general) {
+	bool stateChanged = false;
+
 	if (_active) {
 		if (general.t100ms || _fast) {
+			if (!_wasActive) {
+				_wasActive = stateChanged = true;
+			}
 			float error = _sp - _value;
 			float prevError = error - _previousError;
 			_previousError = error;
@@ -80,13 +87,35 @@ void PID::loop(General &general) {
 		if (abs(_sp - _value) >= (_max - _min) * _deviationLimit) {
 			if (general.t1s)
 				_deviated = ++_devDelay >= 5;
+
+			if (_deviated && !_wasDeviated)
+				stateChanged = _wasDeviated = true;
 		}
 		else {
 			_deviated = false;
+			
+			stateChanged = stateChanged || _wasDeviated;
+			_wasDeviated = false;
+
 			_devDelay = 0;
 		}
 	}
 	else {
+		stateChanged = _wasActive;
+		_wasActive = false;
+
 		_output = 0.0;
+	}
+
+	if (general.t1s || stateChanged) {
+		PIDdataStruct data;
+
+		data.status.active = _active;
+		data.status.deviated = _deviated;
+		data.status.fast = _fast;
+
+		data.sp = _sp;
+
+		general.stageSend(typePID, _id, *((dataStruct *)&data));
 	}
 }

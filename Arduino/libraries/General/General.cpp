@@ -109,7 +109,7 @@ dataStruct General::readData(int type, int nr) {
 void General::stageSend(int type, int nr, dataStruct data) {
 	//if (_sendBufferI > 9)
 	//	return;
-	
+
 	commStruct newItem;
 
 	newItem.type = type;

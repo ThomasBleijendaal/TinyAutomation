@@ -27,7 +27,7 @@ void M::doubleCoil(int pin0, int pin1, int pin2, int pin3) {
 
 void M::activate(bool act, bool reverse) {
 	_active = act;
-	_reverse = reverse;
+	_reverse = act && reverse;
 }
 void M::activate(bool act) {
 	activate(act, false);
@@ -41,7 +41,6 @@ void M::interlock(bool i0, bool i1, bool i2, bool i3, bool i4, bool i5) {
 	_interlock2 = i3 || i4 || i5;
 	if (_interlock2 && _reverse)
 		_active = false;
-
 }
 void M::interlock(bool i0, bool i1, bool i2) {
 	_interlock1 = i0 || i1 || i2;
@@ -62,6 +61,8 @@ float M::activeTime() {
 }
 
 void M::loop(General &general, IO &io) {
+	bool stateChanged = false;
+
 	if (_active) {
 		if (general.t2_5ms) {
 			if (!_reverse) {
@@ -73,6 +74,7 @@ void M::loop(General &general, IO &io) {
 		}
 		if (!_wasActive) {
 			_startCount++;
+			stateChanged = true;
 			_wasActive = true;
 		}
 		if (general.t100ms) {
@@ -81,14 +83,15 @@ void M::loop(General &general, IO &io) {
 	}
 	else {
 		_seq = -1;
+		stateChanged = _wasActive;
 		_wasActive = false;
 	}
 
-	if (general.t100ms) {
+	if (stateChanged || general.t1s) {
 		MdataStruct data;
 
 		data.status.active = _active;
-		data.status.reverse = _reverse;
+		data.status.reverse = _reverse && _active;
 		data.status.interlock = _interlock1;
 		data.status.interlockReverse = _interlock2;
 

@@ -1,39 +1,36 @@
 import struct
 
-class Motor(object):
+class AnalogOutput(object):
     _active = False
-    _reverse = False
     _interlock = False
-    _interlockReverse = False
-
     _startCount = 0
     _activeTime = 0.0
+    _output = 0.0
 
     _width = 6
     _height = 1
 
-    def __init__(self, name, i, positionX, positionY):
+    def __init__(self, name, units, i, positionX, positionY):
         self.name = name
+        self.units = units
         self.i = i
         self.positionX = positionX
         self.positionY = positionY
     def __del__(self):
-        print("M destroyed")
+        print("AO destroyed")
 
+    def handleData(self,data):
+        objectType, objectNr, statusCmd, startCount, activeTime, output, dummy2 = struct.unpack('=4h3f', data)
 
-    def handleData(self, data):
-        objectType, objectNr, statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=4h3f', data)
         if objectNr == self.i:
-            self._active = statusCmd & 0x01
-            self._reverse = statusCmd & 0x02
-            self._interlock = statusCmd & 0x04
-            self._interlockReverse = statusCmd & 0x08
+            self._active = bool(statusCmd & 1)
+            self._interlock = bool(statusCmd & 2)
+
             self._startCount = startCount
             self._activeTime = activeTime
-
+            self._output = output
 
     def draw(self,w):
-
         w.create_text(
             self.positionX * 20,
             self.positionY * 20 - 15,
@@ -41,12 +38,11 @@ class Motor(object):
             text=self.name,
             fill="#808080"
         )
-
         w.create_rectangle(
             self.positionX * 20,
-            (self.positionY + self._height) * 20,
+            (self.positionY + 1) * 20,
             (self._width + self.positionX) * 20,
-            (self._height + 2 + self.positionY) * 20,
+            60 + self.positionY * 20,
             fill = "",
             outline = "#808080"
         )
@@ -56,31 +52,35 @@ class Motor(object):
             self.positionY * 20,
             (self._width + self.positionX) * 20,
             (self._height + self.positionY) * 20,
-            fill = "#00ff00"
-                if self._active or self._reverse else "#0080d0"
-                if self._interlock or self._interlockReverse
-                else "#808080",
+            fill = "#00ff00" if self._active else "#0080d0" if self._interlock else "#808080",
             outline = "#404040"
         )
 
-        if self._interlock or self._interlockReverse:
+        if self._interlock:
             w.create_text(
                 (self.positionX + self._width) * 20 - 5,
                 self.positionY * 20 + 3,
                 anchor="ne",
-                text="ITL" if self._interlock and self._interlockReverse else "forward ITL" if self._interlock else "reverse ITL",
+                text="ITL",
                 fill="#000000"
             )
 
         w.create_text(
             self.positionX * 20 + 5,
-            (self.positionY + self._height) * 20 + 3,
+            self.positionY * 20 + 3,
             anchor="nw",
-            text=str(self._startCount) + " x"
+            text=str(round(self._output,1)) + " " + self.units
         )
         w.create_text(
             self.positionX * 20 + 5,
-            (self.positionY + self._height + 1) * 20 + 3,
+            (self.positionY + 1) * 20 + 3,
             anchor="nw",
             text=str(round(self._activeTime,1)) + " s"
         )
+        w.create_text(
+            self.positionX * 20 + 5,
+            (self.positionY + 2) * 20 + 3,
+            anchor="nw",
+            text=str(round(self._startCount,1)) + " x"
+        )
+

@@ -33,6 +33,9 @@ struct commStruct {
 const int typeDI = 1;
 const int typeAI = 2;
 const int typeM = 3;
+const int typeDO = 4;
+const int typeAO = 5;
+const int typePID = 6;
 
 class General {
     public:

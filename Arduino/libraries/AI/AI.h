@@ -55,6 +55,7 @@ public:
 	AI(int id, int pin, float rangeLow, float rangeHigh);
 	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
 	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
+	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
 
 	bool lolo();
 	bool lo();
@@ -76,7 +77,7 @@ public:
 
 	void loop(General &general);
 private:
-	void _init(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
+	void _init(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
 
 	int _id;
 	int _pin;
@@ -111,6 +112,7 @@ private:
 	bool _isHi;
 	bool _isHihi;
 	bool _isBTA;
+	bool _damping;
 
 	bool _firstCycle;
 	bool _firstValueSet;

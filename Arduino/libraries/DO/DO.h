@@ -11,12 +11,46 @@ Writes a digitial output. Set the output according to its active state, counts t
 #include <General.h>
 #include <IO.h>
 
+struct DOdataStruct {
+	struct status {
+		bool active : 1;
+		bool interlock : 1;
+		char spare : 6;
+		status() {
+			active = false;
+			spare = 0;
+		}
+	} status;
+	struct cmd {
+		char spare : 8;
+		cmd() {
+			spare = 0;
+		}
+	} cmd;
+	int startCount;
+	float activeTime;
+	char spare[8];
+
+	DOdataStruct() {
+		startCount = 0;
+		activeTime = 0.0;
+		spare[0] = 0;
+		spare[1] = 0;
+		spare[2] = 0;
+		spare[3] = 0;
+		spare[4] = 0;
+		spare[5] = 0;
+		spare[6] = 0;
+		spare[7] = 0;
+	}
+};
+
 class DO {
 public:
-	DO(int pin);
+	DO(int id,int pin);
 	
 	bool isActive();
-	unsigned int switchCount();
+	unsigned int startCount();
 	float activeTime();
 
 	void activate(bool activate);
@@ -27,13 +61,14 @@ public:
 	void loop(General &general, IO &io);
 private:
 	int _pin;
+	int _id;
 
 	bool _interlock;
 	bool _active;
 	bool _blinks;
 	bool _wasActive;
 
-	unsigned int _switchCount;
+	unsigned int _startCount;
 	unsigned int _activeTime;
 };
 

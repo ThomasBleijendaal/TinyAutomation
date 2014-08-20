@@ -42,6 +42,7 @@ struct DIdataStruct {
 		spare[7] = 0;
 	}
 };
+
 class DI {
 public:
 	DI(int id, int pin);

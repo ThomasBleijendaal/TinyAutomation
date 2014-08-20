@@ -2,19 +2,22 @@
 #include "AI.h"
 
 AI::AI(int id, int pin) {
-	_init(id, pin, 0.0, 100.0, -1.0, -1.0, 101.0, 101.0, false, 0, 1023);
+	_init(id, pin, 0.0, 100.0, -1.0, -1.0, 101.0, 101.0, false, 0, 1023, false);
 }
 AI::AI(int id, int pin, float rangeLow, float rangeHigh) {
-	_init(id, pin, rangeLow, rangeHigh, rangeLow - 1.0, rangeLow - 1.0, rangeHigh + 1.0, rangeHigh + 1.0, false, 0, 1023);
+	_init(id, pin, rangeLow, rangeHigh, rangeLow - 1.0, rangeLow - 1.0, rangeHigh + 1.0, rangeHigh + 1.0, false, 0, 1023, false);
 }
 AI::AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi) {
-	_init(id, pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, false, 0, 1023);
+	_init(id, pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, false, 0, 1023, false);
 }
 AI::AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh) {
-	_init(id, pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, enableBTA, rawLow, rawHigh);
+	_init(id, pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, enableBTA, rawLow, rawHigh, false);
+}
+AI::AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping) {
+	_init(id, pin, rangeLow, rangeHigh, lolo, lo, hi, hihi, enableBTA, rawLow, rawHigh, damping);
 }
 
-void AI::_init(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh) {
+void AI::_init(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping) {
 	_id = id;
 	_pin = pin;
 
@@ -36,6 +39,8 @@ void AI::_init(int id, int pin, float rangeLow, float rangeHigh, float lolo, flo
 	_enableHihi = (hihi < rangeHigh);
 	_enableBTA = enableBTA;
 
+	_damping = damping;
+
 	_raw = 0;
 	_value = 0.0;
 
@@ -52,7 +57,12 @@ void AI::loop(General &general) {
 		if (_enable)
 			_raw = analogRead(_pin);
 
-		_value = ((float)(_raw - _rawLow)) * ((_rangeHigh - _rangeLow) / ((float)(_rawHigh - _rawLow))) + _rangeLow;
+		float value = ((float)(_raw - _rawLow)) * ((_rangeHigh - _rangeLow) / ((float)(_rawHigh - _rawLow))) + _rangeLow;
+		
+		if (_damping)
+			_value = ((9.0 * _value) + value) / 10.0;
+		else
+			_value = value;
 	}
 
 	if (_firstCycle || (_pin == -1 && !_firstValueSet)) {
@@ -69,10 +79,10 @@ void AI::loop(General &general) {
 
 		float delta = (_rangeHigh - _rangeLow) * 0.01;
 
-		_isLolo = _enableLolo && (_isLolo || _value < _lolo) && _value <= _lolo + delta;
-		_isLo = _enableLo && (_isLo || _value < _lo) && _value <= _lo + delta;
-		_isHi = _enableHi && (_isHi || _value > _hi) && _value >= _hi - delta;
-		_isHihi = _enableHihi && (_isHihi || _value > _hihi) && _value >= _hihi - delta;
+		_isLolo = _enableLolo && (_isLolo || _value < _lolo) && _value <= _lolo - delta;
+		_isLo = _enableLo && (_isLo || _value < _lo) && _value <= _lo - delta;
+		_isHi = _enableHi && (_isHi || _value > _hi) && _value >= _hi + delta;
+		_isHihi = _enableHihi && (_isHihi || _value > _hihi) && _value >= _hihi + delta;
 		_isBTA = _enableBTA && (_isBTA || _value <= _rangeLow || _value >= _rangeHigh) && (_value <= _rangeLow + delta || _value >= _rangeHigh - delta);
 
 		if (general.t100ms) {

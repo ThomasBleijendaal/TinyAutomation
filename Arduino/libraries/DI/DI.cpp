@@ -59,10 +59,7 @@ void DI::loop(General &general) {
 		}
 	}
 	else {
-		if (_active)
-		{
-			_deActivated = true;
-		}
+		_deActivated = _active;
 		_active = false;
 	}
 

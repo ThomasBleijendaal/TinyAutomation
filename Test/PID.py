@@ -1,32 +1,34 @@
 import struct
 
-class DigitalInput(object):
+class PIDController(object):
     _active = False
-    _count = 0
-    _activeTime = 0.0
+    _deviated = False
+    _fast = False
+    _sp = 0.0
 
-    _width = 3
+    _width = 6
     _height = 1
 
-    def __init__(self, name, i, positionX, positionY):
+    def __init__(self, name, units, i, positionX, positionY):
         self.name = name
+        self.units = units
         self.i = i
         self.positionX = positionX
         self.positionY = positionY
     def __del__(self):
-        print("DI destroyed")
+        print("PID destroyed")
 
+    def handleData(self,data):
+        objectType, objectNr, statusCmd, sp, dummy0, dummy1, dummy2 = struct.unpack('=3h3f1h', data)
 
-    def handleData(self, data):
-        objectType, objectNr, statusCmd, switchCount, activeTime, dummy1, dummy2 = struct.unpack('=4h3f', data)
         if objectNr == self.i:
-            self._active = statusCmd == 1
-            self._count = switchCount
-            self._activeTime = activeTime
+            self._active = bool(statusCmd & 1)
+            self._deviated = bool(statusCmd & 2)
+            self._fast = bool(statusCmd & 4)
 
+            self._sp = sp
 
     def draw(self,w):
-
         w.create_text(
             self.positionX * 20,
             self.positionY * 20 - 15,
@@ -34,12 +36,11 @@ class DigitalInput(object):
             text=self.name,
             fill="#808080"
         )
-
         w.create_rectangle(
             self.positionX * 20,
             (self.positionY + 1) * 20,
             (self._width + self.positionX) * 20,
-            60 + self.positionY * 20,
+            40 + self.positionY * 20,
             fill = "",
             outline = "#808080"
         )
@@ -49,7 +50,7 @@ class DigitalInput(object):
             self.positionY * 20,
             (self._width + self.positionX) * 20,
             (self._height + self.positionY) * 20,
-            fill = "#00ff00" if self._active else "#808080",
+            fill = "#ff0000" if self._deviated else "#00ff00" if self._active else "#808080",
             outline = "#404040"
         )
 
@@ -57,11 +58,6 @@ class DigitalInput(object):
             self.positionX * 20 + 5,
             (self.positionY + 1) * 20 + 3,
             anchor="nw",
-            text=str(self._count) + " x"
+            text="SP: "  + str(round(self._sp,1)) + self.units
         )
-        w.create_text(
-            self.positionX * 20 + 5,
-            (self.positionY + 2) * 20 + 3,
-            anchor="nw",
-            text=str(round(self._activeTime,1)) + " s"
-        )
+

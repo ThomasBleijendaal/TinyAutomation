@@ -10,11 +10,48 @@ Basic implementation of a very naive PID controller.
 #include <PID.h>
 #include <General.h>
 
+struct PIDdataStruct {
+	struct status {
+		bool active : 1;
+		bool deviated : 1;
+		bool fast : 1;
+		char spare : 5;
+		status() {
+			active = false;
+			deviated = false;
+			fast = false;
+			spare = 0;
+		}
+	} status;
+	struct cmd {
+		char spare : 8;
+		cmd() {
+			spare = 0;
+		}
+	} cmd;
+	float sp;
+	char spare[10];
+
+	PIDdataStruct() {
+		sp = 0.0;
+		spare[0] = 0;
+		spare[1] = 0;
+		spare[2] = 0;
+		spare[3] = 0;
+		spare[4] = 0;
+		spare[5] = 0;
+		spare[6] = 0;
+		spare[7] = 0;
+		spare[8] = 0;
+		spare[9] = 0;
+	}
+};
+
 class PID {
 public:
-	PID(int AI, float min, float max, int AO, float P, float I, float D);
-	PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit);
-	PID(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
+	PID(int id, int AI, float min, float max, int AO, float P, float I, float D);
+	PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit);
+	PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
 
 	float value();
 	void value(float value);
@@ -34,7 +71,9 @@ public:
 	void loop(General &general);
 
 private:
-	void _init(int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
+	void _init(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
+
+	int _id;
 
 	float _min;
 	float _max;
@@ -43,6 +82,7 @@ private:
 
 	float _deviationLimit;
 	bool _deviated;
+	bool _wasDeviated;
 	int _devDelay;
 
 	float _P;
@@ -61,6 +101,7 @@ private:
 	float _sp;
 
 	bool _active;
+	bool _wasActive;
 };
 
 #endif

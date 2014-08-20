@@ -1,29 +1,19 @@
 import struct
+import DI
 
-class DigitalInput(object):
-    _active = False
-    _count = 0
-    _activeTime = 0.0
+class DigitalOutput(DI.DigitalInput):
+    _interlock = False
 
-    _width = 3
-    _height = 1
-
-    def __init__(self, name, i, positionX, positionY):
-        self.name = name
-        self.i = i
-        self.positionX = positionX
-        self.positionY = positionY
     def __del__(self):
-        print("DI destroyed")
-
+        print("DO destroyed")
 
     def handleData(self, data):
-        objectType, objectNr, statusCmd, switchCount, activeTime, dummy1, dummy2 = struct.unpack('=4h3f', data)
+        objectType, objectNr, statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=4h3f', data)
         if objectNr == self.i:
             self._active = statusCmd == 1
-            self._count = switchCount
+            self._interlock = statusCmd == 2
+            self._count = startCount
             self._activeTime = activeTime
-
 
     def draw(self,w):
 
@@ -49,9 +39,18 @@ class DigitalInput(object):
             self.positionY * 20,
             (self._width + self.positionX) * 20,
             (self._height + self.positionY) * 20,
-            fill = "#00ff00" if self._active else "#808080",
+            fill = "#00ff00" if self._active else "#0080d0" if self._interlock else "#808080",
             outline = "#404040"
         )
+
+        if self._interlock:
+            w.create_text(
+                (self.positionX + self._width) * 20 - 5,
+                self.positionY * 20 + 3,
+                anchor="ne",
+                text="ITL",
+                fill="#000000"
+            )
 
         w.create_text(
             self.positionX * 20 + 5,
