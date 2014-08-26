@@ -1,6 +1,7 @@
 import struct
+from Typical import Typical
 
-class PIDController(object):
+class PIDController(Typical):
     _active = False
     _deviated = False
     _fast = False
@@ -19,14 +20,13 @@ class PIDController(object):
         print("PID destroyed")
 
     def handleData(self,data):
-        objectType, objectNr, statusCmd, sp, dummy0, dummy1, dummy2 = struct.unpack('=3h3f1h', data)
+        statusCmd, sp, dummy0, dummy1, dummy2 = struct.unpack('=1h3f1h', data)
 
-        if objectNr == self.i:
-            self._active = bool(statusCmd & 1)
-            self._deviated = bool(statusCmd & 2)
-            self._fast = bool(statusCmd & 4)
+        self._active = bool(statusCmd & 1)
+        self._deviated = bool(statusCmd & 2)
+        self._fast = bool(statusCmd & 4)
 
-            self._sp = sp
+        self._sp = sp
 
     def draw(self,w):
         w.create_text(

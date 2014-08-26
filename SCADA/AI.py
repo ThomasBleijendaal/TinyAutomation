@@ -1,6 +1,7 @@
 import struct
+from Typical import Typical
 
-class AnalogInput(object):
+class AnalogInput(Typical):
     _lolo = False
     _lo = False
     _hi = False
@@ -20,22 +21,19 @@ class AnalogInput(object):
         self.i = i
         self.positionX = positionX
         self.positionY = positionY
-    def __del__(self):
-        print("AI destroyed")
 
     def handleData(self,data):
-        objectType, objectNr, statusCmd, value, min, max, dummy1 = struct.unpack('=3h3f1h', data)
+        statusCmd, value, min, max, dummy1 = struct.unpack('=1h3f1h', data)
 
-        if objectNr == self.i:
-            self._lolo = bool(statusCmd & 1)
-            self._lo = bool(statusCmd & 2)
-            self._hi = bool(statusCmd & 4)
-            self._hihi = bool(statusCmd & 8)
-            self._bta = bool(statusCmd & 16)
+        self._lolo = bool(statusCmd & 1)
+        self._lo = bool(statusCmd & 2)
+        self._hi = bool(statusCmd & 4)
+        self._hihi = bool(statusCmd & 8)
+        self._bta = bool(statusCmd & 16)
 
-            self._value = value
-            self._min = min
-            self._max = max
+        self._value = value
+        self._min = min
+        self._max = max
 
     def draw(self,w):
         if self._lolo or self._hihi:

@@ -2,3 +2,5 @@
 *.sublime-workspace
 RaspberryPi/SCADA/sftp-config.json
 *.idea
+*.pyc
+z.ignore/*

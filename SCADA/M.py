@@ -1,6 +1,7 @@
 import struct
+from Typical import Typical
 
-class Motor(object):
+class Motor(Typical):
     _active = False
     _reverse = False
     _interlock = False
@@ -12,24 +13,15 @@ class Motor(object):
     _width = 6
     _height = 1
 
-    def __init__(self, name, i, positionX, positionY):
-        self.name = name
-        self.i = i
-        self.positionX = positionX
-        self.positionY = positionY
-    def __del__(self):
-        print("M destroyed")
-
-
     def handleData(self, data):
-        objectType, objectNr, statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=4h3f', data)
-        if objectNr == self.i:
-            self._active = statusCmd & 0x01
-            self._reverse = statusCmd & 0x02
-            self._interlock = statusCmd & 0x04
-            self._interlockReverse = statusCmd & 0x08
-            self._startCount = startCount
-            self._activeTime = activeTime
+        statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=2h3f', data)
+
+        self._active = statusCmd & 0x01
+        self._reverse = statusCmd & 0x02
+        self._interlock = statusCmd & 0x04
+        self._interlockReverse = statusCmd & 0x08
+        self._startCount = startCount
+        self._activeTime = activeTime
 
 
     def draw(self,w):

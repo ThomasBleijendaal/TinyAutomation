@@ -1,36 +1,22 @@
 import struct
+import DI
 
-class AnalogOutput(object):
-    _active = False
+class DigitalOutput(DI.DigitalInput):
     _interlock = False
-    _startCount = 0
-    _activeTime = 0.0
-    _output = 0.0
 
-    _width = 6
-    _height = 1
-
-    def __init__(self, name, units, i, positionX, positionY):
-        self.name = name
-        self.units = units
-        self.i = i
-        self.positionX = positionX
-        self.positionY = positionY
     def __del__(self):
-        print("AO destroyed")
+        print("DO destroyed")
 
-    def handleData(self,data):
-        objectType, objectNr, statusCmd, startCount, activeTime, output, dummy2 = struct.unpack('=4h3f', data)
+    def handleData(self, data):
+        statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=2h3f', data)
 
-        if objectNr == self.i:
-            self._active = bool(statusCmd & 1)
-            self._interlock = bool(statusCmd & 2)
-
-            self._startCount = startCount
-            self._activeTime = activeTime
-            self._output = output
+        self._active = statusCmd == 1
+        self._interlock = statusCmd == 2
+        self._count = startCount
+        self._activeTime = activeTime
 
     def draw(self,w):
+
         w.create_text(
             self.positionX * 20,
             self.positionY * 20 - 15,
@@ -38,6 +24,7 @@ class AnalogOutput(object):
             text=self.name,
             fill="#808080"
         )
+
         w.create_rectangle(
             self.positionX * 20,
             (self.positionY + 1) * 20,
@@ -67,20 +54,13 @@ class AnalogOutput(object):
 
         w.create_text(
             self.positionX * 20 + 5,
-            self.positionY * 20 + 3,
-            anchor="nw",
-            text=str(round(self._output,1)) + " " + self.units
-        )
-        w.create_text(
-            self.positionX * 20 + 5,
             (self.positionY + 1) * 20 + 3,
             anchor="nw",
-            text=str(round(self._activeTime,1)) + " s"
+            text=str(self._count) + " x"
         )
         w.create_text(
             self.positionX * 20 + 5,
             (self.positionY + 2) * 20 + 3,
             anchor="nw",
-            text=str(round(self._startCount,1)) + " x"
+            text=str(round(self._activeTime,1)) + " s"
         )
-

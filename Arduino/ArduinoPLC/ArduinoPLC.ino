@@ -24,19 +24,16 @@ SFE_BMP180 PT_barometricPressureSensor;
 /* **************************************** */
 #define LS_open 0
 #define LS_closed 1
-#define LS_lidClosed 2
 DI DIs[] = {
-    DI(LS_open,12,true),DI(LS_closed,13,true),DI(LS_lidClosed,3,true)
+    DI(LS_open,12,true),DI(LS_closed,13,true)
 };
 
 /* **************************************** */
 #define M_evacuator 0
 #define M_agitator 1
-#define X_generalFailure 2
 DO DOs[] = {
-    DO(100),
-    DO(101),
-    DO(102)
+    DO(M_evacuator,100),
+    DO(M_agitator,101)
 };
 
 /* **************************************** */
@@ -55,24 +52,32 @@ M Ms[] = {
 #define TT_atmosphere 5
 #define QT_light 6
 #define QT_light2 7
+#define TT_heatingPad 8
 AI AIs[] = {
-    AI(QT_insideHumidity, -1, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0, false, 0, 1023),
+    AI(QT_insideHumidity, -1, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0),
     AI(QT_outsideHumidity, -1, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0),
     AI(TT_inside, -1, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0),
     AI(TT_outside, -1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
     AI(PT_atmosphere, -1, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0),
     AI(TT_atmosphere, -1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0),
     AI(QT_light, 0, 0.0, 100.0),
-    AI(QT_light2, 1, 0.0, 100.0)
+    AI(QT_light2, 1, 0.0, 100.0),
+    //AI(TT_heatingPad, 2, -40.0, 125.0, 10.0, 25.0, 35.0, 50.0, true, 20, 360)
+    AI(TT_heatingPad, 2, -10.0, 125.0, 10.0, 25.0, 35.0, 50.0, true, 41, 614, true)
 };
 
 /* **************************************** */
 // int pin, float min, float max, float rate //
+#define X_heatingPad 0
 AO AOs[] = {
+    AO(X_heatingPad,3,0.0,100.0)
 };
 
 /* **************************************** */
+// int AI, float min, float max, int AO, float P, float I, float D
+#define TC_heatingPad 0u
 PID PIDs[] = {
+    PID(TC_heatingPad, TT_heatingPad, 0.0, 100.0, X_heatingPad, 3.0, 0.2, 1.0)
 };
 
 void setup() {
@@ -83,6 +88,7 @@ void setup() {
     Ms[M_hatch].doubleCoil(104,106,105,107);
     
     PT_barometricPressureSensor.begin();
+    
 }
  
 void loop() {
@@ -97,7 +103,11 @@ void loop() {
     
     loopTypicals();
     
-    general.send();   
+    
+    PIDs[TC_heatingPad].sp(32.0);
+    PIDs[TC_heatingPad].activate(true);
+    
+    //general.send();   
     io.write();
 }
 
@@ -105,12 +115,14 @@ void loop() {
 
 bool vent = false;
 void program() {
-    vent = DIs[LS_lidClosed].isActive();
-    DOs[X_generalFailure].activate(vent);
+    //vent = AIs[QT_light].value() > 70.0;
     
-    ventilate(vent);
+    //AOs[X_LED].output(AIs[QT_light].value());
+    //AOs[X_LED].activate(AIs[QT_light].value() > 40.0);
     
-    DOs[M_agitator].activate(vent);
+    //ventilate(vent);
+    
+    //DOs[M_agitator].activate(vent);
 }
 
 void interruptProgram() {
@@ -150,7 +162,7 @@ void ventilate(bool ventilate) {
     bool endPosition = (ventilate && DIs[LS_open].isActive()) || (!ventilate && DIs[LS_closed].isActive());
     
     Ms[M_hatch].activate(!endPosition,!ventilate);
-    //DOs[M_evacuator].activate(endPosition && ventilate);
+    DOs[M_evacuator].activate(endPosition && ventilate);
 }
 
 /* **************************************** */

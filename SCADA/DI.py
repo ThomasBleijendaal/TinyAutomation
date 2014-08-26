@@ -1,6 +1,7 @@
 import struct
+from Typical import Typical
 
-class DigitalInput(object):
+class DigitalInput(Typical):
     _active = False
     _count = 0
     _activeTime = 0.0
@@ -8,21 +9,12 @@ class DigitalInput(object):
     _width = 3
     _height = 1
 
-    def __init__(self, name, i, positionX, positionY):
-        self.name = name
-        self.i = i
-        self.positionX = positionX
-        self.positionY = positionY
-    def __del__(self):
-        print("DI destroyed")
-
-
     def handleData(self, data):
-        objectType, objectNr, statusCmd, switchCount, activeTime, dummy1, dummy2 = struct.unpack('=4h3f', data)
-        if objectNr == self.i:
-            self._active = statusCmd == 1
-            self._count = switchCount
-            self._activeTime = activeTime
+        statusCmd, switchCount, activeTime, dummy1, dummy2 = struct.unpack('=2h3f', data)
+
+        self._active = statusCmd == 1
+        self._count = switchCount
+        self._activeTime = activeTime
 
 
     def draw(self,w):
