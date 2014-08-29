@@ -9,78 +9,53 @@ Includes
 #ifndef General_h
 #define General_h
 
-#include <General.h>
+#include <Communication.h>
+#include <Time.h>
+#include <IO.h>
 
-struct dataStruct {
-	char data[16];
-};
-
-struct commStruct {
-	int header;
-	int type;
-	int nr;
-	dataStruct data;
-	int footer;
-
-	commStruct() {
-		header = 1234;
-		type = 0;
-		nr = 0;
-		footer = 4321;
-	}
-};
-
-const int typeDI = 1;
-const int typeAI = 2;
-const int typeM = 3;
-const int typeDO = 4;
-const int typeAO = 5;
-const int typePID = 6;
+#include <AI.h>
+#include <DI.h>
+#include <AO.h>
+#include <DO.h>
+#include <M.h>
+#include <PID.h>
 
 class General {
     public:
-        General();
+		General(int numAI, int numDI, int numAO, int numDO, int numM, int numPID);
 
-		bool t2_5ms;
-        bool t100ms;
-        bool t250ms;
-        bool t1s;
-        bool t5s;
-		bool t1m;
-		bool t5m;
+		AI &addAI(AI object);
+		DI &addDI(DI object);
+		AO &addAO(AO object);
+		DO &addDO(DO object);
+		M &addM(M object);
+		PID &addPID(PID object);
 
-		bool b1s;
+		void loop();
 
-		unsigned long cps;
-
-		void time();
-
-		void send();
-		void read();
-
-		dataStruct readData(int type, int nr);
-		void stageSend(int type, int nr, dataStruct data);
+		Communication communication;
+		Time time;
+		IO io;
     
 	private:
-		unsigned long _t2_5ms;
-        int _t100ms;
-        int _t250ms;
-        int _t1s;
-        int _t5s;
-		int _t1m;
-		int _t5m;
-		
-		int _sendBufferI;
-		int _readBufferI;
+		AI* _AIs;
+		int _AIi;
 
-		bool _send;
+		DI* _DIs;
+		int _DIi;
 
-		//commStruct _sendBuffer[];
-		//commStruct _readBuffer[1];
+		AO* _AOs;
+		int _AOi;
 
-		unsigned long _cps;
+		DO* _DOs;
+		int _DOi;
+
+		M* _Ms;
+		int _Mi;
+
+		PID* _PIDs;
+		int _PIDi;
+
 };
-
-
 
 #endif

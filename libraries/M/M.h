@@ -11,8 +11,8 @@ TODO:
 #ifndef M_h
 #define M_h
 
-#include <M.h>
-#include <General.h>
+#include <Time.h>
+#include <Communication.h>
 #include <IO.h>
 
 struct MdataStruct {
@@ -55,8 +55,10 @@ struct MdataStruct {
 };
 class M {
 public:
-	M(int id);
+	M();
 	
+	void setId(int id);
+
 	void singleCoil(int pin0, int pin1);
 	void doubleCoil(int pin0, int pin1, int pin2, int pin3);
 
@@ -70,7 +72,7 @@ public:
 	void interlock(bool i0, bool i1, bool i2, bool i3, bool i4, bool i5);
 	void interlock(bool i0, bool i1, bool i2);
 
-	void loop(General &general, IO &io);
+	void loop(Time &time, Communication &communication, IO &io);
 private:
 	int _id;
 	int _pin[4];

@@ -1,16 +1,23 @@
 #include "Arduino.h"
 #include "DO.h"
+#include "General.h"
+#include "IO.h"
 
-DO::DO(int id,int pin) {
+DO::DO() {}
+DO::DO(int pin) {
 	pinMode(pin, OUTPUT);
 
-	_id = id;
+	_id = -1;
 	_pin = pin;
 
 	_active = false;
 	_wasActive = false;
 	_startCount = 0U;
 	_activeTime = 0U;
+}
+
+void DO::setId(int id) {
+	_id = id;
 }
 
 void DO::activate(bool activate) {
@@ -43,14 +50,14 @@ void DO::interlock(bool i0, bool i1, bool i2) {
 	}
 }
 
-void DO::loop(General &general, IO &io) {
+void DO::loop(Time &time, Communication &communication, IO &io) {
 	bool stateChanged = false;
 
 	if (_active) {
-		if (!_blinks || (_blinks && general.b1s)) {
+		if (!_blinks || (_blinks && time.b1s)) {
 			io.writeBit(_pin, HIGH);
 		}
-		else if (_blinks && !general.b1s) {
+		else if (_blinks && !time.b1s) {
 			io.writeBit(_pin, LOW);
 		}
 
@@ -59,7 +66,7 @@ void DO::loop(General &general, IO &io) {
 			_wasActive = true;
 			stateChanged = true;
 		}
-		if (general.t100ms) {
+		if (time.t100ms) {
 			_activeTime++;
 		}
 	}
@@ -70,7 +77,7 @@ void DO::loop(General &general, IO &io) {
 		_wasActive = false;
 	}
 
-	if (stateChanged || general.t1s) {
+	if (stateChanged || time.t1s) {
 		DOdataStruct data;
 
 		data.status.active = _active;
@@ -79,6 +86,6 @@ void DO::loop(General &general, IO &io) {
 		data.startCount = _startCount;
 		data.activeTime = activeTime();
 
-		general.stageSend(typeDO, _id, *((dataStruct *)&data));
+		communication.stageSend(typeDO, _id, *((dataStruct *)&data));
 	}
 }

@@ -7,8 +7,10 @@ Basic implementation of a very naive PID controller.
 #ifndef PID_h
 #define PID_h
 
-#include <PID.h>
-#include <General.h>
+#include <Time.h>
+#include <Communication.h>
+#include <AI.h>
+#include <AO.h>
 
 struct PIDdataStruct {
 	struct status {
@@ -49,18 +51,14 @@ struct PIDdataStruct {
 
 class PID {
 public:
-	PID(int id, int AI, float min, float max, int AO, float P, float I, float D);
-	PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit);
-	PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
+	PID();
+	PID(AI *input, float min, float max, AO *output, float P, float I, float D);
+	PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit);
+	PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast);
 
-	float value();
-	void value(float value);
+	void setId(int id);
 
-	float output();
 	float sp();
-
-	int AI();
-	int AO();
 
 	bool isActive();
 	bool isDeviated();
@@ -68,10 +66,10 @@ public:
 	void sp(float sp);
 	void activate(bool activate);
 
-	void loop(General &general);
+	void loop(Time &time, Communication &communication);
 
 private:
-	void _init(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast);
+	void _init(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast);
 
 	int _id;
 
@@ -89,8 +87,8 @@ private:
 	float _I;
 	float _D;
 
-	int _AI;
-	int _AO;
+	AI *_AI;
+	AO *_AO;
 
 	float _value;
 	float _totalError;

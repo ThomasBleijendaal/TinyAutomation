@@ -7,8 +7,8 @@ Writes an analog output (PWM). Recieves a 0 - 100 % input which is converted to 
 #ifndef AO_h
 #define AO_h
 
-#include <AO.h>
-#include <General.h>
+#include <Time.h>
+#include <Communication.h>
 
 struct AOdataStruct {
 	struct status {
@@ -45,9 +45,12 @@ struct AOdataStruct {
 
 class AO {
 public:
-	AO(int id, int pin);
-	AO(int id, int pin, float min, float max);
-	AO(int id, int pin, float min, float max, float rate);
+	AO();
+	AO(int pin);
+	AO(int pin, float min, float max);
+	AO(int pin, float min, float max, float rate);
+
+	void setId(int id);
 
 	void output(float output);
 	void activate(bool activate);
@@ -59,10 +62,10 @@ public:
 
 	void interlock(bool i0, bool i1, bool i2);
 
-	void loop(General &general);
+	void loop(Time &time, Communication &communication);
 
 private:
-	void _init(int id, int pin, float min, float max, float rate);
+	void _init(int pin, float min, float max, float rate);
 
 	int _id;
 	int _pin;

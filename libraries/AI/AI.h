@@ -4,13 +4,12 @@ Analog Input
 Reads an analog input. Maps the raw input to the configured range and determines if the input is out of range (bta, broken transmitter), 
 too high (hihi), high (hi), low (lo) or too low (lolo). Also computes a rolling average per 100ms.
 
-
 */
 #ifndef AI_h
 #define AI_h
 
-#include <AI.h>
-#include <General.h>
+#include <Time.h>
+#include <Communication.h>
 
 struct AIdataStruct {
 	struct status {
@@ -51,11 +50,14 @@ struct AIdataStruct {
 
 class AI {
 public:
-	AI(int id, int pin);
-	AI(int id, int pin, float rangeLow, float rangeHigh);
-	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
-	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
-	AI(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
+	AI();
+	AI(int pin);
+	AI(int pin, float rangeLow, float rangeHigh);
+	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
+	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
+	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
+
+	void setId(int id);
 
 	bool lolo();
 	bool lo();
@@ -75,9 +77,9 @@ public:
 	float rangeLow();
 	float rangeHigh();
 
-	void loop(General &general);
+	void loop(Time &time, Communication &communication);
 private:
-	void _init(int id, int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
+	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
 
 	int _id;
 	int _pin;

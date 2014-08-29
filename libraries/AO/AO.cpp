@@ -1,18 +1,18 @@
-#include "Arduino.h"
+ #include "Arduino.h"
 #include "AO.h"
 
-
-AO::AO(int id, int pin) {
-	_init(id, pin, 0.0, 100.0, -1.0);
+AO::AO() {}
+AO::AO(int pin) {
+	_init(pin, 0.0, 100.0, -1.0);
 }
-AO::AO(int id, int pin, float min, float max) {
-	_init(id, pin, min, max, -1.0);
+AO::AO(int pin, float min, float max) {
+	_init(pin, min, max, -1.0);
 }
-AO::AO(int id, int pin, float min, float max, float rate) {
-	_init(id, pin, min, max, rate);
+AO::AO(int pin, float min, float max, float rate) {
+	_init(pin, min, max, rate);
 }
-void AO::_init(int id, int pin, float min, float max, float rate) {
-	_id = id;
+void AO::_init(int pin, float min, float max, float rate) {
+	_id = -1;
 	_pin = pin;
 
 	pinMode(_pin, OUTPUT);
@@ -28,6 +28,10 @@ void AO::_init(int id, int pin, float min, float max, float rate) {
 	_currentOutput = min;
 
 	analogWrite(_pin, _raw);
+}
+
+void AO::setId(int id) {
+	_id = id;
 }
 
 void AO::activate(bool activate) {
@@ -64,12 +68,12 @@ void AO::interlock(bool i0, bool i1, bool i2) {
 		_active = false;
 }
 
-void AO::loop(General &general) {
+void AO::loop(Time &time, Communication &communication) {
 	int sp = max(_min, min(_max, _output));
 	bool stateChanged = false;
 
 	if (_active) {
-		if (_rate != -1 && general.t100ms) {
+		if (_rate != -1 && time.t100ms) {
 			
 			float delta = _rate / 10.0;
 
@@ -84,7 +88,7 @@ void AO::loop(General &general) {
 			_currentOutput = max(_min, min(_max, _output));
 		}
 
-		if (general.t100ms) {
+		if (time.t100ms) {
 			_avg = ((_avg * 99.0) + _currentOutput) / 100.0;
 
 			if (_active)
@@ -108,7 +112,7 @@ void AO::loop(General &general) {
 		analogWrite(_pin, 0);
 	}
 	
-	if (stateChanged || general.t1s) {
+	if (stateChanged || time.t1s) {
 		AOdataStruct data;
 
 		data.status.active = _active;
@@ -118,6 +122,6 @@ void AO::loop(General &general) {
 		data.activeTime = activeTime();
 		data.output = _currentOutput;
 
-		general.stageSend(typeAO, _id, *((dataStruct *)&data));
+		communication.stageSend(typeAO, _id, *((dataStruct *)&data));
 	}
 }

@@ -1,17 +1,18 @@
 #include "Arduino.h"
 #include "PID.h"
 
-PID::PID(int id, int AI, float min, float max, int AO, float P, float I, float D) {
-	_init(id, AI, min, max, AO, P, I, D, 1000.0, false);
+PID::PID() {}
+PID::PID(AI *input, float min, float max, AO *output, float P, float I, float D) {
+	_init(input, min, max, output, P, I, D, 1000.0, false);
 }
-PID::PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit) {
-	_init(id, AI, min, max, AO, P, I, D, deviationLimit, false);
+PID::PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit) {
+	_init(input, min, max, output, P, I, D, deviationLimit, false);
 }
-PID::PID(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
-	_init(id, AI, min, max, AO, P, I, D, deviationLimit, fast);
+PID::PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast) {
+	_init(input, min, max, output, P, I, D, deviationLimit, fast);
 }
-void PID::_init(int id, int AI, float min, float max, int AO, float P, float I, float D, float deviationLimit, bool fast) {
-	_id = id;
+void PID::_init(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast) {
+	_id = -1;
 	
 	_min = min;
 	_max = max;
@@ -24,10 +25,14 @@ void PID::_init(int id, int AI, float min, float max, int AO, float P, float I, 
 	_I = I;
 	_D = D;
 	
-	_AI = AI;
-	_AO = AO;
+	_AI = input;
+	_AO = output;
 	
 	_active = false;
+}
+
+void PID::setId(int id) {
+	_id = id;
 }
 
 void PID::activate(bool activate) {
@@ -35,24 +40,6 @@ void PID::activate(bool activate) {
 }
 bool PID::isActive() {
 	return _active;
-}
-
-void PID::value(float value) {
-	_value = value;
-}
-float PID::value() {
-	return _value;
-}
-
-float PID::output() {
-	return _output;
-}
-
-int PID::AI() {
-	return _AI;
-}
-int PID::AO() {
-	return _AO;
 }
 
 void PID::sp(float sp) {
@@ -66,11 +53,13 @@ bool PID::isDeviated() {
 	return _deviated;
 }
 
-void PID::loop(General &general) {
+void PID::loop(Time &time, Communication &communication) {
 	bool stateChanged = false;
 
+	_value = _AI->value();
+
 	if (_active) {
-		if (general.t100ms || _fast) {
+		if (time.t100ms || _fast) {
 			if (!_wasActive) {
 				_wasActive = stateChanged = true;
 			}
@@ -85,7 +74,7 @@ void PID::loop(General &general) {
 			_output = max(_min, min(_max, newOutput));	
 		}
 		if (abs(_sp - _value) >= (_max - _min) * _deviationLimit) {
-			if (general.t1s)
+			if (time.t1s)
 				_deviated = ++_devDelay >= 5;
 
 			if (_deviated && !_wasDeviated)
@@ -107,7 +96,7 @@ void PID::loop(General &general) {
 		_output = 0.0;
 	}
 
-	if (general.t1s || stateChanged) {
+	if (time.t1s || stateChanged) {
 		PIDdataStruct data;
 
 		data.status.active = _active;
@@ -116,6 +105,9 @@ void PID::loop(General &general) {
 
 		data.sp = _sp;
 
-		general.stageSend(typePID, _id, *((dataStruct *)&data));
+		communication.stageSend(typePID, _id, *((dataStruct *)&data));
 	}
+
+	_AO->output(_output);
+	_AO->activate(_active);
 }

@@ -1,13 +1,17 @@
 #include "Arduino.h"
 #include "M.h"
 
-M::M(int id) {
+M::M() {
 	_active = false;
 	_maxPins = 0;
 	_seq = 0;
 	_wasActive = false;
 	_startCount = 0U;
 	_activeTime = 0U;
+	_id = -1;
+}
+
+void M::setId(int id) {
 	_id = id;
 }
 
@@ -60,11 +64,11 @@ float M::activeTime() {
 	return ((float)_activeTime) / 10.0;
 }
 
-void M::loop(General &general, IO &io) {
+void M::loop(Time &time, Communication &communication, IO &io) {
 	bool stateChanged = false;
 
 	if (_active) {
-		if (general.t2_5ms) {
+		if (time.t2_5ms) {
 			if (!_reverse) {
 				_seq = (_seq + 1) % _maxPins;
 			}
@@ -77,7 +81,7 @@ void M::loop(General &general, IO &io) {
 			stateChanged = true;
 			_wasActive = true;
 		}
-		if (general.t100ms) {
+		if (time.t100ms) {
 			_activeTime++;
 		}
 	}
@@ -87,7 +91,7 @@ void M::loop(General &general, IO &io) {
 		_wasActive = false;
 	}
 
-	if (stateChanged || general.t1s) {
+	if (stateChanged || time.t1s) {
 		MdataStruct data;
 
 		data.status.active = _active;
@@ -98,7 +102,7 @@ void M::loop(General &general, IO &io) {
 		data.startCount = _startCount;
 		data.activeTime = _activeTime;
 
-		general.stageSend(typeM, _id, *((dataStruct *)&data));
+		communication.stageSend(typeM, _id, *((dataStruct *)&data));
 	}
 
 	for (int i = 0; i < _maxPins; ++i) {
