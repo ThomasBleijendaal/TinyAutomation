@@ -1,6 +1,4 @@
 /*
-IO
-
 IO abstraction layer.
 
 Currently supports
@@ -11,9 +9,6 @@ Currently supports
 */
 #ifndef IO_h
 #define IO_h
-
-#include <IO.h>
-#include <General.h>
 
 class IO {
 public:
