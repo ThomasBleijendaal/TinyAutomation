@@ -11,6 +11,10 @@ Includes
 
 struct dataStruct {
 	char data[16];
+	dataStruct() {
+		for (int i = 0; i < 16; i++)
+			data[i] = 0;
+	}
 };
 
 struct commStruct {
@@ -51,9 +55,6 @@ class Communication {
 		int _readBufferI;
 
 		bool _send;
-
-		//commStruct _sendBuffer[];
-		//commStruct _readBuffer[1];
 };
 
 

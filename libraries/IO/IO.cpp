@@ -40,6 +40,7 @@ void IO::writeByte(int byte, unsigned char value) {
 }
 
 void IO::write() {
+	// todo: only when io change occured
 	PORTD &= (unsigned char)~_latchPinMask;
 
 	for (int b = (_writeBytes * 8) - 1; b >= 0; b--) {

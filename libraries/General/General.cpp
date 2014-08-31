@@ -26,32 +26,27 @@ void General::loop() {
 	communication.read();
 	//io.read();
 
-	int i = 0;
-
-	for (i = 0; i < _DIi; i++) {
+	for (int i = 0; i < _DIi; i++) {
 		_DIs[i].loop(time, communication);
 	}
 	
-	for (i = 0; i < _AIi; i++) {
+	for (int i = 0; i < _AIi; i++) {
 		_AIs[i].loop(time, communication);
 	}
 
-	for (i = 0; i < _PIDi; i++) {
-		//_PIDs[i].value(_AIs[_PIDs[i].AI()].value());
+	for (int i = 0; i < _PIDi; i++) {
 		_PIDs[i].loop(time, communication);
-		//_AOs[_PIDs[i].AO()].output(_PIDs[i].output());
-		//_AOs[_PIDs[i].AO()].activate(_PIDs[i].isActive());
 	}
 
-	for (i = 0; i < _DOi; i++) {
+	for (int i = 0; i < _DOi; i++) {
 		_DOs[i].loop(time, communication, io);            
 	}
 
-	for (i = 0; i < _AOi; i++) {
+	for (int i = 0; i < _AOi; i++) {
 		_AOs[i].loop(time, communication);
 	}
 
-	for (i = 0; i < _Mi; i++) {
+	for (int i = 0; i < _Mi; i++) {
 		_Ms[i].loop(time, communication, io);
 	}
 	
@@ -60,8 +55,9 @@ void General::loop() {
 }
 	
 AI &General::addAI(AI object) {
-	object.setId(_AIi);
+	
 	_AIs[_AIi] = object;
+	_AIs[_AIi].setId(_AIi);
 	
 	return _AIs[_AIi++];
 }

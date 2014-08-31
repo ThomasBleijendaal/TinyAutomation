@@ -85,6 +85,7 @@ class Communication(object):
 
     def start(self):
         self._connection = serial.Serial('COM3', 115200)
+        #todo: replace this with check
         time.sleep(5)
         self._connection.flushInput()
 
@@ -99,9 +100,16 @@ class Communication(object):
                 self._connection.flushInput()
                 break
 
+            typical = int(struct.unpack('h',readBytes[2:4])[0])
+            i = int(struct.unpack('h',readBytes[4:6])[0]) # - 10 if typical == 2 else 0
+
+            if typical == 2 and i == 10:
+                print("Jeej")
+            #print("Typical: " + str(typical) + "  I: " + str(i))
+
             yield [
-                int(struct.unpack('h',readBytes[2:4])[0]),
-                int(struct.unpack('h',readBytes[4:6])[0]),
+                typical,
+                i,
                 readBytes[6:22]
             ]
 
@@ -118,8 +126,6 @@ class Presentation(object):
         self._parent = parent[0]
 
     def interrupt(self):
-        print("Presentation interrupt")
-
         self._parent.loop()
 
         self._master.after(100,self.interrupt)

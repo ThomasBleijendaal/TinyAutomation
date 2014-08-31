@@ -2,9 +2,21 @@
 General Typical functionality
 
 Includes
-- OS: one shots: timed bools
-- B: blink: blinking bools
-- Serial communication (very beta)
+- Communication class
+- Time class
+- IO class
+
+TODO:
+implement:
+
+int freeRam () {
+extern int __heap_start, *__brkval;
+int v;
+return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
+
+make typical arrays dynamic
+
 */
 #ifndef General_h
 #define General_h
