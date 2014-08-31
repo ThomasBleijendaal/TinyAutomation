@@ -18,6 +18,7 @@ struct DOdataStruct {
 		char spare : 6;
 		status() {
 			active = false;
+			interlock = false;
 			spare = 0;
 		}
 	} status;

@@ -89,7 +89,6 @@ private:
 	int _rawHigh;
 
 	float _value;
-	float _previousValue;
 	float _rangeLow;
 	float _rangeHigh;
 
@@ -108,13 +107,13 @@ private:
 	bool _enableHi;
 	bool _enableHihi;
 	bool _enableBTA;
+	bool _damping;
 
 	bool _isLolo;
 	bool _isLo;
 	bool _isHi;
 	bool _isHihi;
 	bool _isBTA;
-	bool _damping;
 
 	bool _firstCycle;
 	bool _firstValueSet;

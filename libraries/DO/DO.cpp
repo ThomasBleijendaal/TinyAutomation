@@ -10,12 +10,13 @@ DO::DO(int pin) {
 	_id = -1;
 	_pin = pin;
 
+	_interlock = false;
 	_active = false;
 	_blinks = false;
 	_wasActive = false;
+
 	_startCount = 0U;
 	_activeTime = 0U;
-	_interlock = false;
 }
 
 void DO::setId(int id) {

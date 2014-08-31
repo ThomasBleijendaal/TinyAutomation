@@ -24,7 +24,7 @@ void AI::_init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, f
 
 	_rangeLow = rangeLow;
 	_rangeHigh = rangeHigh;
-
+	
 	_rawLow = rawLow;
 	_rawHigh = rawHigh;
 
@@ -33,13 +33,18 @@ void AI::_init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, f
 	_hi = hi;
 	_hihi = hihi;
 
+	_isLolo = false;
+	_isLo = false;
+	_isHi = false;
+	_isHihi = false;
+	_isBTA = false;
+
 	_enable = true;
 	_enableLolo = (lolo > rangeLow);
 	_enableLo = (lo > lolo);
 	_enableHi = (hi < hihi);
 	_enableHihi = (hihi < rangeHigh);
 	_enableBTA = enableBTA;
-
 	_damping = damping;
 
 	_raw = 0;
@@ -94,8 +99,6 @@ void AI::loop(Time &time, Communication &communication) {
 			_avg = ((_avg * 99.0) + _value) / 100.0;
 		}
 		if ((_pin != -1 && time.t250ms) || (_pin == -1 and time.t1s)) {
-			_previousValue = _value;
-
 			AIdataStruct data;
 
 			data.status.lolo = _isLolo;
