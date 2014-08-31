@@ -100,7 +100,7 @@ void M::loop(Time &time, Communication &communication, IO &io) {
 		data.status.interlockReverse = _interlock2;
 
 		data.startCount = _startCount;
-		data.activeTime = _activeTime;
+		data.activeTime = activeTime();
 
 		communication.stageSend(typeM, _id, *((dataStruct *)&data));
 	}
