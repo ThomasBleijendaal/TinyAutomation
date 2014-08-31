@@ -111,7 +111,7 @@ void AI::loop(Time &time, Communication &communication) {
 			data.min = _min;
 			data.max = _max;
 
-			communication.stageSend(typeAI, _id, *((dataStruct *)&data));
+			communication.sendData(typeAI, _id, *((dataStruct *)&data));
 		}
 	}
 }

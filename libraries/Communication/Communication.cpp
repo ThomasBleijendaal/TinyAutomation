@@ -13,7 +13,7 @@ dataStruct Communication::readData(int type, int nr) {
 	dataStruct nothing;
 	return nothing;
 }
-void Communication::stageSend(int type, int nr, dataStruct data) {
+void Communication::sendData(int type, int nr, dataStruct data) {
 	commStruct newItem;
 
 	newItem.type = type;

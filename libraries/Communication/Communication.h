@@ -47,14 +47,7 @@ class Communication {
 		void read();
 
 		dataStruct readData(int type, int nr);
-		void stageSend(int type, int nr, dataStruct data);
-    
-	private:
-		
-		int _sendBufferI;
-		int _readBufferI;
-
-		bool _send;
+		void sendData(int type, int nr, dataStruct data);
 };
 
 

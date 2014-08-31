@@ -105,7 +105,7 @@ void PID::loop(Time &time, Communication &communication) {
 
 		data.sp = _sp;
 
-		communication.stageSend(typePID, _id, *((dataStruct *)&data));
+		communication.sendData(typePID, _id, *((dataStruct *)&data));
 	}
 
 	_AO->output(_output);

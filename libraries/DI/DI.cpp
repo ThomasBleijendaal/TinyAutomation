@@ -72,6 +72,6 @@ void DI::loop(Time &time, Communication &communication) {
 		data.switchCount = _switchCount;
 		data.activeTime = activeTime();
 
-		communication.stageSend(typeDI, _id, *((dataStruct *)&data));
+		communication.sendData(typeDI, _id, *((dataStruct *)&data));
 	}
 }

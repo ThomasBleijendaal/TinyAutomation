@@ -102,7 +102,7 @@ void M::loop(Time &time, Communication &communication, IO &io) {
 		data.startCount = _startCount;
 		data.activeTime = activeTime();
 
-		communication.stageSend(typeM, _id, *((dataStruct *)&data));
+		communication.sendData(typeM, _id, *((dataStruct *)&data));
 	}
 
 	for (int i = 0; i < _maxPins; ++i) {
