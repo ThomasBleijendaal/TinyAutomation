@@ -122,6 +122,6 @@ void AO::loop(Time &time, Communication &communication) {
 		data.activeTime = activeTime();
 		data.output = _currentOutput;
 
-		communication.sendData(typeAO, _id, *((dataStruct *)&data));
+		communication.sendData(sizeof(data), typeAO, _id, (char*)&data);
 	}
 }

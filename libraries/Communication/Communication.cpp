@@ -13,15 +13,22 @@ dataStruct Communication::readData(int type, int nr) {
 	dataStruct nothing;
 	return nothing;
 }
-void Communication::sendData(int type, int nr, dataStruct data) {
-	commStruct newItem;
+void Communication::sendData(int payloadSize, int type, int nr, const char * payload) 
+{
+	int header = 1234;
+	unsigned int identifier = payloadSize * 1000 + type * 100 + nr;
+	int footer = 4321;
 
-	newItem.type = type;
-	newItem.nr = nr;
-	newItem.data = data;
+	char * buffer = new char[(payloadSize + 6)];
+	
+	memcpy(buffer, &header, 2);
+	memcpy(buffer + 2, &identifier, 2);
+	memcpy(buffer + 4, payload, payloadSize);
+	memcpy(buffer + 20, &footer, 2);
 
-	char buffer[24];
-	memcpy(buffer, &newItem, 24);
+	for (int i = 0; i < (payloadSize + 6); i++)
+		Serial.write(buffer[i]);
 
-	Serial.write(buffer, 24);
+	delete[] buffer;
+
 }

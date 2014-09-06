@@ -89,6 +89,6 @@ void DO::loop(Time &time, Communication &communication, IO &io) {
 		data.startCount = _startCount;
 		data.activeTime = activeTime();
 
-		communication.sendData(typeDO, _id, *((dataStruct *)&data));
+		communication.sendData(sizeof(data), typeDO, _id, (char*)&data);
 	}
 }

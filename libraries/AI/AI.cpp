@@ -98,7 +98,7 @@ void AI::loop(Time &time, Communication &communication) {
 		if (time.t100ms) {
 			_avg = ((_avg * 99.0) + _value) / 100.0;
 		}
-		if ((_pin != -1 && time.t250ms) || (_pin == -1 and time.t1s)) {
+		if (time.t1s) {
 			AIdataStruct data;
 
 			data.status.lolo = _isLolo;
@@ -111,7 +111,7 @@ void AI::loop(Time &time, Communication &communication) {
 			data.min = _min;
 			data.max = _max;
 
-			communication.sendData(typeAI, _id, *((dataStruct *)&data));
+			communication.sendData(sizeof(data), typeAI, _id, (char*)&data);
 		}
 	}
 }

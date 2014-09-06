@@ -1,8 +1,23 @@
 /*
 General Communication functionality
 
-Includes
-- Serial communication (beta)
+Serial communication including:
+- dynamic payload size
+
+Byte layout
+
+int header
+- always 1234
+unsigned int identifier
+- 65535
+  ||		-> payload size 2 - 64 (always even)
+   ||		-> type 1 - 15
+     ||		-> object id 0 - 99 (max 35 if type == 15)
+  - example: payload: 32, type 12, object id = 88 -> 33288
+byte[] payload
+int footer
+- always 4321
+
 */
 #ifndef Communication_h
 #define Communication_h
@@ -40,14 +55,18 @@ const int typeAO = 5;
 const int typePID = 6;
 
 class Communication {
-    public:
-		Communication();
+public:
+	Communication();
 
-		void send();
-		void read();
+	void send();
+	void read();
 
-		dataStruct readData(int type, int nr);
-		void sendData(int type, int nr, dataStruct data);
+	dataStruct readData(int type, int nr);
+		
+	void sendData(int payloadSize, int type, int nr, const char * payload);
+private:
+	char _desc[6];
+	char _payload[64];
 };
 
 

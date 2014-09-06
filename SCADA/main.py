@@ -14,6 +14,7 @@ print("Starting")
 
 general = General()
 
+
 # todo: get this info from XML
 general.Objects.addObject("LS_open", DI.DigitalInput("Open switch",0,1,1))
 general.Objects.addObject("LS_closed", DI.DigitalInput("Close switch",1,1,6))

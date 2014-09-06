@@ -43,10 +43,17 @@ struct AIdataStruct {
 		value = 0.0;
 		min = 0.0;
 		max = 0.0;
-		spare[0] = 0;
-		spare[1] = 0;
 	}
 };
+/*struct AIcmdStruct {
+	struct cmd {
+		char spare : 8;
+		cmd() {
+			spare = 0;
+		}
+	};
+
+};*/
 
 class AI {
 public:

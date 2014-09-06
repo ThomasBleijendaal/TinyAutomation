@@ -57,8 +57,8 @@ void setup() {
 
   PT_barometricPressureSensor.begin();
 
-  TC_heatingPad.sp(32.0);
-  TC_heatingPad.activate(true);
+  //TC_heatingPad.sp(32.0);
+  //TC_heatingPad.activate(true);
 }
 
 void loop() {
@@ -77,7 +77,7 @@ void loop() {
 bool vent = false;
 void program() {
 
-  vent = QT_light.value() > 80.0;
+  vent = QT_light.value() > 50.0;
 
   ventilate(vent);
   M_agitator.activate(vent);

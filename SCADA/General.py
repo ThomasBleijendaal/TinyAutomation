@@ -63,8 +63,8 @@ class ObjectHandler(object):
         self._nameToObject[name]["typical"] = typical
 
     def handleData(self, dataSet):
-        for typical, i, data in dataSet:
-            self._objects[typical][i].handleData(data)
+        for typical, id, data in dataSet:
+            self._objects[typical][id].handleData(data)
 
     def draw(self,w):
         w.delete(ALL)
@@ -85,33 +85,59 @@ class Communication(object):
 
     def start(self):
         self._connection = serial.Serial('COM3', 115200)
+        self._connection.stopbits = 2
+
         #todo: replace this with check
         time.sleep(5)
+
         self._connection.flushInput()
 
     def readData(self):
-        while self._connection.inWaiting() > 24:
-            readBytes = self._connection.read(24)
+        while self._connection.inWaiting() >= 8:
+            headerBytes = self._connection.read(4)
 
-            header = int(struct.unpack('h',readBytes[:2])[0])
-            footer = int(struct.unpack('h',readBytes[22:])[0])
+            header, identifier = struct.unpack('=2h', headerBytes)
 
-            if header != 1234 or footer != 4321:
+            if header != 1234:
                 self._connection.flushInput()
+                print(header)
+                print("headerbreak")
                 break
 
-            typical = int(struct.unpack('h',readBytes[2:4])[0])
-            i = int(struct.unpack('h',readBytes[4:6])[0]) # - 10 if typical == 2 else 0
+            id = identifier % 100
+            identifier -= id
 
-            if typical == 2 and i == 10:
-                print("Jeej")
-            #print("Typical: " + str(typical) + "  I: " + str(i))
+            typical = int((identifier % 1000) / 100)
+            identifier -= typical * 100
+
+            payloadSize = int(identifier / 1000)
+            if payloadSize % 2:
+                typical += 10
+                payloadSize -= 1
+
+            payload = self._connection.read(payloadSize)
+            footerBytes = self._connection.read(2)
+
+            print(payload)
+
+            footer = struct.unpack('=h', footerBytes)[0]
+
+            if footer != 4321:
+                self._connection.flushInput()
+                print(footer)
+                print("footerbreak")
+                break
 
             yield [
                 typical,
-                i,
-                readBytes[6:22]
+                id,
+                payload
             ]
+
+    def sendData(self,typical,i,sendBytes):
+        data = struct.pack('=2h16c',typical,i,sendBytes)
+
+        self._connection.write(data)
 
 
 
@@ -138,7 +164,6 @@ class Presentation(object):
         self.interrupt()
 
         mainloop()
-
 
 
 

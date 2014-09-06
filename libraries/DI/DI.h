@@ -66,7 +66,7 @@ private:
 	int _id;
 	
 	bool _NC;
-		
+	
 	bool _active;
 	bool _activated;
 	bool _deActivated;
