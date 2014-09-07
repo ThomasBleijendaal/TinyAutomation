@@ -12,6 +12,7 @@ Basic implementation of a very naive PID controller.
 #include <AI.h>
 #include <AO.h>
 
+// char, char, float =1h1f
 struct PIDdataStruct {
 	struct status {
 		bool active : 1;
@@ -32,20 +33,9 @@ struct PIDdataStruct {
 		}
 	} cmd;
 	float sp;
-	char spare[10];
 
 	PIDdataStruct() {
 		sp = 0.0;
-		spare[0] = 0;
-		spare[1] = 0;
-		spare[2] = 0;
-		spare[3] = 0;
-		spare[4] = 0;
-		spare[5] = 0;
-		spare[6] = 0;
-		spare[7] = 0;
-		spare[8] = 0;
-		spare[9] = 0;
 	}
 };
 

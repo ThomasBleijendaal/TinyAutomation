@@ -20,7 +20,7 @@ class PIDController(Typical):
         print("PID destroyed")
 
     def handleData(self,data):
-        statusCmd, sp, dummy0, dummy1, dummy2 = struct.unpack('=1h3f1h', data)
+        statusCmd, sp = struct.unpack('=1h1f', data)
 
         self._active = bool(statusCmd & 1)
         self._deviated = bool(statusCmd & 2)

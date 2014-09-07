@@ -8,7 +8,7 @@ class DigitalOutput(DI.DigitalInput):
         print("DO destroyed")
 
     def handleData(self, data):
-        statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=2h3f', data)
+        statusCmd, startCount, activeTime = struct.unpack('=2h1f', data)
 
         self._active = statusCmd == 1
         self._interlock = statusCmd == 2

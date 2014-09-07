@@ -19,7 +19,7 @@ class AnalogOutput(Typical):
         self.positionY = positionY
 
     def handleData(self,data):
-        statusCmd, startCount, activeTime, output, dummy2 = struct.unpack('=2h3f', data)
+        statusCmd, startCount, activeTime, output = struct.unpack('=2h2f', data)
 
         self._active = bool(statusCmd & 1)
         self._interlock = bool(statusCmd & 2)

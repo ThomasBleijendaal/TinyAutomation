@@ -10,6 +10,7 @@ Writes an analog output (PWM). Recieves a 0 - 100 % input which is converted to 
 #include <Time.h>
 #include <Communication.h>
 
+// char, char, int, float, float =2h2f
 struct AOdataStruct {
 	struct status {
 		bool active : 1;
@@ -30,16 +31,11 @@ struct AOdataStruct {
 	int startCount;
 	float activeTime;
 	float output;
-	char spare[4];
 
 	AOdataStruct() {
 		startCount = 0;
 		activeTime = 0.0;
 		output = 0.0;
-		spare[0] = 0;
-		spare[1] = 0;
-		spare[2] = 0;
-		spare[3] = 0;
 	}
 };
 

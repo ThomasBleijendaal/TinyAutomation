@@ -14,7 +14,7 @@ class Motor(Typical):
     _height = 1
 
     def handleData(self, data):
-        statusCmd, startCount, activeTime, dummy1, dummy2 = struct.unpack('=2h3f', data)
+        statusCmd, startCount, activeTime = struct.unpack('=2h1f', data)
 
         self._active = statusCmd & 0x01
         self._reverse = statusCmd & 0x02

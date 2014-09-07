@@ -15,6 +15,7 @@ TODO:
 #include <Communication.h>
 #include <IO.h>
 
+// char, char, int, float =2h1f
 struct MdataStruct {
 	struct status {
 		bool active : 1;
@@ -38,19 +39,10 @@ struct MdataStruct {
 	} cmd;
 	int startCount;
 	float activeTime;
-	char spare[8];
 
 	MdataStruct() {
 		startCount = 0;
 		activeTime = 0.0;
-		spare[0] = 0;
-		spare[1] = 0;
-		spare[2] = 0;
-		spare[3] = 0;
-		spare[4] = 0;
-		spare[5] = 0;
-		spare[6] = 0;
-		spare[7] = 0;
 	}
 };
 class M {
