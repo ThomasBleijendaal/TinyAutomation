@@ -26,5 +26,5 @@ class ObjectHandler(GeneralObject):
         w.delete(ALL)
 
         for typical in self._objects:
-            for i in self._objects[typical]:
-                self._objects[typical][i].draw(w)
+            for id in self._objects[typical]:
+                self._objects[typical][id].draw(w)
