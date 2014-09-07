@@ -1,6 +1,6 @@
 class Typical(object):
     name = "{defaultName}"
-    i = -1
+    id = -1
 
     positionX = 1
     positionY = 1
@@ -8,15 +8,16 @@ class Typical(object):
     _width = 1
     _height = 1
 
-    def __init__(self, name, i, positionX, positionY):
+    def __init__(self, name, positionX, positionY):
         self.name = name
-        self.i = i
         self.positionX = positionX
         self.positionY = positionY
 
     def __del__(self):
         print(self.name + " destroyed")
 
+    def setId(self, id):
+        self.id = id
 
     def handleData(self, data):
         pass

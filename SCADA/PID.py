@@ -16,10 +16,9 @@ class PIDController(Typical):
     _width = 6
     _height = 1
 
-    def __init__(self, name, units, i, positionX, positionY):
+    def __init__(self, name, units, positionX, positionY):
         self.name = name
         self.units = units
-        self.i = i
         self.positionX = positionX
         self.positionY = positionY
     def __del__(self):
