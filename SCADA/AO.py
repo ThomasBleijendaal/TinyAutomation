@@ -7,6 +7,7 @@ class AnalogOutput(Typical):
     _startCount = 0
     _activeTime = 0.0
     _output = 0.0
+    _average = 0.0
 
     _width = 6
     _height = 1
@@ -19,14 +20,10 @@ class AnalogOutput(Typical):
         self.positionY = positionY
 
     def handleData(self,data):
-        statusCmd, startCount, activeTime, output = struct.unpack('=2h2f', data)
+        statusCmd, self._startCount, self._activeTime, self._output, self._average = struct.unpack('=2h3f', data)
 
         self._active = bool(statusCmd & 1)
         self._interlock = bool(statusCmd & 2)
-
-        self._startCount = startCount
-        self._activeTime = activeTime
-        self._output = output
 
     def draw(self,w):
         w.create_text(

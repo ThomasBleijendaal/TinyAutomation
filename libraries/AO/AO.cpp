@@ -50,9 +50,6 @@ float AO::output() {
 		return 0.0;
 	}
 }
-float AO::voltage() {
-	return output() * (5.0 / 100.0);
-}
 
 float AO::average() {
 	return _avg;
@@ -121,6 +118,7 @@ void AO::loop(Time &time, Communication &communication) {
 		data.startCount = _startCount;
 		data.activeTime = activeTime();
 		data.output = _currentOutput;
+		data.average = _avg;
 
 		communication.sendData(sizeof(data), typeAO, _id, (char*)&data);
 	}

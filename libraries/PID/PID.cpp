@@ -103,7 +103,13 @@ void PID::loop(Time &time, Communication &communication) {
 		data.status.deviated = _deviated;
 		data.status.fast = _fast;
 
+		data.input = _value;
 		data.sp = _sp;
+		data.output = _output;
+		data.P = _P;
+		data.I = _I;
+		data.D = _D;
+		data.deviationLimit = _deviationLimit;
 
 		communication.sendData(sizeof(data), typePID, _id, (char *)&data);
 	}

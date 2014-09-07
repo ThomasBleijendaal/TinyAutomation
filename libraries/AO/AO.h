@@ -31,11 +31,13 @@ struct AOdataStruct {
 	int startCount;
 	float activeTime;
 	float output;
+	float average;
 
 	AOdataStruct() {
 		startCount = 0;
 		activeTime = 0.0;
 		output = 0.0;
+		average = 0.0;
 	}
 };
 
@@ -54,7 +56,6 @@ public:
 	float output();
 	float average();
 	float activeTime();
-	float voltage();
 
 	void interlock(bool i0, bool i1, bool i2);
 

@@ -11,6 +11,7 @@ class AnalogInput(Typical):
     _value = 0.0
     _min = 0.0
     _max = 0.0
+    _average = 0.0
 
     _width = 6
     _height = 1
@@ -23,17 +24,13 @@ class AnalogInput(Typical):
         self.positionY = positionY
 
     def handleData(self,data):
-        statusCmd, value, min, max = struct.unpack('=1h3f', data)
+        statusCmd, self._value, self._min, self._max, self._average = struct.unpack('=1h4f', data)
 
         self._lolo = bool(statusCmd & 1)
         self._lo = bool(statusCmd & 2)
         self._hi = bool(statusCmd & 4)
         self._hihi = bool(statusCmd & 8)
         self._bta = bool(statusCmd & 16)
-
-        self._value = value
-        self._min = min
-        self._max = max
 
     def draw(self,w):
         if self._lolo or self._hihi:
@@ -52,8 +49,6 @@ class AnalogInput(Typical):
             outline = "#404040"
             text = ""
             fill = "#808080"
-
-
 
         w.create_text(
             self.positionX * 20,

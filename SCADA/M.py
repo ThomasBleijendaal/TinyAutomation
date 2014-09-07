@@ -14,14 +14,12 @@ class Motor(Typical):
     _height = 1
 
     def handleData(self, data):
-        statusCmd, startCount, activeTime = struct.unpack('=2h1f', data)
+        statusCmd, self._startCount, self._activeTime = struct.unpack('=2h1f', data)
 
         self._active = statusCmd & 0x01
         self._reverse = statusCmd & 0x02
         self._interlock = statusCmd & 0x04
         self._interlockReverse = statusCmd & 0x08
-        self._startCount = startCount
-        self._activeTime = activeTime
 
 
     def draw(self,w):

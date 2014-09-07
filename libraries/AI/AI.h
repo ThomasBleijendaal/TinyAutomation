@@ -11,7 +11,7 @@ too high (hihi), high (hi), low (lo) or too low (lolo). Also computes a rolling 
 #include <Time.h>
 #include <Communication.h>
 
-// char, char, float, float, float =h3f
+// char, char, float, float, float, float =h4f
 struct AIdataStruct {
 	struct status {
 		bool lolo : 1;
@@ -38,11 +38,13 @@ struct AIdataStruct {
 	float value;
 	float min;
 	float max;
+	float average;
 
 	AIdataStruct() {
 		value = 0.0;
 		min = 0.0;
 		max = 0.0;
+		average = 0.0;
 	}
 };
 /*struct AIcmdStruct {

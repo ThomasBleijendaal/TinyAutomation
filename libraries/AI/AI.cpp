@@ -110,6 +110,7 @@ void AI::loop(Time &time, Communication &communication) {
 			data.value = _value;
 			data.min = _min;
 			data.max = _max;
+			data.average = _avg;
 
 			communication.sendData(sizeof(data), typeAI, _id, (char*)&data);
 		}

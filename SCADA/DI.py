@@ -10,11 +10,9 @@ class DigitalInput(Typical):
     _height = 1
 
     def handleData(self, data):
-        statusCmd, switchCount, activeTime = struct.unpack('=2h1f', data)
+        statusCmd, self._switchCount, self._activeTime = struct.unpack('=2h1f', data)
 
         self._active = statusCmd == 1
-        self._count = switchCount
-        self._activeTime = activeTime
 
 
     def draw(self,w):

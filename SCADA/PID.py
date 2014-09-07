@@ -5,7 +5,13 @@ class PIDController(Typical):
     _active = False
     _deviated = False
     _fast = False
+    _input = 0.0
     _sp = 0.0
+    _output = 0.0
+    _P = 0.0
+    _I = 0.0
+    _D = 0.0
+    _deviationLimit = 0.0
 
     _width = 6
     _height = 1
@@ -20,13 +26,11 @@ class PIDController(Typical):
         print("PID destroyed")
 
     def handleData(self,data):
-        statusCmd, sp = struct.unpack('=1h1f', data)
+        statusCmd, self._input, self._sp, self._output, self._P, self._I, self._D, self._deviationLimit = struct.unpack('=1h7f', data)
 
         self._active = bool(statusCmd & 1)
         self._deviated = bool(statusCmd & 2)
         self._fast = bool(statusCmd & 4)
-
-        self._sp = sp
 
     def draw(self,w):
         w.create_text(
