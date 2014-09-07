@@ -19,6 +19,8 @@ int footer
 - always 4321
 
 */
+//#define COMM_DEBUG
+
 #ifndef Communication_h
 #define Communication_h
 

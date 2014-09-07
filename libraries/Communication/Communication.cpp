@@ -24,10 +24,19 @@ void Communication::sendData(int payloadSize, int type, int nr, const char * pay
 	memcpy(buffer, &header, 2);
 	memcpy(buffer + 2, &identifier, 2);
 	memcpy(buffer + 4, payload, payloadSize);
-	memcpy(buffer + 20, &footer, 2);
+	memcpy(buffer + (payloadSize + 4), &footer, 2);
 
+#ifndef COMM_DEBUG
 	for (int i = 0; i < (payloadSize + 6); i++)
 		Serial.write(buffer[i]);
+#else
+	for (int i = 0; i < (payloadSize + 6); i++) {
+		Serial.print(buffer[i],HEX);
+		Serial.print(".");
+	}
+	Serial.println(payloadSize);
+#endif
+	
 
 	delete[] buffer;
 

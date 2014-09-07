@@ -85,7 +85,6 @@ class Communication(object):
 
     def start(self):
         self._connection = serial.Serial('COM3', 115200)
-        self._connection.stopbits = 2
 
         #todo: replace this with check
         time.sleep(5)
@@ -114,6 +113,8 @@ class Communication(object):
             if payloadSize % 2:
                 typical += 10
                 payloadSize -= 1
+
+            print(payloadSize)
 
             payload = self._connection.read(payloadSize)
             footerBytes = self._connection.read(2)

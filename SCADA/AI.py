@@ -23,7 +23,7 @@ class AnalogInput(Typical):
         self.positionY = positionY
 
     def handleData(self,data):
-        statusCmd, value, min, max, dummy1 = struct.unpack('=1h3f1h', data)
+        statusCmd, value, min, max = struct.unpack('=1h3f', data)
 
         self._lolo = bool(statusCmd & 1)
         self._lo = bool(statusCmd & 2)
