@@ -1,57 +1,72 @@
 #include "Arduino.h"
 #include "IO.h"
 
-IO::IO() {
+IO::IO() {}
+IO::IO(int driverCount) {
+	_driverCount = driverCount + 1;
+	_filledSlot = -1;
 
+	_drivers = new IODriver*[_driverCount];
+	_pinLayout = new int[_driverCount];
+
+	registerDriver(0, 13, new DefaultDriver());
 }
 
-void IO::setRegisterOut(int dataWritePin, int clockPin, int latchPin, int writeBytes) {
-	_dataWritePin = dataWritePin;
-	_writeBytes = writeBytes;
-	_clockPin = clockPin;
-	_latchPin = latchPin;
+void IO::registerDriver(int rangeLow, int rangeHigh, IODriver * driver) {
+	if (_filledSlot > -1 && _pinLayout[_filledSlot] > rangeLow)
+		return;
 
-	_dataWritePinMask = 0x01 << dataWritePin;
-	_clockPinMask = 0x01 << clockPin;
-	_latchPinMask = 0x01 << latchPin;
-
-	pinMode(dataWritePin, OUTPUT);
-	pinMode(clockPin, OUTPUT);
-	pinMode(latchPin, OUTPUT);
-
-	PORTD |= _latchPinMask;
+	_drivers[++_filledSlot] = driver;
+	_pinLayout[_filledSlot] = rangeLow;
 }
 
-void IO::writeBit(int pin, bool value) {
-	if (pin < 100) {
-		digitalWrite(pin, value);
+void IO::begin() {
+	for (int i = _filledSlot; i >= 0; i--)
+		_drivers[i]->begin();
+}
+
+// TODO: change this to only cycle-able drivers
+void IO::cycle() {
+	for (int i = _filledSlot; i >= 0; i--)
+		_drivers[i]->cycle();
+}
+
+void IO::digitalWrite(int address, bool data) {
+	for (int i = _filledSlot; i >= 0; i--) {
+		if (address >= _pinLayout[i]) {
+			_drivers[i]->writeData(address - _pinLayout[i], data);
+			break;
+		}
 	}
-	else {
-		int byteNr = ((int)(pin / 100)) - 1;
-		int bitNr = pin % 100;
+}
 
-		_writeData[(byteNr * 8) + bitNr] = value;
+int IO::analogRead(int address) {
+	for (int i = _filledSlot; i >= 0; i--) {
+		if (address >= _pinLayout[i]) {
+			return _drivers[i]->readData(address - _pinLayout[i]);
+		}
 	}
 }
 
-void IO::writeByte(int byte, unsigned char value) {
-	for (int i = 0; i < 8; i++)
-		_writeData[byte * 8 + i] = bitRead(value, i);
+void IO::analogWrite(int address, int data) {
+	for (int i = _filledSlot; i >= 0; i--) {
+		if (address >= _pinLayout[i]) {
+			_drivers[i]->writeData(address - _pinLayout[i], data);
+			break;
+		}
+	}
 }
 
-void IO::write() {
-	// todo: only when io change occured
-	PORTD &= (unsigned char)~_latchPinMask;
+DefaultDriver::DefaultDriver() {}
+void DefaultDriver::begin() {}
+void DefaultDriver::cycle() {}
 
-	for (int b = (_writeBytes * 8) - 1; b >= 0; b--) {
-		if (_writeData[b])
-			PORTD |= _dataWritePinMask;
-		else
-			PORTD &= (unsigned char)~_dataWritePinMask;
-
-		PORTD |= _clockPinMask;
-		PORTD &= (unsigned char)~_clockPinMask;
-	}
-
-	PORTD |= _latchPinMask;
+int DefaultDriver::readData(int address) {
+	return analogRead(address);
+}
+void DefaultDriver::writeData(int address, bool data) {
+	digitalWrite(address, data);
+}
+void DefaultDriver::writeData(int address, int data) {
+	analogWrite(address, data);
 }

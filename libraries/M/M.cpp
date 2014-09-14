@@ -106,6 +106,6 @@ void M::loop(Time &time, Communication &communication, IO &io) {
 	}
 
 	for (int i = 0; i < _maxPins; ++i) {
-		io.writeBit(_pin[i], _seq == i);
+		io.digitalWrite(_pin[i], _seq == i);
 	}
 }

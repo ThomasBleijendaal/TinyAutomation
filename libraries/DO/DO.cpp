@@ -58,10 +58,10 @@ void DO::loop(Time &time, Communication &communication, IO &io) {
 
 	if (_active) {
 		if (!_blinks || (_blinks && time.b1s)) {
-			io.writeBit(_pin, HIGH);
+			io.digitalWrite(_pin, HIGH);
 		}
 		else if (_blinks && !time.b1s) {
-			io.writeBit(_pin, LOW);
+			io.digitalWrite(_pin, LOW);
 		}
 
 		if (!_wasActive) {
@@ -74,7 +74,7 @@ void DO::loop(Time &time, Communication &communication, IO &io) {
 		}
 	}
 	else {
-		io.writeBit(_pin, LOW);
+		io.digitalWrite(_pin, LOW);
 
 		stateChanged = _wasActive;
 		_wasActive = false;

@@ -1,41 +1,52 @@
 /*
 IO abstraction layer.
 
-Currently supports
-- Arduino UNO
-- Output Shift Registers (have to be on 0-7)
-- Digital output
+Register IO drivers in order to extend the IO range.
+
+TODO:
+	- Differentiate between types of IO Drivers
+	- Improve handling of IO errors
+	- Support all forms of IO (analog and digital)
+	- 
 
 */
 #ifndef IO_h
 #define IO_h
 
+#include <IODriver.h>
+
 class IO {
 public:
 	IO();
+	IO(int driverCount);
 
-	void setRegisterOut(int dataPin, int clockPin, int latchPin, int writeBytes);
-	void writeBit(int bit, bool value);
-	void writeByte(int byte, unsigned char value);
+	void registerDriver(int rangeLow, int rangeHigh, IODriver * driver);
 
-	//void setRegisterIn(int dataPin, int clockPin, int loadPin, int readBytes);
-	//bool readBit(int bit);
-	//unsigned char readByte(int byte);
+	void begin();
+	void cycle();
 
-	//void read();
-	void write();
+	void digitalWrite(int address, bool data);
+	
+	int analogRead(int address);
+	void analogWrite(int address, int data);
+
 private:
-	int _dataWritePin;
-	int _writeBytes;
+	int _driverCount;
+	int _filledSlot;
 
-	int _clockPin;
-	int _latchPin;
+	IODriver ** _drivers;
+	int * _pinLayout;
+};
 
-	unsigned char _dataWritePinMask;
-	unsigned char _clockPinMask;
-	unsigned char _latchPinMask;
+class DefaultDriver : public IODriver {	
+public:
+	DefaultDriver();
 
-	bool _writeData[32];
+	void begin();
+	int readData(int address);
+	void writeData(int address, bool data);
+	void writeData(int address, int data);
+	void cycle();
 };
 
 #endif

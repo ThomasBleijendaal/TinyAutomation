@@ -4,7 +4,7 @@
 General::General(int numAI, int numDI, int numAO, int numDO, int numM, int numPID) {
 	communication = Communication();
 	time = Time();
-	io = IO();
+	io = IO(1);
 
 	_AIs = new AI[numAI];
 	_AIi = 0;
@@ -50,7 +50,7 @@ void General::loop() {
 		_Ms[i].loop(time, communication, io);
 	}
 	
-	io.write();
+	io.cycle();
 	communication.send();
 }
 	
