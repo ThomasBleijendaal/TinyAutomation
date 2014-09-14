@@ -9,9 +9,9 @@ void Communication::send() {
 void Communication::read() {
 }
 
-dataStruct Communication::readData(int type, int nr) {
-	dataStruct nothing;
-	return nothing;
+char * Communication::readData(int type, int nr) {
+	char * buffer = new char[10];
+	return buffer;
 }
 void Communication::sendData(int payloadSize, int type, int nr, const char * payload) 
 {

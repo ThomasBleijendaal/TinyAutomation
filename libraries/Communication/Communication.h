@@ -63,7 +63,7 @@ public:
 	void send();
 	void read();
 
-	dataStruct readData(int type, int nr);
+	char * readData(int type, int nr);
 		
 	void sendData(int payloadSize, int type, int nr, const char * payload);
 private:
