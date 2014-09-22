@@ -12,10 +12,7 @@ AO::AO(int pin, float min, float max, float rate) {
 	_init(pin, min, max, rate);
 }
 void AO::_init(int pin, float min, float max, float rate) {
-	_id = -1;
 	_pin = pin;
-
-	pinMode(_pin, OUTPUT);
 
 	_min = min;
 	_max = max;
@@ -26,12 +23,6 @@ void AO::_init(int pin, float min, float max, float rate) {
 	_raw = (int)(_min * 2.55);
 	_output = 0.0;
 	_currentOutput = min;
-
-	analogWrite(_pin, _raw);
-}
-
-void AO::setId(int id) {
-	_id = id;
 }
 
 void AO::activate(bool activate) {
@@ -65,7 +56,10 @@ void AO::interlock(bool i0, bool i1, bool i2) {
 		_active = false;
 }
 
-void AO::loop(Time &time, Communication &communication) {
+void AO::begin(Time &time, Communication &communication, IO &io) {
+	io.mode(_pin, OUTPUT);
+}
+void AO::loop(Time &time, Communication &communication, IO &io) {
 	int sp = max(_min, min(_max, _output));
 	bool stateChanged = false;
 
@@ -92,7 +86,7 @@ void AO::loop(Time &time, Communication &communication) {
 				_activeTime++;
 		}
 
-		analogWrite(_pin, (int)(_currentOutput * 2.55));
+		io.analogWrite(_pin, (int)(_currentOutput * 2.55));
 
 		if (!_wasActive) {
 			_startCount++;
@@ -106,7 +100,7 @@ void AO::loop(Time &time, Communication &communication) {
 
 		_currentOutput = _min;
 
-		analogWrite(_pin, 0);
+		io.analogWrite(_pin, 0);
 	}
 	
 	if (stateChanged || time.t1s) {

@@ -6,17 +6,6 @@ Includes
 - Time class
 - IO class
 
-TODO:
-implement:
-
-int freeRam () {
-extern int __heap_start, *__brkval;
-int v;
-return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-}
-
-make typical arrays dynamic
-
 */
 #ifndef General_h
 #define General_h
@@ -32,6 +21,7 @@ make typical arrays dynamic
 #include <M.h>
 #include <PID.h>
 
+
 class General {
     public:
 		General(int numAI, int numDI, int numAO, int numDO, int numM, int numPID);
@@ -44,6 +34,7 @@ class General {
 		PID &addPID(PID object);
 
 		void loop();
+		void begin();
 
 		Communication communication;
 		Time time;

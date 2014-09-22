@@ -25,15 +25,6 @@ void HC595::begin() {
 	PORTD |= _latchPinMask;
 }
 
-void HC595::writeData(int address, bool data) {
-	_writeRequired = true;
-	
-	int byteNr = int(address / 8);
-	int bitNr = int(address % 8);
-
-	_writeData[(byteNr * 8) + bitNr] = data;
-}
-
 void HC595::cycle() {
 	if (!_writeRequired)
 		return;
@@ -58,4 +49,12 @@ void HC595::cycle() {
 	PORTD |= _latchPinMask;
 
 	interrupts();
+}
+void HC595::digitalWrite(int address, bool data) {
+	_writeRequired = true;
+
+	int byteNr = int(address / 8);
+	int bitNr = int(address % 8);
+
+	_writeData[(byteNr * 8) + bitNr] = data;
 }

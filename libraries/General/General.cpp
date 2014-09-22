@@ -20,6 +20,13 @@ General::General(int numAI, int numDI, int numAO, int numDO, int numM, int numPI
 	_PIDi = 0;
 }
 
+void General::begin() {
+	io.begin();
+
+	// typicals begin //
+
+}
+
 void General::loop() {
 	time.loop();
 	
@@ -27,11 +34,11 @@ void General::loop() {
 	//io.read();
 
 	for (int i = 0; i < _DIi; i++) {
-		_DIs[i].loop(time, communication);
+		_DIs[i].loop(time, communication, io);
 	}
 	
 	for (int i = 0; i < _AIi; i++) {
-		_AIs[i].loop(time, communication);
+		_AIs[i].loop(time, communication, io);
 	}
 
 	for (int i = 0; i < _PIDi; i++) {
@@ -43,7 +50,7 @@ void General::loop() {
 	}
 
 	for (int i = 0; i < _AOi; i++) {
-		_AOs[i].loop(time, communication);
+		_AOs[i].loop(time, communication, io);
 	}
 
 	for (int i = 0; i < _Mi; i++) {

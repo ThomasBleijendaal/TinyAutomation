@@ -4,8 +4,10 @@
 IODriver::IODriver() {}
 void IODriver::begin() {}
 void IODriver::cycle() {}
+void IODriver::mode(int address, int mode) {}
 
-int IODriver::readData(int address) {}
+bool IODriver::digitalRead(int address) {}
+void IODriver::digitalWrite(int address, bool data) {}
 
-void IODriver::writeData(int address, bool data) {}
-void IODriver::writeData(int address, int data) {}
+int IODriver::analogRead(int address) {}
+void IODriver::analogWrite(int address, int data) {}

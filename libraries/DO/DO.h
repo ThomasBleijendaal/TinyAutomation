@@ -7,6 +7,7 @@ Writes a digitial output. Set the output according to its active state, counts t
 #ifndef DO_h
 #define DO_h
 
+#include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
 #include <IO.h>
@@ -38,13 +39,11 @@ struct DOdataStruct {
 	}
 };
 
-class DO {
+class DO : public Typical {
 public:
 	DO();
 	DO(int pin);
 
-	void setId(int id);
-	
 	bool isActive();
 	unsigned int startCount();
 	float activeTime();
@@ -54,10 +53,10 @@ public:
 
 	void interlock(bool i0, bool i1, bool i2);
 
+	void begin(Time &time, Communication &communication, IO &io);
 	void loop(Time &time, Communication &communication, IO &io);
 private:
 	int _pin;
-	int _id;
 
 	bool _interlock;
 	bool _active;

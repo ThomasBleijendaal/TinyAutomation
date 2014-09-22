@@ -7,8 +7,10 @@ Reads a digital input. Counts the times the input is turned on and the duration 
 #ifndef DI_h
 #define DI_h
 
+#include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
+#include <IO.h>
 
 // char, char, int, float =2h1f
 struct DIdataStruct {
@@ -35,13 +37,11 @@ struct DIdataStruct {
 	}
 };
 
-class DI {
+class DI : public Typical {
 public:
 	DI();
 	DI(int pin);
 	DI(int pin, bool NC);
-
-	void setId(int id);
 
 	bool isActive();
 	bool activated();
@@ -49,13 +49,13 @@ public:
 
 	unsigned int switchCount();
 	float activeTime();
-		
-	void loop(Time &time, Communication &communication);
+
+	void begin(Time &time, Communication &communication, IO &io);
+	void loop(Time &time, Communication &communication, IO &io);
 private:
 	void _init(int pin, bool NC);
 
 	int _pin;
-	int _id;
 	
 	bool _NC;
 	

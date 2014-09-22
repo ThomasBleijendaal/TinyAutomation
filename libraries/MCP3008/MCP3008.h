@@ -17,7 +17,8 @@ public:
 	MCP3008(int resampleCount, int delayTime, int CLK, int Din, int Dout, int ChipSelect);
 
 	void begin();
-	int readData(int address);
+
+	int analogRead(int address);
 
 private:
 	int _resampleCount;

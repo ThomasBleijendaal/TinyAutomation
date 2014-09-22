@@ -19,7 +19,6 @@ AI::AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi,
 }
 
 void AI::_init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping) {
-	_id = -1;
 	_pin = pin;
 
 	_rangeLow = rangeLow;
@@ -58,14 +57,14 @@ void AI::_init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, f
 	_firstValueSet = false;
 }
 
-void AI::setId(int id) {
-	_id = id;
+void AI::begin(Time &time, Communication &communication, IO &io) {
+	io.mode(_pin, INPUT);
 }
 
-void AI::loop(Time &time, Communication &communication) {
+void AI::loop(Time &time, Communication &communication, IO &io) {
 	if (_pin != -1) {
 		if (_enable)
-			_raw = analogRead(_pin);
+			_raw = io.analogRead(_pin);
 
 		float value = ((float)(_raw - _rawLow)) * ((_rangeHigh - _rangeLow) / ((float)(_rawHigh - _rawLow))) + _rangeLow;
 		

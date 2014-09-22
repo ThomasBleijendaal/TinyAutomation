@@ -17,8 +17,9 @@ public:
 	HC595(int dataPin, int clockPin, int latchPin, int chainLength);
 	
 	void begin();
-	void writeData(int address, bool data);
 	void cycle();
+
+	void digitalWrite(int address, bool data);
 
 private:
 	int _dataPin;

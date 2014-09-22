@@ -1,13 +1,8 @@
 #include "Arduino.h"
 #include "DO.h"
-#include "General.h"
-#include "IO.h"
 
 DO::DO() {}
 DO::DO(int pin) {
-	pinMode(pin, OUTPUT);
-
-	_id = -1;
 	_pin = pin;
 
 	_interlock = false;
@@ -17,10 +12,6 @@ DO::DO(int pin) {
 
 	_startCount = 0U;
 	_activeTime = 0U;
-}
-
-void DO::setId(int id) {
-	_id = id;
 }
 
 void DO::activate(bool activate) {
@@ -53,6 +44,9 @@ void DO::interlock(bool i0, bool i1, bool i2) {
 	}
 }
 
+void DO::begin(Time &time, Communication &communication, IO &io) {
+	io.mode(_pin, OUTPUT);
+}
 void DO::loop(Time &time, Communication &communication, IO &io) {
 	bool stateChanged = false;
 

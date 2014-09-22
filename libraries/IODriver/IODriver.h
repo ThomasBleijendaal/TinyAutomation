@@ -30,10 +30,13 @@ public:
 
 	virtual void begin();
 	virtual void cycle();
+	virtual void mode(int address, int mode);
 
-	virtual int readData(int address);
-	virtual void writeData(int address, bool data);
-	virtual void writeData(int address, int data);
+	virtual bool digitalRead(int address);
+	virtual void digitalWrite(int address, bool data);
+
+	virtual int analogRead(int address);
+	virtual void analogWrite(int address, int data);
 
 private:
 	

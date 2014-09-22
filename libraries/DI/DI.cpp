@@ -1,6 +1,5 @@
 #include "Arduino.h"
 #include "DI.h"
-#include "General.h"
 
 DI::DI() {}
 DI::DI(int pin) {
@@ -10,19 +9,12 @@ DI::DI(int pin, bool NC) {
 	_init(pin, NC);
 }
 void DI::_init(int pin, bool NC) {
-	pinMode(_pin, (NC) ? INPUT_PULLUP : INPUT);
-	
-	_id = -1;
 	_pin = pin;
 	_NC = NC;
 
 	_active = false;
 	_switchCount = 0U;
 	_activeTime = 0U;
-}
-
-void DI::setId(int id) {
-	_id = id;
 }
 
 bool DI::isActive() {
@@ -43,8 +35,11 @@ float DI::activeTime() {
 	return float(_activeTime) / 10.0;
 }
 
-void DI::loop(Time &time, Communication &communication) {
-	int pinValue = digitalRead(_pin);
+void DI::begin(Time &time, Communication &communication, IO &io) {
+	io.mode(_pin, (_NC) ? INPUT_PULLUP : INPUT);
+}
+void DI::loop(Time &time, Communication &communication, IO &io) {
+	int pinValue = io.digitalRead(_pin);
 
 	_activated = false;
 	_deActivated = false;

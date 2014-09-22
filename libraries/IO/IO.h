@@ -7,7 +7,7 @@ TODO:
 	- Differentiate between types of IO Drivers
 	- Improve handling of IO errors
 	- Support all forms of IO (analog and digital)
-	- 
+	- Improve looping through drivers
 
 */
 #ifndef IO_h
@@ -24,7 +24,9 @@ public:
 
 	void begin();
 	void cycle();
+	void mode(int address, int mode);
 
+	bool digitalRead(int address);
 	void digitalWrite(int address, bool data);
 	
 	int analogRead(int address);
@@ -36,17 +38,6 @@ private:
 
 	IODriver ** _drivers;
 	int * _pinLayout;
-};
-
-class DefaultDriver : public IODriver {	
-public:
-	DefaultDriver();
-
-	void begin();
-	int readData(int address);
-	void writeData(int address, bool data);
-	void writeData(int address, int data);
-	void cycle();
 };
 
 #endif

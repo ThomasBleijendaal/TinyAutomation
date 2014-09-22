@@ -22,7 +22,7 @@ void MCP3008::begin() {
 	digitalWrite(_CS, LOW);
 }
 
-int MCP3008::readData(int address) {
+int MCP3008::analogRead(int address) {
 	int data = 0;
 	int result = 0;
 

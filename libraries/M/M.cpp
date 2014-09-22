@@ -8,11 +8,6 @@ M::M() {
 	_wasActive = false;
 	_startCount = 0U;
 	_activeTime = 0U;
-	_id = -1;
-}
-
-void M::setId(int id) {
-	_id = id;
 }
 
 void M::singleCoil(int pin0, int pin1) {
@@ -64,6 +59,9 @@ float M::activeTime() {
 	return ((float)_activeTime) / 10.0;
 }
 
+void M::begin(Time &time, Communication &communication, IO &io) {
+
+}
 void M::loop(Time &time, Communication &communication, IO &io) {
 	bool stateChanged = false;
 

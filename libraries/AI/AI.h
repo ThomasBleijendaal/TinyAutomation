@@ -8,8 +8,10 @@ too high (hihi), high (hi), low (lo) or too low (lolo). Also computes a rolling 
 #ifndef AI_h
 #define AI_h
 
+#include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
+#include <IO.h>
 
 // char, char, float, float, float, float =h4f
 struct AIdataStruct {
@@ -57,7 +59,7 @@ struct AIdataStruct {
 
 };*/
 
-class AI {
+class AI : public Typical {
 public:
 	AI();
 	AI(int pin);
@@ -65,8 +67,6 @@ public:
 	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
 	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
 	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
-
-	void setId(int id);
 
 	bool lolo();
 	bool lo();
@@ -86,11 +86,11 @@ public:
 	float rangeLow();
 	float rangeHigh();
 
-	void loop(Time &time, Communication &communication);
+	void begin(Time &time, Communication &communication, IO &io);
+	void loop(Time &time, Communication &communication, IO &io);
 private:
 	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
 
-	int _id;
 	int _pin;
 
 	int _raw;

@@ -3,13 +3,11 @@
 
 IO::IO() {}
 IO::IO(int driverCount) {
-	_driverCount = driverCount + 1;
+	_driverCount = driverCount;
 	_filledSlot = -1;
 
 	_drivers = new IODriver*[_driverCount];
 	_pinLayout = new int[_driverCount];
-
-	registerDriver(0, 13, new DefaultDriver());
 }
 
 void IO::registerDriver(int rangeLow, int rangeHigh, IODriver * driver) {
@@ -31,10 +29,26 @@ void IO::cycle() {
 		_drivers[i]->cycle();
 }
 
+void IO::mode(int address, int mode) {
+	for (int i = _filledSlot; i >= 0; i--) {
+		if (address >= _pinLayout[i]) {
+			return _drivers[i]->mode(address - _pinLayout[i], mode);
+		}
+	}
+}
+
+bool IO::digitalRead(int address) {
+	for (int i = _filledSlot; i >= 0; i--) {
+		if (address >= _pinLayout[i]) {
+			return _drivers[i]->digitalRead(address - _pinLayout[i]);
+		}
+	}
+}
+
 void IO::digitalWrite(int address, bool data) {
 	for (int i = _filledSlot; i >= 0; i--) {
 		if (address >= _pinLayout[i]) {
-			_drivers[i]->writeData(address - _pinLayout[i], data);
+			_drivers[i]->digitalWrite(address - _pinLayout[i], data);
 			break;
 		}
 	}
@@ -43,7 +57,7 @@ void IO::digitalWrite(int address, bool data) {
 int IO::analogRead(int address) {
 	for (int i = _filledSlot; i >= 0; i--) {
 		if (address >= _pinLayout[i]) {
-			return _drivers[i]->readData(address - _pinLayout[i]);
+			return _drivers[i]->analogRead(address - _pinLayout[i]);
 		}
 	}
 }
@@ -51,22 +65,8 @@ int IO::analogRead(int address) {
 void IO::analogWrite(int address, int data) {
 	for (int i = _filledSlot; i >= 0; i--) {
 		if (address >= _pinLayout[i]) {
-			_drivers[i]->writeData(address - _pinLayout[i], data);
+			_drivers[i]->analogWrite(address - _pinLayout[i], data);
 			break;
 		}
 	}
-}
-
-DefaultDriver::DefaultDriver() {}
-void DefaultDriver::begin() {}
-void DefaultDriver::cycle() {}
-
-int DefaultDriver::readData(int address) {
-	return analogRead(address);
-}
-void DefaultDriver::writeData(int address, bool data) {
-	digitalWrite(address, data);
-}
-void DefaultDriver::writeData(int address, int data) {
-	analogWrite(address, data);
 }
