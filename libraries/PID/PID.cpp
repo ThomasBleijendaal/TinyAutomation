@@ -2,16 +2,16 @@
 #include "PID.h"
 
 PID::PID() {}
-PID::PID(AI *input, float min, float max, AO *output, float P, float I, float D) {
+PID::PID(AI **input, float min, float max, AO **output, float P, float I, float D) {
 	_init(input, min, max, output, P, I, D, 1000.0, false);
 }
-PID::PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit) {
+PID::PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit) {
 	_init(input, min, max, output, P, I, D, deviationLimit, false);
 }
-PID::PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast) {
+PID::PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast) {
 	_init(input, min, max, output, P, I, D, deviationLimit, fast);
 }
-void PID::_init(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast) {
+void PID::_init(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast) {
 	_id = -1;
 	
 	_min = min;
@@ -25,8 +25,8 @@ void PID::_init(AI *input, float min, float max, AO *output, float P, float I, f
 	_I = I;
 	_D = D;
 	
-	_AI = input;
-	_AO = output;
+	_AI = *input;
+	_AO = *output;
 	
 	_active = false;
 }
@@ -53,7 +53,10 @@ bool PID::isDeviated() {
 	return _deviated;
 }
 
-void PID::loop(Time &time, Communication &communication) {
+void PID::begin(Time &time, Communication &communication, IO &io) {
+
+}
+void PID::loop(Time &time, Communication &communication, IO &io) {
 	bool stateChanged = false;
 
 	_value = _AI->value();
@@ -97,7 +100,7 @@ void PID::loop(Time &time, Communication &communication) {
 	}
 
 	if (time.t1s || stateChanged) {
-		PIDdataStruct data;
+		PIDsendStruct data;
 
 		data.status.active = _active;
 		data.status.deviated = _deviated;

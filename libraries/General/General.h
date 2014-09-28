@@ -24,14 +24,10 @@ Includes
 
 class General {
     public:
-		General(int numAI, int numDI, int numAO, int numDO, int numM, int numPID);
+		General(int objectCount, int ioCount);
 
-		AI &addAI(AI object);
-		DI &addDI(DI object);
-		AO &addAO(AO object);
-		DO &addDO(DO object);
-		M &addM(M object);
-		PID &addPID(PID object);
+		template <class T>
+		T * add(T * object);
 
 		void loop();
 		void begin();
@@ -41,24 +37,10 @@ class General {
 		IO io;
     
 	private:
-		AI* _AIs;
-		int _AIi;
+		Typical ** _typicals;
+		void _add(Typical * object);
 
-		DI* _DIs;
-		int _DIi;
-
-		AO* _AOs;
-		int _AOi;
-
-		DO* _DOs;
-		int _DOi;
-
-		M* _Ms;
-		int _Mi;
-
-		PID* _PIDs;
-		int _PIDi;
-
+		int _typicalCount;
 };
 
 #endif

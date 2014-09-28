@@ -7,13 +7,14 @@ Basic implementation of a very naive PID controller.
 #ifndef PID_h
 #define PID_h
 
+#include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
 #include <AI.h>
 #include <AO.h>
 
 // char, char, 7 x float =1h7f
-struct PIDdataStruct {
+struct PIDsendStruct {
 	struct status {
 		bool active : 1;
 		bool deviated : 1;
@@ -26,12 +27,7 @@ struct PIDdataStruct {
 			spare = 0;
 		}
 	} status;
-	struct cmd {
-		char spare : 8;
-		cmd() {
-			spare = 0;
-		}
-	} cmd;
+	char spare;
 	float input;
 	float sp;
 	float output;
@@ -40,17 +36,41 @@ struct PIDdataStruct {
 	float D; 
 	float deviationLimit;
 
-	PIDdataStruct() {
-		sp = 0.0;
+	PIDsendStruct() {
+		sp = input = output = P = I = D = deviationLimit = 0.0;
+	}
+};
+// char, char, 5 x float
+struct PIDrecStruct {
+	struct cmd {
+		bool setFast : 1;
+		bool resetFast : 1;
+		char spare : 6;
+
+		cmd() {
+			setFast = false;
+			resetFast = false;
+			spare = 0;
+		}
+	};
+	char spare;
+	float sp;
+	float P;
+	float I;
+	float D;
+	float deviationLimit;
+
+	PIDrecStruct() {
+		sp = P = I = D = deviationLimit = 0.0;
 	}
 };
 
-class PID {
+class PID : public Typical {
 public:
 	PID();
-	PID(AI *input, float min, float max, AO *output, float P, float I, float D);
-	PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit);
-	PID(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast);
+	PID(AI **input, float min, float max, AO **output, float P, float I, float D);
+	PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit);
+	PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast);
 
 	void setId(int id);
 
@@ -62,10 +82,11 @@ public:
 	void sp(float sp);
 	void activate(bool activate);
 
-	void loop(Time &time, Communication &communication);
+	void begin(Time &time, Communication &communication, IO &io);
+	void loop(Time &time, Communication &communication, IO &io);
 
 private:
-	void _init(AI *input, float min, float max, AO *output, float P, float I, float D, float deviationLimit, bool fast);
+	void _init(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast);
 
 	int _id;
 
