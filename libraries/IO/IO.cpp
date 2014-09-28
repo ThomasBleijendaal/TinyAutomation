@@ -19,14 +19,16 @@ void IO::registerDriver(int rangeLow, int rangeHigh, IODriver * driver) {
 }
 
 void IO::begin() {
-	for (int i = _filledSlot; i >= 0; i--)
+	for (int i = _filledSlot; i >= 0; i--) {
 		_drivers[i]->begin();
+	}
 }
 
 // TODO: change this to only cycle-able drivers
 void IO::cycle() {
-	for (int i = _filledSlot; i >= 0; i--)
+	for (int i = _filledSlot; i >= 0; i--) {
 		_drivers[i]->cycle();
+	}
 }
 
 void IO::mode(int address, int mode) {

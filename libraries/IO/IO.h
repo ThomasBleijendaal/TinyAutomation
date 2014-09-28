@@ -8,6 +8,7 @@ TODO:
 	- Improve handling of IO errors
 	- Support all forms of IO (analog and digital)
 	- Improve looping through drivers
+	- Driver count should be dynamic
 
 */
 #ifndef IO_h
