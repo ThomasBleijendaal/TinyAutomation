@@ -50,8 +50,8 @@ public:
 	unsigned int switchCount();
 	float activeTime();
 
-	void begin(Time &time, Communication &communication, IO &io);
-	void loop(Time &time, Communication &communication, IO &io);
+	void begin(Time * time, Communication * communication, IO * io);
+	void loop(Time * time, Communication * communication, IO * io);
 private:
 	void _init(int pin, bool NC);
 

@@ -56,15 +56,15 @@ void AO::interlock(bool i0, bool i1, bool i2) {
 		_active = false;
 }
 
-void AO::begin(Time &time, Communication &communication, IO &io) {
-	io.mode(_pin, OUTPUT);
+void AO::begin(Time * time, Communication * communication, IO * io) {
+	io->mode(_pin, OUTPUT);
 }
-void AO::loop(Time &time, Communication &communication, IO &io) {
+void AO::loop(Time * time, Communication * communication, IO * io) {
 	int sp = max(_min, min(_max, _output));
 	bool stateChanged = false;
 
 	if (_active) {
-		if (_rate != -1 && time.t100ms) {
+		if (_rate != -1 && time->t100ms) {
 			
 			float delta = _rate / 10.0;
 
@@ -79,14 +79,14 @@ void AO::loop(Time &time, Communication &communication, IO &io) {
 			_currentOutput = max(_min, min(_max, _output));
 		}
 
-		if (time.t100ms) {
+		if (time->t100ms) {
 			_avg = ((_avg * 99.0) + _currentOutput) / 100.0;
 
 			if (_active)
 				_activeTime++;
 		}
 
-		io.analogWrite(_pin, (int)(_currentOutput * 2.55));
+		io->analogWrite(_pin, (int)(_currentOutput * 2.55));
 
 		if (!_wasActive) {
 			_startCount++;
@@ -100,10 +100,10 @@ void AO::loop(Time &time, Communication &communication, IO &io) {
 
 		_currentOutput = _min;
 
-		io.analogWrite(_pin, 0);
+		io->analogWrite(_pin, 0);
 	}
 	
-	if (stateChanged || time.t1s) {
+	if (stateChanged || time->t1s) {
 		AOdataStruct data;
 
 		data.status.active = _active;
@@ -114,6 +114,6 @@ void AO::loop(Time &time, Communication &communication, IO &io) {
 		data.output = _currentOutput;
 		data.average = _avg;
 
-		communication.sendData(sizeof(data), typeAO, _id, (char*)&data);
+		communication->sendData(sizeof(data), typeAO, _id, (char*)&data);
 	}
 }

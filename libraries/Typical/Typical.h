@@ -17,8 +17,8 @@ public:
 
 	void setId(int id);
 
-	virtual void begin(Time &time, Communication &communication, IO &io);
-	virtual void loop(Time &time, Communication &communication, IO &io);
+	virtual void begin(Time * time, Communication * communication, IO * io);
+	virtual void loop(Time * time, Communication * communication, IO * io);
 protected:
 	int _id;
 };

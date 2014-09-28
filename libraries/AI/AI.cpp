@@ -57,14 +57,14 @@ void AI::_init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, f
 	_firstValueSet = false;
 }
 
-void AI::begin(Time &time, Communication &communication, IO &io) {
-	io.mode(_pin, INPUT);
+void AI::begin(Time * time, Communication * communication, IO * io) {
+	io->mode(_pin, INPUT);
 }
 
-void AI::loop(Time &time, Communication &communication, IO &io) {
+void AI::loop(Time * time, Communication * communication, IO * io) {
 	if (_pin != -1) {
 		if (_enable)
-			_raw = io.analogRead(_pin);
+			_raw = io->analogRead(_pin);
 
 		float value = ((float)(_raw - _rawLow)) * ((_rangeHigh - _rangeLow) / ((float)(_rawHigh - _rawLow))) + _rangeLow;
 		
@@ -94,10 +94,10 @@ void AI::loop(Time &time, Communication &communication, IO &io) {
 		_isHihi = _enableHihi && (_isHihi || _value > _hihi) && _value >= _hihi + delta;
 		_isBTA = _enableBTA && (_isBTA || _value <= _rangeLow || _value >= _rangeHigh) && (_value <= _rangeLow + delta || _value >= _rangeHigh - delta);
 
-		if (time.t100ms) {
+		if (time->t100ms) {
 			_avg = ((_avg * 99.0) + _value) / 100.0;
 		}
-		if (time.t1s) {
+		if (time->t1s) {
 			AIdataStruct data;
 
 			data.status.lolo = _isLolo;
@@ -111,7 +111,7 @@ void AI::loop(Time &time, Communication &communication, IO &io) {
 			data.max = _max;
 			data.average = _avg;
 
-			communication.sendData(sizeof(data), typeAI, _id, (char*)&data);
+			communication->sendData(sizeof(data), typeAI, _id, (char*)&data);
 		}
 	}
 }

@@ -59,14 +59,14 @@ float M::activeTime() {
 	return ((float)_activeTime) / 10.0;
 }
 
-void M::begin(Time &time, Communication &communication, IO &io) {
+void M::begin(Time * time, Communication * communication, IO * io) {
 
 }
-void M::loop(Time &time, Communication &communication, IO &io) {
+void M::loop(Time * time, Communication * communication, IO * io) {
 	bool stateChanged = false;
 
 	if (_active) {
-		if (time.t2_5ms) {
+		if (time->t2_5ms) {
 			if (!_reverse) {
 				_seq = (_seq + 1) % _maxPins;
 			}
@@ -79,7 +79,7 @@ void M::loop(Time &time, Communication &communication, IO &io) {
 			stateChanged = true;
 			_wasActive = true;
 		}
-		if (time.t100ms) {
+		if (time->t100ms) {
 			_activeTime++;
 		}
 	}
@@ -89,7 +89,7 @@ void M::loop(Time &time, Communication &communication, IO &io) {
 		_wasActive = false;
 	}
 
-	if (stateChanged || time.t1s) {
+	if (stateChanged || time->t1s) {
 		MdataStruct data;
 
 		data.status.active = _active;
@@ -100,10 +100,10 @@ void M::loop(Time &time, Communication &communication, IO &io) {
 		data.startCount = _startCount;
 		data.activeTime = activeTime();
 
-		communication.sendData(sizeof(data), typeM, _id, (char*)&data);
+		communication->sendData(sizeof(data), typeM, _id, (char*)&data);
 	}
 
 	for (int i = 0; i < _maxPins; ++i) {
-		io.digitalWrite(_pin[i], _seq == i);
+		io->digitalWrite(_pin[i], _seq == i);
 	}
 }

@@ -82,8 +82,8 @@ public:
 	void sp(float sp);
 	void activate(bool activate);
 
-	void begin(Time &time, Communication &communication, IO &io);
-	void loop(Time &time, Communication &communication, IO &io);
+	void begin(Time * time, Communication * communication, IO * io);
+	void loop(Time * time, Communication * communication, IO * io);
 
 private:
 	void _init(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast);

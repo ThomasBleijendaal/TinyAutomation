@@ -35,11 +35,11 @@ float DI::activeTime() {
 	return float(_activeTime) / 10.0;
 }
 
-void DI::begin(Time &time, Communication &communication, IO &io) {
-	io.mode(_pin, (_NC) ? INPUT_PULLUP : INPUT);
+void DI::begin(Time * time, Communication * communication, IO * io) {
+	io->mode(_pin, (_NC) ? INPUT_PULLUP : INPUT);
 }
-void DI::loop(Time &time, Communication &communication, IO &io) {
-	int pinValue = io.digitalRead(_pin);
+void DI::loop(Time * time, Communication * communication, IO * io) {
+	int pinValue = io->digitalRead(_pin);
 
 	_activated = false;
 	_deActivated = false;
@@ -50,7 +50,7 @@ void DI::loop(Time &time, Communication &communication, IO &io) {
 			_switchCount++;
 			_active = true;
 		}
-		if (time.t100ms) {
+		if (time->t100ms) {
 			_activeTime++;
 		}
 	}
@@ -59,7 +59,7 @@ void DI::loop(Time &time, Communication &communication, IO &io) {
 		_active = false;
 	}
 
-	if (_activated || _deActivated || time.t1s) {
+	if (_activated || _deActivated || time->t1s) {
 		DIdataStruct data;
 
 		data.status.active = _active;
@@ -67,6 +67,6 @@ void DI::loop(Time &time, Communication &communication, IO &io) {
 		data.switchCount = _switchCount;
 		data.activeTime = activeTime();
 
-		communication.sendData(sizeof(data), typeDI, _id, (char*)&data);
+		communication->sendData(sizeof(data), typeDI, _id, (char*)&data);
 	}
 }

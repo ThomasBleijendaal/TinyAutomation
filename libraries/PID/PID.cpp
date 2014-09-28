@@ -53,16 +53,16 @@ bool PID::isDeviated() {
 	return _deviated;
 }
 
-void PID::begin(Time &time, Communication &communication, IO &io) {
+void PID::begin(Time * time, Communication * communication, IO * io) {
 
 }
-void PID::loop(Time &time, Communication &communication, IO &io) {
+void PID::loop(Time * time, Communication * communication, IO * io) {
 	bool stateChanged = false;
 
 	_value = _AI->value();
 
 	if (_active) {
-		if (time.t100ms || _fast) {
+		if (time->t100ms || _fast) {
 			if (!_wasActive) {
 				_wasActive = stateChanged = true;
 			}
@@ -77,7 +77,7 @@ void PID::loop(Time &time, Communication &communication, IO &io) {
 			_output = max(_min, min(_max, newOutput));	
 		}
 		if (abs(_sp - _value) >= (_max - _min) * _deviationLimit) {
-			if (time.t1s)
+			if (time->t1s)
 				_deviated = ++_devDelay >= 5;
 
 			if (_deviated && !_wasDeviated)
@@ -99,7 +99,7 @@ void PID::loop(Time &time, Communication &communication, IO &io) {
 		_output = 0.0;
 	}
 
-	if (time.t1s || stateChanged) {
+	if (time->t1s || stateChanged) {
 		PIDsendStruct data;
 
 		data.status.active = _active;
@@ -114,7 +114,7 @@ void PID::loop(Time &time, Communication &communication, IO &io) {
 		data.D = _D;
 		data.deviationLimit = _deviationLimit;
 
-		communication.sendData(sizeof(data), typePID, _id, (char *)&data);
+		communication->sendData(sizeof(data), typePID, _id, (char *)&data);
 	}
 
 	_AO->output(_output);

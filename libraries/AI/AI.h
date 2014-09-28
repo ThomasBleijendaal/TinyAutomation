@@ -86,8 +86,8 @@ public:
 	float rangeLow();
 	float rangeHigh();
 
-	void begin(Time &time, Communication &communication, IO &io);
-	void loop(Time &time, Communication &communication, IO &io);
+	void begin(Time * time, Communication * communication, IO * io);
+	void loop(Time * time, Communication * communication, IO * io);
 private:
 	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
 

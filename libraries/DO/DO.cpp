@@ -44,18 +44,18 @@ void DO::interlock(bool i0, bool i1, bool i2) {
 	}
 }
 
-void DO::begin(Time &time, Communication &communication, IO &io) {
-	io.mode(_pin, OUTPUT);
+void DO::begin(Time * time, Communication * communication, IO * io) {
+	io->mode(_pin, OUTPUT);
 }
-void DO::loop(Time &time, Communication &communication, IO &io) {
+void DO::loop(Time * time, Communication * communication, IO * io) {
 	bool stateChanged = false;
 
 	if (_active) {
-		if (!_blinks || (_blinks && time.b1s)) {
-			io.digitalWrite(_pin, HIGH);
+		if (!_blinks || (_blinks && time->b1s)) {
+			io->digitalWrite(_pin, HIGH);
 		}
-		else if (_blinks && !time.b1s) {
-			io.digitalWrite(_pin, LOW);
+		else if (_blinks && !time->b1s) {
+			io->digitalWrite(_pin, LOW);
 		}
 
 		if (!_wasActive) {
@@ -63,18 +63,18 @@ void DO::loop(Time &time, Communication &communication, IO &io) {
 			_wasActive = true;
 			stateChanged = true;
 		}
-		if (time.t100ms) {
+		if (time->t100ms) {
 			_activeTime++;
 		}
 	}
 	else {
-		io.digitalWrite(_pin, LOW);
+		io->digitalWrite(_pin, LOW);
 
 		stateChanged = _wasActive;
 		_wasActive = false;
 	}
 
-	if (stateChanged || time.t1s) {
+	if (stateChanged || time->t1s) {
 		DOdataStruct data;
 
 		data.status.active = _active;
@@ -83,6 +83,6 @@ void DO::loop(Time &time, Communication &communication, IO &io) {
 		data.startCount = _startCount;
 		data.activeTime = activeTime();
 
-		communication.sendData(sizeof(data), typeDO, _id, (char*)&data);
+		communication->sendData(sizeof(data), typeDO, _id, (char*)&data);
 	}
 }

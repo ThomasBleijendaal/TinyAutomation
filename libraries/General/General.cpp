@@ -15,7 +15,7 @@ void General::begin() {
 	io.begin();
 
 	for (int i = 0; i < _typicalCount; i++)
-		_typicals[i]->begin(time, communication, io);
+		_typicals[i]->begin(&time, &communication, &io);
 }
 
 void General::loop() {
@@ -23,9 +23,10 @@ void General::loop() {
 	
 	communication.read();
 
-	for (int i = 0; i < _typicalCount; i++)
-		_typicals[i]->loop(time, communication, io);
-	
+	for (int i = 0; i < _typicalCount; i++) {
+		_typicals[i]->loop(&time, &communication, &io);
+	}
+
 	io.cycle();
 
 	communication.send();

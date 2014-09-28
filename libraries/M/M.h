@@ -63,8 +63,8 @@ public:
 	void interlock(bool i0, bool i1, bool i2, bool i3, bool i4, bool i5);
 	void interlock(bool i0, bool i1, bool i2);
 
-	void begin(Time &time, Communication &communication, IO &io);
-	void loop(Time &time, Communication &communication, IO &io);
+	void begin(Time * time, Communication * communication, IO * io);
+	void loop(Time * time, Communication * communication, IO * io);
 private:
 	int _pin[4];
 	int _seq;
