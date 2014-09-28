@@ -19,15 +19,22 @@
 #include <Wire.h>
 #include <SFE_BMP180.h>
 
+
 /* **************************************** */
-// AI, DI, AO, DO, M, PID //
-General general = General(16, 1);
+// Typicals, IODrivers //
+General general = General(16, 2);
+
+int freeRam() {
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+}
 
 // UNTYPICALS //
 /* **************************************** */
-DHT QT_insideHumiditySensor(9, DHT22);
-DHT QT_outsideHumiditySensor(8, DHT22);
-SFE_BMP180 PT_barometricPressureSensor;
+//DHT QT_insideHumiditySensor(9, DHT22);
+//DHT QT_outsideHumiditySensor(8, DHT22);
+//SFE_BMP180 PT_barometricPressureSensor;
 
 // TYPICALS //
 AI *QT_light = general.add(new AI(20, 0.0, 100.0));
@@ -60,12 +67,12 @@ void setup() {
 
   //general.io.setRegisterOut(2, 7, 4, 1);
 
-  M_hatch->doubleCoil(34, 36, 35, 37);
+  //M_hatch->doubleCoil(34, 36, 35, 37);
 
-  PT_barometricPressureSensor.begin();
+  //PT_barometricPressureSensor.begin();
 
-  TC_heatingPad->sp(24.0);
-  TC_heatingPad->activate(true);
+//  TC_heatingPad->sp(24.0);
+//  TC_heatingPad->activate(true);
   
   general.begin();
 }
@@ -79,13 +86,13 @@ void loop() {
   interlocks();
 
   general.loop();
+  
 }
 
 /* **************************************** */
 
 bool vent = false;
 void program() {
-
   vent = TT_heatingPad->average() > 20.0;
 
   ventilate(vent);
@@ -94,7 +101,7 @@ void program() {
 }
 
 void interruptProgram() {
-  char status;
+/*  char status;
   double T, P;
 
   status = PT_barometricPressureSensor.startTemperature();
@@ -119,7 +126,7 @@ void interruptProgram() {
   TT_inside->setValue(QT_insideHumiditySensor.readTemperature());
   
   QT_outsideHumidity->setValue(QT_outsideHumiditySensor.readHumidity());
-  TT_outside->setValue(QT_outsideHumiditySensor.readTemperature());
+  TT_outside->setValue(QT_outsideHumiditySensor.readTemperature());*/
 }
 
 void interlocks() {
