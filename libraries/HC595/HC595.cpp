@@ -26,8 +26,9 @@ void HC595::begin() {
 }
 
 void HC595::cycle() {
-	if (!_writeRequired)
-		return;
+	//if (!_writeRequired)
+	//	return;
+	Serial.println("HC595::cycle");
 
 	_writeRequired = false;
 

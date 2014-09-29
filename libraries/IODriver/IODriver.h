@@ -19,11 +19,6 @@ Two types of IO drivers are foreseen:
 #ifndef IODriver_h
 #define IODriver_h
 
-// IO object types
-#define IOinstant 1
-#define IOinstantCycle 2
-#define IOinterrupt 10
-
 class IODriver {
 public:
 	IODriver();
