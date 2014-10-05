@@ -6,7 +6,7 @@ class Communication(GeneralObject):
     data = None
 
     def start(self):
-        self._connection = serial.Serial('COM3', 115200)
+        self._connection = serial.Serial('COM4', 115200)
 
         #todo: replace this with check
         time.sleep(5)

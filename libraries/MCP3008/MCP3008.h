@@ -1,10 +1,17 @@
 /*
-IO Driver for MCP3008 (8 channel AD converter)
+IO Driver for MCP3008 
+8 channel AD converter
 
-// Requires communicating via on-board pins
+CLK = clock
+Din = MOSI
+Dout = MISO
+ChipSelect = Slave select
 
-// TODO:
-// replace digitalRead and Write with direct port manipulation. 
+Requires communicating via on-board pins
+This ADC is nearly twice as fast as the regular on-board analog pins.
+
+TODO:
+	add support for multiple chips.
 
 */
 #ifndef iodMCP3008_h
@@ -14,7 +21,7 @@ IO Driver for MCP3008 (8 channel AD converter)
 
 class MCP3008 : public IODriver {
 public:
-	MCP3008(int resampleCount, int delayTime, int CLK, int Din, int Dout, int ChipSelect);
+	MCP3008(int clock, int dataIn, int dataOut, int chipSelect);
 
 	void begin();
 
@@ -24,10 +31,17 @@ private:
 	int _resampleCount;
 	int _delayTime;
 
-	int _CLK;
-	int _Din;
-	int _Dout;
-	int _CS;
+	unsigned char _dataInMask;
+	unsigned char _dataOutMask;
+	unsigned char _clockMask;
+	unsigned char _chipSelectMask;
+
+	struct {
+		bool clock;
+		bool dataIn;
+		bool dataOut;
+		bool chipSelect;
+	} _port;
 };
 
 #endif

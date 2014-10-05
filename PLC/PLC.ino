@@ -61,9 +61,10 @@ PID *TC_heatingPad = general.add(new PID(&TT_heatingPad, 0.0, 100.0, &X_heatingP
 
 void setup() {
   Serial.begin(115200);
+  Serial.println(" jeej ");
 
-  general.io.registerDriver(0,27,new ATmega328());
-  general.io.registerDriver(30,37,new HC595(2, 7, 4, 1));
+  general.io.registerDriver(0,27,new ATmega328(), IOinstant);
+  general.io.registerDriver(30,37,new HC595(2, 7, 4, 1), IOinstantCycle);
 
   //general.io.setRegisterOut(2, 7, 4, 1);
 
@@ -91,9 +92,9 @@ void loop() {
 
 /* **************************************** */
 
-bool vent = false;
+bool vent = false;    
 void program() {
-  vent = TT_heatingPad->average() > 20.0;
+  vent = TT_heatingPad->average() > 60.0;
 
   ventilate(vent);
   M_agitator->activate(vent);

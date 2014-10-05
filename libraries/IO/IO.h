@@ -4,10 +4,7 @@ IO abstraction layer.
 Register IO drivers in order to extend the IO range.
 
 TODO:
-	- Differentiate between types of IO Drivers
 	- Improve handling of IO errors
-	- Support all forms of IO (analog and digital)
-	- Improve looping through drivers
 	- Driver count should be dynamic
 
 */
@@ -16,15 +13,22 @@ TODO:
 
 #include <IODriver.h>
 
+// IO Driver types
+#define IOinstant 1
+#define IOinstantCycle 2
+#define IOinterrupt 10
+
 class IO {
 public:
 	IO();
 	IO(int driverCount);
 
-	void registerDriver(int rangeLow, int rangeHigh, IODriver * driver);
+	void registerDriver(int rangeLow, int rangeHigh, IODriver * driver, int driverType);
 
 	void begin();
 	void cycle();
+	void interrupt();
+
 	void mode(int address, int mode);
 
 	bool digitalRead(int address);
@@ -38,7 +42,11 @@ private:
 	int _filledSlot;
 
 	IODriver ** _drivers;
-	int * _pinLayout;
+	int * _addressLow;
+	int * _addressHigh;
+
+	int * _cycleDrivers;
+	int * _interruptDrivers;
 };
 
 #endif

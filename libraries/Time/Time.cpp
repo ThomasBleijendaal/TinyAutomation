@@ -40,7 +40,7 @@ void Time::loop() {
 	t1m = false;
 	t5m = false;
 
-	t2_5ms = u - _t2_5ms >= 2500U;
+	t2_5ms = u - _t2_5ms >= 1800U;
 	if (t2_5ms || u < _t2_5ms) {
 		_t2_5ms = u;
 

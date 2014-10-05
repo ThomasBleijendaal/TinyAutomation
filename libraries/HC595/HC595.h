@@ -1,10 +1,13 @@
 /*
-IO Driver for HC595 Shift Register (8 bit out)
+IO Driver for HC595 
+Shift Register (8 bit out)
 
-// Requires communicating via on-board pins
+Requires communicating via on-board pins
 
-// TODO:
-// replace dependency on PORTD to dynamic port.
+TODO:
+	replace dependency on PORTD to dynamic port.
+	replace casts
+	only pins < 8 can be used.
 
 */
 #ifndef iodHC595_h

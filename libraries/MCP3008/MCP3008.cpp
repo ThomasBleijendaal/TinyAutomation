@@ -1,85 +1,85 @@
 #include "Arduino.h"
 #include "MCP3008.h"
 
-MCP3008::MCP3008(int resampleCount, int delayTime, int CLK, int Din, int Dout, int ChipSelect) {
-	_resampleCount = resampleCount;
-	_delayTime = delayTime;
+MCP3008::MCP3008(int clock, int dataIn, int dataOut, int chipSelect) {
+	// resuse those masks for the actual addresses for pinmode setting at setup-time
+	_clockMask = (unsigned char)clock;
+	_dataInMask = (unsigned char)dataIn;
+	_dataOutMask = (unsigned char)dataOut;
+	_chipSelectMask = (unsigned char)chipSelect;
 
-	_CLK = CLK;
-	_Din = Din;
-	_Dout = Dout;
-	_CS = ChipSelect;
+	_port.clock = clock > 7;
+	_port.dataIn = dataIn > 7;
+	_port.dataOut = dataOut > 7;
+	_port.chipSelect = chipSelect > 7;
 }
 
 void MCP3008::begin() {
-	pinMode(_CLK, OUTPUT);
-	pinMode(_Din, OUTPUT);
-	pinMode(_Dout, INPUT);
-	pinMode(_CS, OUTPUT);
+	pinMode(_clockMask, OUTPUT);
+	pinMode(_dataInMask, OUTPUT);
+	pinMode(_dataOutMask, INPUT);
+	pinMode(_chipSelectMask, OUTPUT);
 
-	digitalWrite(_CLK, HIGH);
-	digitalWrite(_Din, LOW);
-	digitalWrite(_CS, LOW);
+	_dataInMask = 0x01 << _dataInMask % 8;
+	_dataOutMask = 0x01 << _dataOutMask % 8;
+	_clockMask = 0x01 << _clockMask % 8;
+	_chipSelectMask = 0x01 << _chipSelectMask % 8;
 }
 
 int MCP3008::analogRead(int address) {
-	int data = 0;
 	int result = 0;
+	
+	if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
 
-	for (int r = 0; r < _resampleCount; r++) {
-		digitalWrite(_Din, LOW);
-		digitalWrite(_CLK, HIGH);
-
-		digitalWrite(_CS, HIGH);
-		delayMicroseconds(_delayTime);
-		digitalWrite(_CS, LOW);
+	if (_port.chipSelect) PORTB |= _chipSelectMask; else PORTD |= _chipSelectMask;
+	if (_port.chipSelect) PORTB &= ~_chipSelectMask; else PORTD &= ~_chipSelectMask;
+	
+	// START BIT
+	if (_port.dataIn) PORTB |= _dataInMask; else PORTD |= _dataInMask;
+	
+	if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+	if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
+	
+	// SINGLE CHANNEL BIT
+	// (dataIn still high) //
+	if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+	if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
 		
-		digitalWrite(_Din, HIGH);
+	// THREE ADDRESS BITS
+	for (int i = 0; i < 3; i++) {
+		if (address & 0x04)
+			if (_port.dataIn) PORTB |= _dataInMask; else PORTD |= _dataInMask;
+		else
+			if (_port.dataIn) PORTB &= ~_dataInMask; else PORTD &= ~_dataInMask;
 		
-		digitalWrite(_CLK, LOW);
-		delayMicroseconds(_delayTime);
-		digitalWrite(_CLK, HIGH);
-		
-		digitalWrite(_Din, HIGH);
-		
-		digitalWrite(_CLK, LOW);
-		delayMicroseconds(_delayTime);
-		digitalWrite(_CLK, HIGH);
-		
-		// 3 selection bits
-		for (int i = 0; i < 3; i++) {
-			digitalWrite(_Din, (address & 0x04) ? HIGH : LOW);
-			delayMicroseconds(_delayTime);
-			digitalWrite(_CLK, LOW);
-			delayMicroseconds(_delayTime);
-			digitalWrite(_CLK, HIGH);
+		if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+		if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
 			
-			address = address << 1;
-		}
-
-		digitalWrite(_CLK, LOW);
-		delayMicroseconds(_delayTime);
-		digitalWrite(_CLK, HIGH);
-		
-		// 10 CLK cycles Dout
-		for (int i = 0; i < 10; i++) {
-			digitalWrite(_CLK, LOW);
-			delayMicroseconds(_delayTime);
-			
-			data |= digitalRead(_Dout) << (10 - i);
-
-			digitalWrite(_CLK, HIGH);
-			delayMicroseconds(_delayTime);
-		}
-
-		digitalWrite(_CLK, HIGH);
-		digitalWrite(_Din, LOW);
-
-		result += data;
+		address = address << 1;
 	}
 
+	// dataIn is done. //
+	if (_port.dataIn) PORTB &= ~_dataInMask; else PORTD &= ~_dataInMask;
 
-	return int(result / _resampleCount);
+	// SAMPLE BIT
+	if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+	if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
 
+	// NULL BIT
+	if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+	if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
 
+	// 10 DATA BITS MSB
+	for (int i = 9; i >= 0; i--) {
+		if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+		
+		result |= ((_port.dataOut) ? bool(PINB & _dataOutMask) : bool(PIND & _dataOutMask)) << i;
+
+		if (_port.clock) PORTB |= _clockMask; else PORTD |= _clockMask;
+	}
+
+	// Lower the clock and be done //
+	if (_port.clock) PORTB &= ~_clockMask; else PORTD &= ~_clockMask;
+
+	return result;
 }

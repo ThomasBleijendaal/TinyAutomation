@@ -27,7 +27,12 @@ void General::loop() {
 		_typicals[i]->loop(&time, &communication, &io);
 	}
 
-	io.cycle();
+	if (time.t5s) {
+		io.interrupt();
+	}
+	else {
+		io.cycle();
+	}
 
 	communication.send();
 }
