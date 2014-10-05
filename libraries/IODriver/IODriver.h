@@ -5,7 +5,7 @@ An abstract class which provides a basic structure for the IO class to interact 
 The IO driver class gives the posibility to write highly specialized drivers for various IO extenders, like Shift Registers or Analog to Digital Converters.
 
 Two types of IO drivers are foreseen:
-- Instant
+- Instant / InstantCycle
 	This type of driver is very quick and can, if needed, be used every cycle.
 	For example, a A2D Converter, as these sample speeds are well above 1ksps and are very fast communicators.
 	These drivers do not require the cycle()-method, but manipulate the IO instantly. But, in some cases, a cycle()-method
@@ -33,8 +33,6 @@ public:
 	virtual int analogRead(int address);
 	virtual void analogWrite(int address, int data);
 
-private:
-	
 };
 
 #endif
