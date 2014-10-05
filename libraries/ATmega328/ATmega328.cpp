@@ -12,10 +12,38 @@ void ATmega328::mode(int address, int mode) {
 }
 
 bool ATmega328::digitalRead(int address) {
+#ifndef FASTDIGITAL
 	return ::digitalRead(address);
+#else
+	if (address > 7) {
+		return bool(PINB & (0x01 << address - 8));
+	}
+	else {
+		return bool(PIND & (0x01 << address));
+	}
+#endif
 }
 void ATmega328::digitalWrite(int address, bool data) {
+#ifndef FASTDIGITAL
 	::digitalWrite(address, data);
+#else
+	if (address > 7) {
+		if (data) {
+			PORTB |= (0x01 << address - 8);
+		}
+		else {
+			PORTB &= ~(0x01 << address - 8);
+		}
+	} 
+	else {
+		if (data) {
+			PORTD |= (0x01 << address);
+		}
+		else {
+			PORTD &= ~(0x01 << address);
+		}
+	}
+#endif
 }
 
 int ATmega328::analogRead(int address) {
