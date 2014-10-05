@@ -8,7 +8,7 @@ This readme is under construction.
 Model
 -----
 
-[[[Arduino (PLC)]]]
+Arduino (PLC)
 
 
 
