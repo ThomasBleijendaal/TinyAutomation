@@ -8,6 +8,7 @@ TODO:
 	support multiple addresses
 	support INPUT_PULLUP
 	remove whiles
+	improve reading of data, de datasheet indicates that it can be faster.
 
 Speedtest:
 	First implementation:	65929 ms
