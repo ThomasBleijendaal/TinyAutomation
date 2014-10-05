@@ -26,10 +26,9 @@ void HC595::begin() {
 }
 
 void HC595::cycle() {
-	//if (!_writeRequired)
-	//	return;
-	Serial.println("HC595::cycle");
-
+	if (!_writeRequired)
+		return;
+	
 	_writeRequired = false;
 
 	// don't interrupt in the write cycle //
