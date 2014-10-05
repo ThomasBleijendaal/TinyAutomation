@@ -31,6 +31,7 @@ public:
 	virtual void digitalWrite(int address, bool data);
 
 	virtual int analogRead(int address);
+	virtual float formattedRead(int address);
 	virtual void analogWrite(int address, int data);
 
 };

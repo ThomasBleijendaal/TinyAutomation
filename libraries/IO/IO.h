@@ -35,6 +35,7 @@ public:
 	void digitalWrite(int address, bool data);
 	
 	int analogRead(int address);
+	float formattedRead(int address);
 	void analogWrite(int address, int data);
 
 private:

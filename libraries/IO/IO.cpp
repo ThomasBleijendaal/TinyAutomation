@@ -96,6 +96,14 @@ int IO::analogRead(int address) {
 	}
 }
 
+float IO::formattedRead(int address) {
+	for (int i = 0; i <= _filledSlot; i++) {
+		if (address <= _addressHigh[i]) {
+			return _drivers[i]->formattedRead(address - _addressLow[i]);
+		}
+	}
+}
+
 void IO::analogWrite(int address, int data) {
 	for (int i = 0; i <= _filledSlot; i++) {
 		if (address <= _addressHigh[i]) {

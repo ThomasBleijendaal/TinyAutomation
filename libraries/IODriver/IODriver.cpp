@@ -10,4 +10,5 @@ bool IODriver::digitalRead(int address) {}
 void IODriver::digitalWrite(int address, bool data) {}
 
 int IODriver::analogRead(int address) {}
+float IODriver::formattedRead(int address) {}
 void IODriver::analogWrite(int address, int data) {}
