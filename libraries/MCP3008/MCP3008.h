@@ -8,7 +8,7 @@ Dout = MISO
 ChipSelect = Slave select
 
 Requires communicating via on-board pins
-Is nearly twice as fast as the regular on-board pins.
+This ADC is nearly twice as fast as the regular on-board analog pins.
 
 TODO:
 	add support for multiple chips.
