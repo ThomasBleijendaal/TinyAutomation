@@ -50,5 +50,5 @@ int ATmega328::analogRead(int address) {
 	return ::analogRead(address - 20);
 }
 void ATmega328::analogWrite(int address, int data) {
-	::analogWrite(address - 20, data);
+	::analogWrite(address, data);
 }
