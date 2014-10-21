@@ -29,6 +29,10 @@ void IO::registerDriver(int rangeLow, int rangeHigh, IODriver * driver, int driv
 	_addressLow[_filledSlot] = rangeLow;
 	_addressHigh[_filledSlot] = rangeHigh;
 
+	if (_filledSlot > 0) {
+		driver->baseDriver = _drivers[0];
+	}
+
 	if (driverType == IOinstantCycle) {
 		int i = -1;
 		while (_cycleDrivers[++i] > 0) {}

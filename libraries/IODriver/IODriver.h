@@ -34,6 +34,8 @@ public:
 	virtual float formattedRead(int address);
 	virtual void analogWrite(int address, int data);
 
+	IODriver * baseDriver;
+
 };
 
 #endif
