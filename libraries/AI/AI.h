@@ -91,11 +91,11 @@ public:
 private:
 	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
 
-	int _pin;
+	int _pin : 2;
 
-	int _raw;
-	int _rawLow;
-	int _rawHigh;
+	int _raw : 2;
+	int _rawLow : 2;
+	int _rawHigh : 2;
 
 	float _value;
 	float _rangeLow;
@@ -110,22 +110,22 @@ private:
 	float _min;
 	float _max;
 
-	bool _enable;
-	bool _enableLolo;
-	bool _enableLo;
-	bool _enableHi;
-	bool _enableHihi;
-	bool _enableBTA;
-	bool _damping;
+	bool _enable : 1;
+	bool _enableLolo : 1;
+	bool _enableLo : 1;
+	bool _enableHi : 1;
+	bool _enableHihi : 1;
+	bool _enableBTA : 1;
+	bool _damping : 1;
 
-	bool _isLolo;
-	bool _isLo;
-	bool _isHi;
-	bool _isHihi;
-	bool _isBTA;
+	bool _isLolo : 1;
+	bool _isLo : 1;
+	bool _isHi : 1;
+	bool _isHihi : 1;
+	bool _isBTA : 1;
 
-	bool _firstCycle;
-	bool _firstValueSet;
+	bool _firstCycle : 1;
+	bool _firstValueSet : 1;
 };
 
 #endif
