@@ -1,5 +1,9 @@
-TinyAutomation
-==============
+TinyAutomation 0.2 beta
+==================
+
+This 0.2 beta branch. The code does not compile and does not work yet. This documentation is also not finished.
+
+---
 
 Small scale process automation.
 
