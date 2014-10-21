@@ -4,3 +4,9 @@ RaspberryPi/SCADA/sftp-config.json
 *.idea
 *.pyc
 z.ignore/*
+hardware/*
+PLC/Debug/*
+PLC/Visual Micro/*
+*.atsln
+*.atsuo
+*.cppproj
