@@ -2,7 +2,7 @@
 #include <Communication.h>
 #include <IODriver.h>
 #include <IO.h>
-#include <ATmega328.h>
+#include <ATmega32u4.h>
 #include <HC595.h>
 
 #include <Typical.h>
@@ -32,61 +32,64 @@ int freeRam() {
 
 // UNTYPICALS //
 /* **************************************** */
-//DHT QT_insideHumiditySensor(9, DHT22);
-//DHT QT_outsideHumiditySensor(8, DHT22);
+//DHT QT_insideHumiditySensor(8, DHT22);
+//DHT QT_outsideHumiditySensor(7, DHT22);
 //SFE_BMP180 PT_barometricPressureSensor;
 
 // TYPICALS //
-AI *QT_light = general.add(new AI(20, 0.0, 100.0));
-AI *QT_light2 = general.add(new AI(21, 0.0, 100.0));
-AI *QT_insideHumidity = general.add(new AI(-1, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0));
-AI *QT_outsideHumidity = general.add(new AI(-1, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0));
-AI *TT_inside = general.add(new AI(-1, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0));
-AI *TT_outside = general.add(new AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0));
-AI *PT_atmosphere = general.add(new AI(-1, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0));
-AI *TT_atmosphere = general.add(new AI(-1, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0));
-AI *TT_heatingPad = general.add(new AI(22, -10.0, 125.0, 10.0, 25.0, 35.0, 50.0, true, 41, 614, true));
+AI *QT_light = general.add(new AI(20)); //, 0.0, 100.0));
+AI *QT_light2 = general.add(new AI(21)); //, 0.0, 100.0));
+AI *QT_insideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0));
+AI *QT_outsideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0));
+AI *TT_inside = general.add(new AI(-1)); //, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0));
+AI *TT_outside = general.add(new AI(-1)); //, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0));
+AI *PT_atmosphere = general.add(new AI(-1)); //, 980.0, 1050.0, 980.0, 990.0, 1020.0, 1030.0));
+AI *TT_atmosphere = general.add(new AI(-1)); //, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0));
+AI *TT_heatingPad = general.add(new AI(22)); //, -10.0, 125.0, 10.0, 25.0, 35.0, 50.0, true, 41, 614, true));
 
-DI *LS_open = general.add(new DI(12, true));
-DI *LS_closed = general.add(new DI(3, true));
+DI *LS_open = general.add(new DI(2, true));
+DI *LS_closed = general.add(new DI(4, true));
 
 DO *M_evacuator = general.add(new DO(30));
 DO *M_agitator = general.add(new DO(31));
 
 M *M_hatch = general.add(new M());
 
-AO *X_heatingPad = general.add(new AO(3,0.0,100.0));
+//AO *X_heatingPad = general.add(new AO(3,0.0,100.0));
 
-PID *TC_heatingPad = general.add(new PID(&TT_heatingPad, 0.0, 100.0, &X_heatingPad, 0.3, 0.002, 3.0));
+//PID *TC_heatingPad = general.add(new PID(&TT_heatingPad, 0.0, 100.0, &X_heatingPad, 0.3, 0.002, 3.0));
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println(" jeej ");
+	Serial.begin(115200);
+	Serial.println(" jeej ");
 
-  general.io.registerDriver(0,27,new ATmega328(), IOinstant);
-  general.io.registerDriver(30,37,new HC595(2, 7, 4, 1), IOinstantCycle);
+	general.io.registerDriver(0,21,new ATmega32u4(), IOinstant);
+	general.io.registerDriver(30,37,new HC595(16, 15, 14, 1), IOinstantCycle);
 
-  //general.io.setRegisterOut(2, 7, 4, 1);
+	general.io.digitalWrite(32,true);
+	general.io.digitalWrite(33, true);
 
-  //M_hatch->doubleCoil(34, 36, 35, 37);
+	//general.io.setRegisterOut(2, 7, 4, 1);
 
-  //PT_barometricPressureSensor.begin();
+	M_hatch->doubleCoil(34, 36, 35, 37);
 
-//  TC_heatingPad->sp(24.0);
-//  TC_heatingPad->activate(true);
+	//PT_barometricPressureSensor.begin();
+
+	//  TC_heatingPad->sp(24.0);
+	//  TC_heatingPad->activate(true);
   
-  general.begin();
+	general.begin();
 }
 
 void loop() {
-  if (general.time.t5s) {
-    interruptProgram();
-  }
+	if (general.time.t5s) {
+		interruptProgram();
+	}
 
-  program();
-  interlocks();
+	program();
+	interlocks();
 
-  general.loop();
+	general.loop();
   
 }
 
@@ -94,10 +97,20 @@ void loop() {
 
 bool vent = false;    
 void program() {
-  vent = TT_heatingPad->average() > 60.0;
+	//vent = TT_heatingPad->average() > 60.0;
 
-  ventilate(vent);
-  M_agitator->activate(vent);
+	if(LS_open->isActive() && general.time.t5s)
+		vent = false;
+	if(LS_closed->isActive() && general.time.t5s)
+		vent = true;
+    
+	if(general.time.t1s)
+		Serial.println(!vent ? "OPEN" : "DICHT");
+
+	vent = false;
+
+	ventilate(vent);
+	M_agitator->activate(vent);
 
 }
 
@@ -131,15 +144,15 @@ void interruptProgram() {
 }
 
 void interlocks() {
-  M_hatch->interlock(LS_open->isActive(), false, false, LS_closed->isActive(), false, false);
-  M_evacuator->interlock(!LS_open->isActive(), false, false);
+	M_hatch->interlock(LS_open->isActive(), false, false, LS_closed->isActive(), false, false);
+	M_evacuator->interlock(!LS_open->isActive(), false, false);
 }
 
 void ventilate(bool ventilate) {
-  bool endPosition = (ventilate && LS_open->isActive()) || (!ventilate && LS_closed->isActive());
+	bool endPosition = (ventilate && LS_open->isActive()) || (!ventilate && LS_closed->isActive());
 
-  M_hatch->activate(!endPosition, !ventilate);
-  M_evacuator->activate(endPosition && ventilate);
+	M_hatch->activate(!endPosition, !ventilate);
+	M_evacuator->activate(endPosition && ventilate);
 }
 
 

@@ -1,10 +1,7 @@
 /*
-General Typical functionality
+General functionality
 
-Includes
-- Communication class
-- Time class
-- IO class
+Main object of the PLC which provides a place to store Typicals, Devices and which deals with the external communication, time handling and IO drivers.
 
 */
 #ifndef General_h
@@ -18,6 +15,7 @@ Includes
 #include <DI.h>
 #include <AO.h>
 #include <DO.h>
+
 #include <M.h>
 #include <PID.h>
 

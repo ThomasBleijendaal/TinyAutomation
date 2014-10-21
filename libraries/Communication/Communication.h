@@ -26,6 +26,9 @@ int footer
 
 #include <Communication.h>
 
+// dataSend types
+#define typeAI 2;
+
 struct dataStruct {
 	char data[16];
 	dataStruct() {

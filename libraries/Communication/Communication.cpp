@@ -15,6 +15,7 @@ char * Communication::readData(int type, int nr) {
 }
 void Communication::sendData(int payloadSize, int type, int nr, const char * payload) 
 {
+	/*
 	int header = 1234;
 	unsigned int identifier = payloadSize * 1000 + type * 100 + nr;
 	int footer = 4321;
@@ -39,5 +40,5 @@ void Communication::sendData(int payloadSize, int type, int nr, const char * pay
 	
 
 	delete[] buffer;
-
+	*/
 }

@@ -59,7 +59,7 @@ void PID::begin(Time * time, Communication * communication, IO * io) {
 void PID::loop(Time * time, Communication * communication, IO * io) {
 	bool stateChanged = false;
 
-	_value = _AI->value();
+	_value = _AI->data.value;
 
 	if (_active) {
 		if (time->t100ms || _fast) {
