@@ -7,6 +7,7 @@ z.ignore/*
 hardware/*
 PLC/Debug/*
 PLC/Visual Micro/*
+libraries/Debug/*
 *.atsln
 *.atsuo
 *.cppproj
