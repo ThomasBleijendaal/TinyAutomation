@@ -1,72 +1,36 @@
 #include "Arduino.h"
 #include "DI.h"
 
-DI::DI() {}
-DI::DI(int pin) {
-	_init(pin, false);
-}
-DI::DI(int pin, bool NC) {
-	_init(pin, NC);
-}
-void DI::_init(int pin, bool NC) {
-	_pin = pin;
-	_NC = NC;
-
-	_active = false;
-	_switchCount = 0U;
-	_activeTime = 0U;
-}
-
-bool DI::isActive() {
-	return _active;
-}
-bool DI::activated() {
-	return _activated;
-}
-bool DI::deActivated() {
-	return _deActivated;
-}
-
-unsigned int DI::switchCount() {
-	return _switchCount;
-}
-
-float DI::activeTime() {
-	return float(_activeTime) / 10.0;
-}
-
 void DI::begin(Time * time, Communication * communication, IO * io) {
-	io->mode(_pin, (_NC) ? INPUT_PULLUP : INPUT);
+	io->mode(_address, (settings.NC) ? INPUT_PULLUP : INPUT);
 }
 void DI::loop(Time * time, Communication * communication, IO * io) {
-	int pinValue = io->digitalRead(_pin);
+	bool pinValue = io->digitalRead(_address);
 
-	_activated = false;
-	_deActivated = false;
+	status.activated = false;
+	status.deActivated = false;
 
-	if (((pinValue == HIGH && !_NC) || (pinValue == LOW && _NC))) {
-		if (!_active) {
-			_activated = true;
-			_switchCount++;
-			_active = true;
+	if ((pinValue && !settings.NC) || (!pinValue && settings.NC)) {
+		if (!status.active) {
+			status.activated = true;
+			data.switchCount++;
+			status.active = true;
 		}
 		if (time->t100ms) {
-			_activeTime++;
+			data.activeTime += 0.1;
 		}
 	}
 	else {
-		_deActivated = _active;
-		_active = false;
+		status.deActivated = status.active;
+		status.active = false;
 	}
 
-	if (_activated || _deActivated || time->t1s) {
-		DIdataStruct data;
+	if (status.activated || status.deActivated || time->t1s) {
+		DI_commSend_T sendData;
 
-		data.status.active = _active;
+		sendData.data = data;
+		sendData.status = status;
 
-		data.switchCount = _switchCount;
-		data.activeTime = activeTime();
-
-		communication->sendData(sizeof(data), typeDI, _id, (char*)&data);
+		communication->sendData(sizeof(data), typeDI, _id, (char*)&sendData);
 	}
 }
