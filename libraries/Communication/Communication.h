@@ -26,8 +26,13 @@ int footer
 
 #include <Communication.h>
 
-// dataSend types
-#define typeAI 2;
+// data types
+const int typeDI = 1;
+const int typeAI = 2;
+const int typeM = 3;
+const int typeDO = 4;
+const int typeAO = 5;
+const int typePID = 6;
 
 struct dataStruct {
 	char data[16];
@@ -51,13 +56,6 @@ struct commStruct {
 		footer = 4321;
 	}
 };
-
-const int typeDI = 1;
-const int typeAI = 2;
-const int typeM = 3;
-const int typeDO = 4;
-const int typeAO = 5;
-const int typePID = 6;
 
 class Communication {
 public:
