@@ -34,7 +34,23 @@ struct AI_settings_t {
 	float hi;
 	float hihi;
 	
-	AI_settings_t() {}
+	AI_settings_t() 
+		: enable(false), 
+		enableLolo(false), 
+		enableLo(false), 
+		enableHi(false), 
+		enableHihi(false), 
+		enableBTA(false), 
+		damping(false), 
+		useFormatted(false), 
+		rawLow(0),
+		rawHigh(0),
+		rangeLow(0.0),
+		rangeHigh(0.0),
+		lolo(0.0), 
+		lo(0.0), 
+		hi(0.0), 
+		hihi(0.0) {}
 };
 struct AI_status_t {
 	bool isLolo;
@@ -55,7 +71,7 @@ struct AI_data_t {
 	AI_data_t() {}
 };
 
-struct AIdataStruct {
+struct AI_commSend_T {
 	AI_status_t status;
 	AI_data_t data;
 };
@@ -63,7 +79,7 @@ struct AIdataStruct {
 class AI : public Typical {
 public:
 	AI();
-	AI(int address);
+	AI(int address) : _address(address), _firstCycle(false) {};
 
 	void begin(Time * time, Communication * communication, IO * io);
 	void loop(Time * time, Communication * communication, IO * io);
@@ -78,3 +94,4 @@ private:
 };
 
 #endif
+	

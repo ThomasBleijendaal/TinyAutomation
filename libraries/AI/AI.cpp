@@ -1,13 +1,6 @@
 #include "Arduino.h"
 #include "AI.h"
 
-AI::AI() {}
-AI::AI(int pin) {
-	_address = pin;
-
-	_firstCycle = true;
-}
-
 void AI::begin(Time * time, Communication * communication, IO * io) {
 	io->mode(_address, INPUT);
 }
@@ -27,7 +20,7 @@ void AI::loop(Time * time, Communication * communication, IO * io) {
 			data.value = ((9.0 * data.value) + IOvalue) / 10.0;
 		} 
 		else {
-			data.value = value;
+			data.value = IOvalue;
 		}
 	}
 	
@@ -52,7 +45,7 @@ void AI::loop(Time * time, Communication * communication, IO * io) {
 			data.avg = ((data.avg * 99.0) + data.value) / 100.0;
 		}
 		if (time->t1s) {
-			AIdataStruct sendData;
+			AI_commSend_T sendData;
 
 			sendData.data = data;
 			sendData.status = status;
