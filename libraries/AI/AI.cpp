@@ -3,38 +3,38 @@
 
 AI::AI() {}
 AI::AI(int pin) {
-	_pin = pin;
+	_address = pin;
 
 	_firstCycle = true;
-	_firstValueSet = false;
 }
 
 void AI::begin(Time * time, Communication * communication, IO * io) {
-	io->mode(_pin, INPUT);
+	io->mode(_address, INPUT);
 }
 
 void AI::loop(Time * time, Communication * communication, IO * io) {
-	int raw;
+	float IOvalue;
 	
-	if (_pin != -1) {
-		if (settings.enable)
-			raw = io->analogRead(_pin);
+	if (settings.enable) {
+		if(settings.useFormatted) {
+			IOvalue = io->formattedRead(_address);
+			} 
+		else {
+			IOvalue = ((float)(io->analogRead(_address) - settings.rawLow)) * ((settings.rangeHigh - settings.rangeLow) / ((float)(settings.rawHigh - settings.rawLow))) + settings.rangeLow;
+		}
 
-		float value = ((float)(raw - settings.rawLow)) * ((settings.rangeHigh - settings.rangeLow) / ((float)(settings.rawHigh - settings.rawLow))) + settings.rangeLow;
-		
-		if (settings.damping)
-			data.value = ((9.0 * data.value) + value) / 10.0;
-		else
+		if (settings.damping) {
+			data.value = ((9.0 * data.value) + IOvalue) / 10.0;
+		} 
+		else {
 			data.value = value;
+		}
 	}
-
-	if (_firstCycle || (_pin == -1 && !_firstValueSet)) {
+	
+	if (_firstCycle) {
 		data.avg = data.value;
 		data.min = data.value;
 		data.max = data.value;
-
-		if (!(_pin == -1 && !_firstValueSet))
-			_firstCycle = false;
 	}
 	else {
 		data.min = min(data.min, data.value);

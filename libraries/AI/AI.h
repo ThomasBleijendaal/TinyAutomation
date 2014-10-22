@@ -60,20 +60,10 @@ struct AIdataStruct {
 	AI_data_t data;
 };
 
-/*struct AIcmdStruct {
-	struct cmd {
-		char spare : 8;
-		cmd() {
-			spare = 0;
-		}
-	};
-
-};*/
-
 class AI : public Typical {
 public:
 	AI();
-	AI(int pin);
+	AI(int address);
 
 	void begin(Time * time, Communication * communication, IO * io);
 	void loop(Time * time, Communication * communication, IO * io);
@@ -82,10 +72,9 @@ public:
 	AI_data_t data;
 	AI_status_t status;
 private:
-	int _pin;
+	int _address;
 	
 	bool _firstCycle;
-	bool _firstValueSet;
 };
 
 #endif
