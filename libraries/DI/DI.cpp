@@ -26,11 +26,11 @@ void DI::loop(Time * time, Communication * communication, IO * io) {
 	}
 
 	if (status.activated || status.deActivated || time->t1s) {
-		DI_commSend_T sendData;
+		DI_commSend_t sendData;
 
 		sendData.data = data;
 		sendData.status = status;
 
-		communication->sendData(sizeof(data), typeDI, _id, (char*)&sendData);
+		communication->sendData(sizeof(sendData), typeDI, _id, (char*)&sendData);
 	}
 }

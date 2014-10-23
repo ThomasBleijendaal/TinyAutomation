@@ -14,26 +14,24 @@ Reads a digital input. Counts the times the input is turned on and the duration 
 
 struct DI_settings_t {
 	bool NC;
-	
+
 	DI_settings_t() : NC(false) {}
 };
-
 struct DI_status_t {
 	bool active;
 	bool activated;
 	bool deActivated;
-	
+
 	DI_status_t() : active(false), activated(false), deActivated(false) {}
 };
-
 struct DI_data_t {
 	unsigned int switchCount;
 	float activeTime;
-	
+
 	DI_data_t() : switchCount(0), activeTime(0.0) {}
 };
 
-struct DI_commSend_T {
+struct DI_commSend_t {
 	DI_status_t status;
 	DI_data_t data;
 };

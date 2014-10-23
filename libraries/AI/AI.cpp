@@ -7,23 +7,23 @@ void AI::begin(Time * time, Communication * communication, IO * io) {
 
 void AI::loop(Time * time, Communication * communication, IO * io) {
 	float IOvalue;
-	
+
 	if (settings.enable) {
 		if(settings.useFormatted) {
 			IOvalue = io->formattedRead(_address);
-			} 
+			}
 		else {
 			IOvalue = ((float)(io->analogRead(_address) - settings.rawLow)) * ((settings.rangeHigh - settings.rangeLow) / ((float)(settings.rawHigh - settings.rawLow))) + settings.rangeLow;
 		}
 
 		if (settings.damping) {
 			data.value = ((9.0 * data.value) + IOvalue) / 10.0;
-		} 
+		}
 		else {
 			data.value = IOvalue;
 		}
 	}
-	
+
 	if (_firstCycle) {
 		data.avg = data.value;
 		data.min = data.value;
@@ -45,12 +45,12 @@ void AI::loop(Time * time, Communication * communication, IO * io) {
 			data.avg = ((data.avg * 99.0) + data.value) / 100.0;
 		}
 		if (time->t1s) {
-			AI_commSend_T sendData;
+			AI_commSend_t sendData;
 
 			sendData.data = data;
 			sendData.status = status;
 
-			communication->sendData(sizeof(data), typeAI, _id, (char*)&sendData);
+			communication->sendData(sizeof(sendData), typeAI, _id, (char*)&sendData);
 		}
 	}
 }
