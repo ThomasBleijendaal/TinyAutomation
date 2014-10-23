@@ -23,10 +23,10 @@ struct DO_status_t {
 	DO_status_t() : interlock(false), active(false), wasActive(false) {};
 };
 struct DO_data_t {
-	float _activeTime;
-	unsigned int _startCount;
+	float activeTime;
+	unsigned int startCount;
 
-	AO_data_t() : activeTime(0.0), startCount(0) {}
+	DO_data_t() : activeTime(0.0), startCount(0) {}
 };
 
 struct DO_commSend_t {
@@ -37,10 +37,14 @@ struct DO_commSend_t {
 class DO : public Typical {
 public:
 	DO();
-	DO(int address) : _address(address);
+	DO(int address) : _address(address) {};
 
 	void begin(Time * time, Communication * communication, IO * io);
 	void loop(Time * time, Communication * communication, IO * io);
+
+	DO_settings_t settings;
+	DO_status_t status;
+	DO_data_t data;
 private:
 	int _address;
 };
