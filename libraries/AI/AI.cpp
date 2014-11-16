@@ -6,51 +6,42 @@ void AI::begin(Time * time, Communication * communication, IO * io) {
 }
 
 void AI::loop(Time * time, Communication * communication, IO * io) {
-	float IOvalue;
-
 	if (settings.enable) {
 		if(settings.useFormatted) {
-			IOvalue = io->formattedRead(_address);
+			data.value = io->formattedRead(_address);
+		}
+		else if(!settings.useExternalValue) {
+			data.value = ((float)(io->analogRead(_address) - settings.rawLow)) * ((settings.rangeHigh - settings.rangeLow) / ((float)(settings.rawHigh - settings.rawLow))) + settings.rangeLow;
+		}
+
+		if (_firstCycle) {
+			data.avg = data.value;
+			data.min = data.value;
+			data.max = data.value;
+		}
+		else {
+			data.min = min(data.min, data.value);
+			data.max = max(data.max, data.value);
+
+			float delta = (settings.rangeHigh - settings.rangeLow) * 0.01;
+
+			status.isLolo = settings.enableLolo && (status.isLolo || data.value < settings.lolo) && data.value <= settings.lolo - delta;
+			status.isLo = settings.enableLo && (status.isLo || data.value < settings.lo) && data.value <= settings.lo - delta;
+			status.isHi = settings.enableHi && (status.isHi || data.value > settings.hi) && data.value >= settings.hi + delta;
+			status.isHihi = settings.enableHihi && (status.isHihi || data.value > settings.hihi) && data.value >= settings.hihi + delta;
+			status.isBTA = settings.enableBTA && (status.isBTA || data.value <= settings.rangeLow || data.value >= settings.rangeHigh) && (data.value <= settings.rangeLow + delta || data.value >= settings.rangeHigh - delta);
+
+			if (time->t100ms) {
+				data.avg = ((data.avg * 99.0) + data.value) / 100.0;
 			}
-		else {
-			IOvalue = ((float)(io->analogRead(_address) - settings.rawLow)) * ((settings.rangeHigh - settings.rangeLow) / ((float)(settings.rawHigh - settings.rawLow))) + settings.rangeLow;
-		}
+			if (time->t1s) {
+				AI_commSend_t sendData;
 
-		if (settings.damping) {
-			data.value = ((9.0 * data.value) + IOvalue) / 10.0;
-		}
-		else {
-			data.value = IOvalue;
-		}
-	}
+				sendData.data = data;
+				sendData.status = status;
 
-	if (_firstCycle) {
-		data.avg = data.value;
-		data.min = data.value;
-		data.max = data.value;
-	}
-	else {
-		data.min = min(data.min, data.value);
-		data.max = max(data.max, data.value);
-
-		float delta = (settings.rangeHigh - settings.rangeLow) * 0.01;
-
-		status.isLolo = settings.enableLolo && (status.isLolo || data.value < settings.lolo) && data.value <= settings.lolo - delta;
-		status.isLo = settings.enableLo && (status.isLo || data.value < settings.lo) && data.value <= settings.lo - delta;
-		status.isHi = settings.enableHi && (status.isHi || data.value > settings.hi) && data.value >= settings.hi + delta;
-		status.isHihi = settings.enableHihi && (status.isHihi || data.value > settings.hihi) && data.value >= settings.hihi + delta;
-		status.isBTA = settings.enableBTA && (status.isBTA || data.value <= settings.rangeLow || data.value >= settings.rangeHigh) && (data.value <= settings.rangeLow + delta || data.value >= settings.rangeHigh - delta);
-
-		if (time->t100ms) {
-			data.avg = ((data.avg * 99.0) + data.value) / 100.0;
-		}
-		if (time->t1s) {
-			AI_commSend_t sendData;
-
-			sendData.data = data;
-			sendData.status = status;
-
-			communication->sendData(sizeof(sendData), typeAI, _id, (char*)&sendData);
+				communication->sendData(sizeof(sendData), AI_COM_data_ID, _id, (char*)&sendData);
+			}
 		}
 	}
 }

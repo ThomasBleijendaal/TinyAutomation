@@ -13,7 +13,7 @@ Provides base for every typical
 
 class Typical {
 public:
-	Typical();
+	Typical() {};
 
 	void setId(int id);
 

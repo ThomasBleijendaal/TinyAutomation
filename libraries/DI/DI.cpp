@@ -31,6 +31,6 @@ void DI::loop(Time * time, Communication * communication, IO * io) {
 		sendData.data = data;
 		sendData.status = status;
 
-		communication->sendData(sizeof(sendData), typeDI, _id, (char*)&sendData);
+		communication->sendData(sizeof(sendData), DI_COM_data_ID, _id, (char*)&sendData);
 	}
 }

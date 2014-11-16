@@ -7,6 +7,10 @@ Writes a digital output. Set the output according to its active state, counts th
 #ifndef DO_h
 #define DO_h
 
+#define DO_COM_settings_ID 0x09
+#define DO_COM_status_ID 0x0A
+#define DO_COM_data_ID 0x0B
+
 #include <Typical.h>
 #include <Time.h>
 #include <Communication.h>

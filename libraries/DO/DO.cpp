@@ -33,6 +33,6 @@ void DO::loop(Time * time, Communication * communication, IO * io) {
 		sendData.data = data;
 		sendData.status = status;
 
-		communication->sendData(sizeof(sendData), typeDO, _id, (char*)&sendData);
+		communication->sendData(sizeof(sendData), DO_COM_data_ID, _id, (char*)&sendData);
 	}
 }

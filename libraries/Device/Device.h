@@ -1,7 +1,7 @@
 /*
 Device layer
 
-The device class provides a programming interface for more complex operations which require fast control or highly interruptive activities. 
+The device class provides a programming interface for more complex operations which require fast control or highly interruptive activities.
 
 Various devices are foreseen:
 - Interactive devices
@@ -13,11 +13,20 @@ Various devices are foreseen:
 #ifndef Device_h
 #define Device_h
 
+#include <Time.h>
+#include <Communication.h>
+
 class Device {
-public
-	Device();
+public:
+	Device() {};
 
+	void setId(int id);
 
+	virtual void begin(Time * time, Communication * communication);
+	virtual void loop(Time * time, Communication * communication);
+
+protected:
+	int _id;
 };
 
 #endif

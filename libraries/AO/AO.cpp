@@ -3,10 +3,12 @@
 
 void AO::begin(Time * time, Communication * communication, IO * io) {
 	io->mode(_address, OUTPUT);
+
+	data.output = settings.minOutput;
 }
 
 void AO::loop(Time * time, Communication * communication, IO * io) {
-	int sp = max(data.minOutput, min(data.maxOutput, data.output));
+	float sp = max(settings.minOutput, min(settings.maxOutput, data.output));
 	bool stateChanged = false;
 
 	if(status.interlock) {
@@ -14,9 +16,9 @@ void AO::loop(Time * time, Communication * communication, IO * io) {
 	}
 
 	if (status.active) {
-		if (data.rateOfChange != -1 && sp != data.currentOutput && time->t100ms) {
+		if (settings.rateOfChange != -1.0 && sp != data.currentOutput && time->t100ms) {
 
-			float delta = data.rateOfChange / 10.0;
+			float delta = settings.rateOfChange / 10.0;
 
 			if (sp > data.currentOutput) {
 				data.currentOutput = min(sp, data.currentOutput + delta);
@@ -25,7 +27,7 @@ void AO::loop(Time * time, Communication * communication, IO * io) {
 				data.currentOutput = max(sp, data.currentOutput - delta);
 			}
 		}
-		else if (data.rateOfChange == -1) {
+		else if (settings.rateOfChange == -1.0) {
 			data.currentOutput = sp;
 		}
 
@@ -49,7 +51,7 @@ void AO::loop(Time * time, Communication * communication, IO * io) {
 		stateChanged = true;
 		status.wasActive = false;
 
-		data.currentOutput = data.minOutput;
+		data.currentOutput = settings.minOutput;
 
 		io->analogWrite(_address, 0);
 	}
@@ -60,6 +62,6 @@ void AO::loop(Time * time, Communication * communication, IO * io) {
 		sendData.data = data;
 		sendData.status = status;
 
-		communication->sendData(sizeof(sendData), typeAO, _id, (char*)&sendData);
+		communication->sendData(sizeof(sendData), AO_COM_data_ID, _id, (char*)&sendData);
 	}
 }

@@ -1,8 +1,6 @@
 #include "Arduino.h"
 #include "Typical.h"
 
-Typical::Typical() {}
-
 void Typical::setId(int id) {
 	_id = id;
 }

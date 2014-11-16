@@ -1,122 +1,86 @@
 #include "Arduino.h"
 #include "PID.h"
 
-PID::PID() {}
-PID::PID(AI **input, float min, float max, AO **output, float P, float I, float D) {
-	_init(input, min, max, output, P, I, D, 1000.0, false);
+void PID::begin(Time * time, Communication * communication) {
+	iTimer = false;
 }
-PID::PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit) {
-	_init(input, min, max, output, P, I, D, deviationLimit, false);
-}
-PID::PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast) {
-	_init(input, min, max, output, P, I, D, deviationLimit, fast);
-}
-void PID::_init(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast) {
-	_id = -1;
-	
-	_min = min;
-	_max = max;
-
-	_fast = fast;
-
-	_deviationLimit = deviationLimit / 100.0;
-
-	_P = P;
-	_I = I;
-	_D = D;
-	
-	_AI = *input;
-	_AO = *output;
-	
-	_active = false;
-}
-
-void PID::setId(int id) {
-	_id = id;
-}
-
-void PID::activate(bool activate) {
-	_active = activate;
-}
-bool PID::isActive() {
-	return _active;
-}
-
-void PID::sp(float sp) {
-	_sp = sp;
-}
-float PID::sp() {
-	return _sp;
-}
-
-bool PID::isDeviated() {
-	return _deviated;
-}
-
-void PID::begin(Time * time, Communication * communication, IO * io) {
-
-}
-void PID::loop(Time * time, Communication * communication, IO * io) {
+void PID::loop(Time * time, Communication * communication) {
 	bool stateChanged = false;
+	bool timer1 = false;
+	bool timer2 = false;
 
-	_value = _AI->data.value;
+	float value = _AI->data.value;
+	float output = _AO->data.output;
 
-	if (_active) {
-		if (time->t100ms || _fast) {
-			if (!_wasActive) {
-				_wasActive = stateChanged = true;
-			}
-			float error = _sp - _value;
-			float prevError = error - _previousError;
-			_previousError = error;
+	float delta = (((data.sp - value)) / (_AI->settings.rangeHigh - _AI->settings.rangeLow)) * 100.0;
 
-			_totalError = max(_min, min(_max, (_totalError + error)));
+	float historyTotal = 0.0;
+	float deltaTotal = 0.0;
 
-			float newOutput = _output + (error * _P) + (_totalError * _I) + (prevError * _D);
-
-			_output = max(_min, min(_max, newOutput));	
+	if(settings.I > 0) {
+		timer1 = time->timer(settings.I / 10U);
+		if(!iTimer && timer1) {
+			history.add(delta); // / ((float)settings.I / 1000.0));
+			iTimer = true;
+		} else if(!timer1) {
+			iTimer = false;
 		}
-		if (abs(_sp - _value) >= (_max - _min) * _deviationLimit) {
-			if (time->t1s)
-				_deviated = ++_devDelay >= 5;
+		historyTotal = history.total();
+	}
+	if(settings.D > 0) {
+		timer2 = time->timer(settings.D / 10U);
+		if(!dTimer && timer2) {
+			historyDelta.add(delta); // / ((float)settings.D / 1000.0));
+			dTimer = true;
+		} else if(!timer2) {
+			dTimer = false;
+		}
+		deltaTotal = historyDelta.delta();
+	}
 
-			if (_deviated && !_wasDeviated)
-				stateChanged = _wasDeviated = true;
+	if (status.active) {
+		if (time->t100ms) {
+			if (!status.wasActive) {
+				status.wasActive = stateChanged = true;
+			}
+
+			float newOutput = output + ((delta + historyTotal + deltaTotal) * settings.P);
+
+			output = max(settings.minOutput, min(settings.maxOutput, newOutput));
+
+		}
+		if (settings.deviationLimit > 0.0 && abs(delta) >= (settings.maxOutput - settings.minOutput) * settings.deviationLimit) {
+			if (time->t1s)
+				status.deviated = ++data.deviationDelay >= 5;
+
+			if (status.deviated && !status.wasDeviated)
+				stateChanged = status.wasDeviated = true;
 		}
 		else {
-			_deviated = false;
-			
-			stateChanged = stateChanged || _wasDeviated;
-			_wasDeviated = false;
+			status.deviated = false;
 
-			_devDelay = 0;
+			stateChanged = stateChanged || status.wasDeviated;
+			status.wasDeviated = false;
+
+			data.deviationDelay = 0;
 		}
 	}
 	else {
-		stateChanged = _wasActive;
-		_wasActive = false;
+		stateChanged = status.wasActive;
+		status.wasActive = false;
 
-		_output = 0.0;
+		output = 0.0;
 	}
 
 	if (time->t1s || stateChanged) {
-		PIDsendStruct data;
+		PID_commSend_t sendData;
 
-		data.status.active = _active;
-		data.status.deviated = _deviated;
-		data.status.fast = _fast;
+		sendData.status = status;
+		sendData.data = data;
 
-		data.input = _value;
-		data.sp = _sp;
-		data.output = _output;
-		data.P = _P;
-		data.I = _I;
-		data.D = _D;
-		data.deviationLimit = _deviationLimit;
-
-		communication->sendData(sizeof(data), typePID, _id, (char *)&data);
+		communication->sendData(sizeof(sendData), PID_COM_data_ID, _id, (char *)&sendData);
 	}
 
-	_AO->output(_output);
-	_AO->activate(_active);
+	_AO->status.active = status.active;
+	_AO->data.output = output;
 }

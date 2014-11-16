@@ -7,6 +7,10 @@ Reads a digital input. Counts the times the input is turned on and the duration 
 #ifndef DI_h
 #define DI_h
 
+#define DI_COM_settings_ID 0x06
+#define DI_COM_status_ID 0x07
+#define DI_COM_data_ID 0x08
+
 #include <Typical.h>
 #include <Time.h>
 #include <Communication.h>

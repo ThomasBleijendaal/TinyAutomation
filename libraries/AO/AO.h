@@ -7,27 +7,32 @@ Writes an analog output (PWM). Recieves a 0 - 100 % input which is converted to 
 #ifndef AO_h
 #define AO_h
 
+#define AO_COM_settings_ID 0x03
+#define AO_COM_status_ID 0x04
+#define AO_COM_data_ID 0x05
+
 #include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
 #include <IO.h>
 
 struct AO_settings_t {
+	float minOutput;
+	float maxOutput;
+	float rateOfChange;
 
+	AO_settings_t() : minOutput(0.0), maxOutput(100.0), rateOfChange(-1.0) {};
 };
 struct AO_status_t {
-	bool interlock;
-	bool active;
-	bool wasActive;
+	bool interlock : 1;
+	bool active : 1;
+	bool wasActive : 1;
 
 	AO_status_t() : interlock(false), active(false), wasActive(false) {};
 
 };
 struct AO_data_t {
 	float avg;
-	float minOutput;
-	float maxOutput;
-	float rateOfChange;
 
 	float activeTime;
 	unsigned int startCount;
@@ -37,9 +42,6 @@ struct AO_data_t {
 
 	AO_data_t()
 		: avg(0.0),
-		minOutput(0.0),
-		maxOutput(0.0),
-		rateOfChange(0.0),
 		activeTime(0.0),
 		startCount(0),
 		output(0.0),
