@@ -2,27 +2,29 @@
 #include <Communication.h>
 #include <IODriver.h>
 #include <IO.h>
-#include <ATmega32u4.h>
-#include <HC595.h>
+#include <ATmega328.h>
+#include <DHT.h>
 
 #include <Typical.h>
 #include <AI.h>
 #include <DI.h>
 #include <DO.h>
 #include <AO.h>
-#include <M.h>
+//#include <M.h>
+
+#include <Device.h>
 #include <PID.h>
 
 #include <General.h>
 
 #include <DHT.h>
 #include <Wire.h>
-#include <SFE_BMP180.h>
+//#include <SFE_BMP180.h>
 
 
 /* **************************************** */
 // Typicals, IODrivers //
-General general = General(16, 2);
+General general = General(2, 1, 2);
 
 int freeRam() {
     extern int __heap_start, *__brkval;
@@ -37,9 +39,10 @@ int freeRam() {
 //SFE_BMP180 PT_barometricPressureSensor;
 
 // TYPICALS //
-AI *QT_light = general.add(new AI(20)); //, 0.0, 100.0));
-AI *QT_light2 = general.add(new AI(21)); //, 0.0, 100.0));
-AI *QT_insideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0));
+AI *heatingPadTemperature = general.add(new AI(A3)); //, -10.0, 125.0, 10.0, 25.0, 35.0, 50.0, true, 41, 614, true));
+//AI *QT_light = general.add(new AI(20)); //, 0.0, 100.0));
+//AI *QT_light2 = general.add(new AI(21)); //, 0.0, 100.0));
+/*AI *QT_insideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0));
 AI *QT_outsideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0));
 AI *TT_inside = general.add(new AI(-1)); //, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0));
 AI *TT_outside = general.add(new AI(-1)); //, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0));
@@ -52,107 +55,45 @@ DI *LS_closed = general.add(new DI(4, true));
 
 DO *M_evacuator = general.add(new DO(30));
 DO *M_agitator = general.add(new DO(31));
+*/
+//M *M_hatch = general.add(new M());
 
-M *M_hatch = general.add(new M());
+AO *heatingPad = general.add(new AO(3));
 
-//AO *X_heatingPad = general.add(new AO(3,0.0,100.0));
-
-//PID *TC_heatingPad = general.add(new PID(&TT_heatingPad, 0.0, 100.0, &X_heatingPad, 0.3, 0.002, 3.0));
+PID *heatingPadController = general.add(new PID(&heatingPadTemperature, &heatingPad));
 
 void setup() {
 	Serial.begin(115200);
-	Serial.println(" jeej ");
 
-	general.io.registerDriver(0,21,new ATmega32u4(), IOinstant);
-	general.io.registerDriver(30,37,new HC595(16, 15, 14, 1), IOinstantCycle);
+	general.io.registerDriver(0,20,new ATmega328(), IOinstant);
+	//general.io.registerDriver(30,31,new DHT(), IOinterrupt);
 
-	general.io.digitalWrite(32,true);
-	general.io.digitalWrite(33, true);
+	//general.io.digitalWrite(32,true);
+	//general.io.digitalWrite(33, true);
 
 	//general.io.setRegisterOut(2, 7, 4, 1);
 
-	M_hatch->doubleCoil(34, 36, 35, 37);
+	//M_hatch->doubleCoil(34, 36, 35, 37);
 
 	//PT_barometricPressureSensor.begin();
 
 	//  TC_heatingPad->sp(24.0);
 	//  TC_heatingPad->activate(true);
-  
+
+	heatingPadTemperature->settings.rangeLow = -10.0;
+	heatingPadTemperature->settings.rangeHigh = 125.0;
+	heatingPadTemperature->settings.rawLow = 41;
+	heatingPadTemperature->settings.rawHigh = 614;
+
+	heatingPadController->settings.P = 1.00;
+	heatingPadController->settings.I = 0U;
+	heatingPadController->settings.D = 3000U;
+	heatingPadController->data.sp = 42.0;
+
 	general.begin();
 }
 
 void loop() {
-	if (general.time.t5s) {
-		interruptProgram();
-	}
-
-	program();
-	interlocks();
-
+	heatingPadController->status.active = heatingPadTemperature->data.value < 50.0;
 	general.loop();
-  
 }
-
-/* **************************************** */
-
-bool vent = false;    
-void program() {
-	//vent = TT_heatingPad->average() > 60.0;
-
-	if(LS_open->isActive() && general.time.t5s)
-		vent = false;
-	if(LS_closed->isActive() && general.time.t5s)
-		vent = true;
-    
-	if(general.time.t1s)
-		Serial.println(!vent ? "OPEN" : "DICHT");
-
-	vent = false;
-
-	ventilate(vent);
-	M_agitator->activate(vent);
-
-}
-
-void interruptProgram() {
-/*  char status;
-  double T, P;
-
-  status = PT_barometricPressureSensor.startTemperature();
-  if (status != 0) {
-    delay(status);
-    status = PT_barometricPressureSensor.getTemperature(T);
-    if (status != 0 && T == T) {
-      TT_atmosphere->setValue(T);
-      status = PT_barometricPressureSensor.startPressure(3);
-      if (status != 0) {
-        delay(status);
-
-        status = PT_barometricPressureSensor.getPressure(P, T);
-        if (status != 0 && P == P) {
-          PT_atmosphere->setValue(P);
-        }
-      }
-    }
-  }
-  
-  QT_insideHumidity->setValue(QT_insideHumiditySensor.readHumidity());
-  TT_inside->setValue(QT_insideHumiditySensor.readTemperature());
-  
-  QT_outsideHumidity->setValue(QT_outsideHumiditySensor.readHumidity());
-  TT_outside->setValue(QT_outsideHumiditySensor.readTemperature());*/
-}
-
-void interlocks() {
-	M_hatch->interlock(LS_open->isActive(), false, false, LS_closed->isActive(), false, false);
-	M_evacuator->interlock(!LS_open->isActive(), false, false);
-}
-
-void ventilate(bool ventilate) {
-	bool endPosition = (ventilate && LS_open->isActive()) || (!ventilate && LS_closed->isActive());
-
-	M_hatch->activate(!endPosition, !ventilate);
-	M_evacuator->activate(endPosition && ventilate);
-}
-
-
