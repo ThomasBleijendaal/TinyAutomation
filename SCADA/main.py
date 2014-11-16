@@ -1,12 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from Typicals import Typical
-
-from Typicals import AI
-from Typicals import AO
-from Typicals import DI
-from Typicals import DO
+from Typicals import AI, AO, DI, DO
 
 #import DO
 #import AI
