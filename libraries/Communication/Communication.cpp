@@ -27,7 +27,7 @@ void Communication::sendData(unsigned int payloadSize, unsigned int type, int id
 	memcpy(buffer, &header, 2);
 	memcpy(buffer + 2, &identifier, 2);
 	memcpy(buffer + 4, &id, 2);
-	//memcpy(buffer + 6, payload, payloadSize);
+	memcpy(buffer + 6, payload, payloadSize);
 	memcpy(buffer + (payloadSize + 6), &footer, 2);
 
 #ifndef COMM_DEBUG
