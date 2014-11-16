@@ -6,56 +6,29 @@ Serial communication including:
 
 Byte layout
 
-int header
-- always 1234
-unsigned int identifier
-- 65535
-  ||		-> payload size 2 - 64 (always even)
-   ||		-> type 1 - 15
-     ||		-> object id 0 - 99 (max 35 if type == 15)
-  - example: payload: 32, type 12, object id = 88 -> 33288
+unsigned int header
+- always 0xAAAA --> 1010 1010 1010 1010 
+
+unsigned word payloadSize
+- 0 - 255
+unsigned word type
+- 0 - 255
+int id
+- 0 - 65535
+	
 byte[] payload
-int footer
-- always 4321
+
+unsigned int footer
+- always 0x5555 --> 0101 0101 0101 0101
 
 */
-//#define COMM_DEBUG
+
+#define COMM_DEBUG
 
 #ifndef Communication_h
 #define Communication_h
 
 #include <Communication.h>
-
-// data types
-const int typeDI = 1;
-const int typeAI = 2;
-const int typeM = 3;
-const int typeDO = 4;
-const int typeAO = 5;
-const int typePID = 6;
-
-struct dataStruct {
-	char data[16];
-	dataStruct() {
-		for (int i = 0; i < 16; i++)
-			data[i] = 0;
-	}
-};
-
-struct commStruct {
-	int header;
-	int type;
-	int nr;
-	dataStruct data;
-	int footer;
-
-	commStruct() {
-		header = 1234;
-		type = 0;
-		nr = 0;
-		footer = 4321;
-	}
-};
 
 class Communication {
 public:
@@ -66,7 +39,7 @@ public:
 
 	char * readData(int type, int nr);
 		
-	void sendData(int payloadSize, int type, int nr, const char * payload);
+	void sendData(unsigned int payloadSize, unsigned int type, int id, const char * payload);
 private:
 	char _desc[6];
 	char _payload[64];
