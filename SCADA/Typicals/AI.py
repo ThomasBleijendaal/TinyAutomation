@@ -1,5 +1,5 @@
 import struct
-from Typicals.Typical import Typical
+from Typical import Typical
 
 class AnalogInput(Typical):
     _lolo = False

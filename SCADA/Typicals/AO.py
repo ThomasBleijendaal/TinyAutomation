@@ -1,5 +1,5 @@
 import struct
-from Typicals.Typical import Typical
+from Typical import Typical
 
 class AnalogOutput(Typical):
     _active = False
