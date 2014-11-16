@@ -1,7 +1,7 @@
 from tkinter import *
-from GeneralObject import *
+from ThreadObject import *
 
-class ObjectHandler(GeneralObject):
+class ObjectHandler(ThreadObject):
     _objects = {}
     #todo: replace with typicalID from typical
     _typicalToI = {"DigitalInput" : 1, "AnalogInput" : 2, "Motor" : 3, "DigitalOutput" : 4, "AnalogOutput" : 5, "PIDController" : 6}

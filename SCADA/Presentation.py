@@ -1,7 +1,7 @@
 from tkinter import *
-from GeneralObject import *
+from ThreadObject import *
 
-class Presentation(GeneralObject):
+class Presentation(ThreadObject):
     _master = None
     #todo rename _w to canvas
     _w = None

@@ -1,7 +1,7 @@
 import serial, time, struct
-from GeneralObject import *
+from ThreadObject import *
 
-class Communication(GeneralObject):
+class Communication(ThreadObject):
     _connection = None
     data = None
 

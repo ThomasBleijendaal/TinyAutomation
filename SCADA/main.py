@@ -1,12 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import DI
-import DO
-import AI
-import AO
-import M
-import PID
+from Typicals import Typical
+
+from Typicals import AI
+from Typicals import AO
+from Typicals import DI
+from Typicals import DO
+
+#import DO
+#import AI
+#import AO
+#import M
+#import PID
 
 from General import General
 
@@ -30,14 +36,14 @@ general.Objects.addObject("PT_atmosphere", AI.AnalogInput("Pressure","mbar",22,1
 general.Objects.addObject("TT_atmosphere", AI.AnalogInput("Temperature","°C",22,6))
 general.Objects.addObject("TT_heatingPad", AI.AnalogInput("Heat sensor","°C",6,16))
 
-general.Objects.addObject("M_hatch", M.Motor("Hatch motor",22,11))
+#general.Objects.addObject("M_hatch", M.Motor("Hatch motor",22,11))
 
 general.Objects.addObject("M_evacuator", DO.DigitalOutput("Evacuator",30,1))
 general.Objects.addObject("M_agitator", DO.DigitalOutput("Agitator",30,6))
 
 general.Objects.addObject("X_heatingPad", AO.AnalogOutput("Heating pad","%",22,16))
 
-general.Objects.addObject("TC_heatingPad", PID.PIDController("Heat controller","°C",14,16))
+#general.Objects.addObject("TC_heatingPad", PID.PIDController("Heat controller","°C",14,16))
 
 general.start()
 
