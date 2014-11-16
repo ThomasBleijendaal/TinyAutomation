@@ -7,7 +7,7 @@ void ATmega328::cycle() {}
 
 void ATmega328::mode(int address, int mode) {
 	// only modify the digital pins
-	if (address < 20)
+	if (address < 14)
 		pinMode(address, mode);
 }
 
@@ -34,7 +34,7 @@ void ATmega328::digitalWrite(int address, bool data) {
 		else {
 			PORTB &= ~(0x01 << address - 8);
 		}
-	} 
+	}
 	else {
 		if (data) {
 			PORTD |= (0x01 << address);
@@ -47,7 +47,7 @@ void ATmega328::digitalWrite(int address, bool data) {
 }
 
 int ATmega328::analogRead(int address) {
-	return ::analogRead(address - 20);
+	return ::analogRead(address);
 }
 void ATmega328::analogWrite(int address, int data) {
 	::analogWrite(address, data);
