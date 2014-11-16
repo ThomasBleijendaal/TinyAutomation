@@ -6,6 +6,7 @@ Register IO drivers in order to extend the IO range.
 TODO:
 	- Improve handling of IO errors
 	- Driver count should be dynamic
+	- Check pin usage
 
 */
 #ifndef IO_h
