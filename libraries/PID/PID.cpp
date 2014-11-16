@@ -20,7 +20,7 @@ void PID::loop(Time * time, Communication * communication) {
 	if(settings.I > 0) {
 		timer1 = time->timer(settings.I / 10U);
 		if(!iTimer && timer1) {
-			history.add(delta); // / ((float)settings.I / 1000.0));
+			history.add(delta);
 			iTimer = true;
 		} else if(!timer1) {
 			iTimer = false;
@@ -30,7 +30,7 @@ void PID::loop(Time * time, Communication * communication) {
 	if(settings.D > 0) {
 		timer2 = time->timer(settings.D / 10U);
 		if(!dTimer && timer2) {
-			historyDelta.add(delta); // / ((float)settings.D / 1000.0));
+			historyDelta.add(delta);
 			dTimer = true;
 		} else if(!timer2) {
 			dTimer = false;
