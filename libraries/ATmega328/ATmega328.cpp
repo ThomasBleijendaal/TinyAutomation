@@ -13,7 +13,7 @@ void ATmega328::mode(int address, int mode) {
 
 bool ATmega328::digitalRead(int address) {
 #ifndef FASTDIGITAL
-	return ::digitalRead(address);
+	return (::digitalRead(address) == HIGH);
 #else
 	if (address > 7) {
 		return bool(PINB & (0x01 << address - 8));

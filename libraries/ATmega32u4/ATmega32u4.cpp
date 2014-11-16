@@ -11,7 +11,7 @@ void ATmega32u4::mode(int address, int mode) {
 
 bool ATmega32u4::digitalRead(int address) {
 //#ifndef FASTDIGITAL
-	return ::digitalRead(address);
+	return (::digitalRead(address) == HIGH);
 //#else
 //	if (address > 7) {
 //		return bool(PINB & (0x01 << address - 8));
@@ -32,7 +32,7 @@ void ATmega32u4::digitalWrite(int address, bool data) {
 //		else {
 //			PORTB &= ~(0x01 << address - 8);
 //		}
-//	} 
+//	}
 //	else {
 //		if (data) {
 //			PORTD |= (0x01 << address);
