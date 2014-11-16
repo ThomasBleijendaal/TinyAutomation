@@ -11,3 +11,10 @@ libraries/Debug/*
 *.atsln
 *.atsuo
 *.cppproj
+*.vcxproj
+*.filters
+*.user
+*.sdf
+*.suo
+*.sln
+*.opensdf
