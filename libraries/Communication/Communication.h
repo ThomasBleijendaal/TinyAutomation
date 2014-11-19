@@ -23,8 +23,6 @@ unsigned int footer
 
 */
 
-#define COMM_DEBUG
-
 #ifndef Communication_h
 #define Communication_h
 
@@ -39,7 +37,7 @@ public:
 
 	char * readData(int type, int nr);
 		
-	void sendData(unsigned int payloadSize, unsigned int type, int id, const char * payload);
+	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload);
 private:
 	char _desc[6];
 	char _payload[64];

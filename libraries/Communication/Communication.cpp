@@ -13,10 +13,10 @@ char * Communication::readData(int type, int nr) {
 	char * buffer = new char[10];
 	return buffer;
 }
-void Communication::sendData(unsigned int payloadSize, unsigned int type, int id, const char * payload)
+void Communication::sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload)
 {
 	unsigned int header = 0xAAAA;
-	int identifier = lowByte(payloadSize) + lowByte(type) * 256;
+	int meta = lowByte(payloadSize) + lowByte(comId) * 256;
 	unsigned int footer = 0x5555;
 
 	unsigned char * buffer = new unsigned char[(payloadSize + 8)];
@@ -25,14 +25,13 @@ void Communication::sendData(unsigned int payloadSize, unsigned int type, int id
 		buffer[i] = 0;
 	
 	memcpy(buffer, &header, 2);
-	memcpy(buffer + 2, &identifier, 2);
+	memcpy(buffer + 2, &meta, 2);
 	memcpy(buffer + 4, &id, 2);
 	memcpy(buffer + 6, payload, payloadSize);
 	memcpy(buffer + (payloadSize + 6), &footer, 2);
 
 #ifndef COMM_DEBUG
-	for (int i = 0; i < (payloadSize + 6); i++)
-		Serial.write(buffer[i]);
+	Serial.write(buffer, payloadSize + 8);
 #else
 	for (int i = 0; i < (payloadSize + 8); i++) {
 		Serial.print((unsigned char) buffer[i],HEX);
