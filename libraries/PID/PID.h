@@ -22,12 +22,14 @@ struct PID_settings_t {
 	unsigned long I;
 	float D;
 
+	float sp;
+
 	float minOutput;
 	float maxOutput;
 
 	float deviationLimit;
 
-	PID_settings_t() : P(0.0), I(0.0), D(0.0), minOutput(0.0), maxOutput(100.0), deviationLimit(0.0) {};
+	PID_settings_t() : P(0.0), I(0.0), D(0.0), sp(0.0), minOutput(0.0), maxOutput(100.0), deviationLimit(0.0) {};
 };
 
 struct PID_status_t {
@@ -41,11 +43,10 @@ struct PID_status_t {
 
 struct PID_data_t {
 	float previousError;
-	float sp;
 
 	int deviationDelay;
 
-	PID_data_t() : previousError(0.0), sp(0.0), deviationDelay(0) {};
+	PID_data_t() : previousError(0.0), deviationDelay(0) {};
 
 };
 
@@ -93,7 +94,6 @@ public:
 	PID_history_t history;
 	PID_history_t historyDelta;
 private:
-	int _id;
 	bool iTimer;
 	bool dTimer;
 

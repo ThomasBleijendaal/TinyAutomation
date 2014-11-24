@@ -88,7 +88,7 @@ void setup() {
 	heatingPadController->settings.P = 1.00;
 	heatingPadController->settings.I = 0U;
 	heatingPadController->settings.D = 3000U;
-	heatingPadController->data.sp = 42.0;
+	heatingPadController->settings.sp = 42.0;
 
 	general.begin();
 }

@@ -12,7 +12,7 @@ void PID::loop(Time * time, Communication * communication) {
 	float value = _AI->data.value;
 	float output = _AO->data.output;
 
-	float delta = (((data.sp - value)) / (_AI->settings.rangeHigh - _AI->settings.rangeLow)) * 100.0;
+	float delta = (((settings.sp - value)) / (_AI->settings.rangeHigh - _AI->settings.rangeLow)) * 100.0;
 
 	float historyTotal = 0.0;
 	float deltaTotal = 0.0;
