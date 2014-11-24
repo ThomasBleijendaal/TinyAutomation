@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using SCADA.Data;
+using SCADA.Data.Types;
+
+namespace SCADA
+{
+	class RawDataConverter : DataConverter<RawData, ObjectData>
+	{
+		public override void ConvertData()
+		{
+			for (int i = 0; i < dataStoragesInput.Count; i++)
+			{
+				DataResult<RawData> result = dataStoragesInput[i].Get(consumedDate[i]);
+				if (result.Entities.Count > 0)
+				{
+					foreach (RawData entity in result.Entities)
+					{
+						IObjectData obj = ObjectData.GetTypical(entity.Data().ComId);
+					}
+					consumedDate[i] = result.EndTimeStamp;
+				}
+			}
+		}
+	}
+}
