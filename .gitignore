@@ -21,3 +21,5 @@ SCADA/SCADA/obj/*
 *.sln
 *.opensdf
 *.pyproj
+*.csproj
+*.csproj
