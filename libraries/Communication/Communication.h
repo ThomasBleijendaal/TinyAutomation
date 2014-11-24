@@ -65,10 +65,7 @@ public:
 		
 	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload);
 	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload, unsigned char remoteAddress);
-private:
-	char _desc[6];
-	char _payload[64];
-
+private: 
 	unsigned char _address;
 	unsigned char _remoteAddress;
 };
