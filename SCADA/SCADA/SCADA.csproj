@@ -51,12 +51,14 @@
     <Compile Include="Data\IDataConverter.cs" />
     <Compile Include="Data\IDataEntity.cs" />
     <Compile Include="Data\IDataProvider.cs" />
+    <Compile Include="Data\Types\ObjectData.cs" />
     <Compile Include="Data\Types\RawData.cs" />
+    <Compile Include="RemoteObjects\PLC.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RawDataConverter.cs" />
     <Compile Include="Threading\DataThread.cs" />
     <Compile Include="Data\IDataThread.cs" />
-    <Compile Include="PLCConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
