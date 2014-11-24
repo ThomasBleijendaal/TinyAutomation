@@ -8,19 +8,19 @@ namespace SCADA.Data
 {
 	abstract class DataConverter<Tin, Tout> : IDataConverter where Tin : IDataEntity where Tout : IDataEntity
 	{
-		protected List<DataStorage<Tin>> dataStoragesInput = new List<DataStorage<Tin>>();
-		protected List<DataStorage<Tout>> dataStoragesOutput = new List<DataStorage<Tout>>();
-		protected List<DateTime> consumedDate = new List<DateTime>();
+		protected List<DataStorage<Tin>> DataStoragesInput = new List<DataStorage<Tin>>();
+		protected List<DataStorage<Tout>> DataStoragesOutput = new List<DataStorage<Tout>>();
+		protected List<DateTime> ConsumedDate = new List<DateTime>();
 
 		public void AttachDataInput(DataStorage<Tin> dataStorage)
 		{
-			dataStoragesInput.Add(dataStorage);
-			consumedDate.Add(DateTime.MinValue);
+			DataStoragesInput.Add(dataStorage);
+			ConsumedDate.Add(DateTime.MinValue);
 		}
 
 		public void AttachDataOutput(DataStorage<Tout> dataStorage)
 		{
-			dataStoragesOutput.Add(dataStorage);
+			DataStoragesOutput.Add(dataStorage);
 		}
 
 		public abstract void ConvertData();

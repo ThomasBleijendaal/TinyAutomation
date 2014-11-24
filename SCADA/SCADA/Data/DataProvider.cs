@@ -8,11 +8,11 @@ namespace SCADA.Data
 {
 	abstract class DataProvider<T> : IDataProvider where T : IDataEntity
 	{
-		protected List<DataStorage<T>> dataStoragesOutput = new List<DataStorage<T>>();
+		protected List<DataStorage<T>> DataStoragesOutput = new List<DataStorage<T>>();
 
 		public void AttachDataOutput(DataStorage<T> dataStorage)
 		{
-			dataStoragesOutput.Add(dataStorage);
+			DataStoragesOutput.Add(dataStorage);
 		}
 
 		public abstract void ProvideData();

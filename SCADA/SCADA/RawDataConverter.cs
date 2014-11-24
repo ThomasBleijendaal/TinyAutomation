@@ -13,16 +13,16 @@ namespace SCADA
 	{
 		public override void ConvertData()
 		{
-			for (int i = 0; i < dataStoragesInput.Count; i++)
+			for (int i = 0; i < DataStoragesInput.Count; i++)
 			{
-				DataResult<RawData> result = dataStoragesInput[i].Get(consumedDate[i]);
+				DataResult<RawData> result = DataStoragesInput[i].Get(ConsumedDate[i]);
 				if (result.Entities.Count > 0)
 				{
 					foreach (RawData entity in result.Entities)
 					{
 						IObjectData obj = ObjectData.GetTypical(entity.Data().ComId);
 					}
-					consumedDate[i] = result.EndTimeStamp;
+					ConsumedDate[i] = result.EndTimeStamp;
 				}
 			}
 		}

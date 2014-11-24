@@ -4,8 +4,8 @@ namespace SCADA.Data.Types
 {
 	class RawData : DataEntity<RawDataEntry>
 	{
-		public override RawData(DateTime timestamp, ushort comId, short id, byte[] data) 
-			: base(timestamp, new RawDataEntry(comId, id, data))
+		public RawData(DateTime timestamp, byte address, byte remoteAddress, ushort comId, short id, byte[] data) 
+			: base(timestamp, new RawDataEntry(address, remoteAddress, comId, id, data))
 		{
 			
 		}
@@ -18,12 +18,16 @@ namespace SCADA.Data.Types
 
 	class RawDataEntry
 	{
+		public byte Address;
+		public byte RemoteAddress;
 		public ushort ComId;
 		public short Id;
 		public byte[] Data;
 
-		public RawDataEntry(ushort comId, short id, byte[] data)
+		public RawDataEntry(byte address, byte remoteAddress, ushort comId, short id, byte[] data)
 		{
+			Address = address;
+			RemoteAddress = remoteAddress;
 			ComId = comId;
 			Id = id;
 			Data = data;

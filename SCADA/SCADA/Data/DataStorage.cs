@@ -8,11 +8,11 @@ namespace SCADA.Data
 {
 	class DataStorage<T> where T : IDataEntity
 	{
-		public List<T> entities = new List<T>();
+		public List<T> Entities = new List<T>();
 
 		public void Add(T entity)
 		{
-			entities.Add(entity);
+			Entities.Add(entity);
 		}
 
 		public DataResult<T> Get(DateTime start)
@@ -25,7 +25,7 @@ namespace SCADA.Data
 
 			if (timeSpan == null)
 			{
-				foreach (T entity in entities)
+				foreach (T entity in Entities)
 				{
 					if (entity.TimeStamp() > startTimeSamp)
 					{
