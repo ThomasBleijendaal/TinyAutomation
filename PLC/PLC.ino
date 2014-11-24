@@ -32,17 +32,14 @@ int freeRam() {
     return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 }
 
-// UNTYPICALS //
-/* **************************************** */
-//DHT QT_insideHumiditySensor(8, DHT22);
-//DHT QT_outsideHumiditySensor(7, DHT22);
-//SFE_BMP180 PT_barometricPressureSensor;
-
 // TYPICALS //
-AI *heatingPadTemperature = general.add(new AI(A3)); //, -10.0, 125.0, 10.0, 25.0, 35.0, 50.0, true, 41, 614, true));
-//AI *QT_light = general.add(new AI(20)); //, 0.0, 100.0));
-//AI *QT_light2 = general.add(new AI(21)); //, 0.0, 100.0));
-/*AI *QT_insideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0));
+AI *heatingPadTemperature = general.add(new AI(A3));
+AO *heatingPad = general.add(new AO(3));
+PID *heatingPadController = general.add(new PID(&heatingPadTemperature, &heatingPad));
+
+/*AI *QT_light = general.add(new AI(20)); //, 0.0, 100.0));
+AI *QT_light2 = general.add(new AI(21)); //, 0.0, 100.0));
+AI *QT_insideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 60.0, 80.0));
 AI *QT_outsideHumidity = general.add(new AI(-1)); //, 0.0, 100.0, 10.0, 20.0, 80.0, 100.0));
 AI *TT_inside = general.add(new AI(-1)); //, 0.0, 40.0, 18.0, 20.0, 23.0, 25.0));
 AI *TT_outside = general.add(new AI(-1)); //, 0.0, 40.0, 15.0, 18.0, 25.0, 30.0));
@@ -55,15 +52,17 @@ DI *LS_closed = general.add(new DI(4, true));
 
 DO *M_evacuator = general.add(new DO(30));
 DO *M_agitator = general.add(new DO(31));
+
+M *M_hatch = general.add(new M());
 */
-//M *M_hatch = general.add(new M());
 
-AO *heatingPad = general.add(new AO(3));
 
-PID *heatingPadController = general.add(new PID(&heatingPadTemperature, &heatingPad));
 
 void setup() {
 	Serial.begin(115200);
+
+	general.communication.setAddress(2);
+	general.communication.setRemoteAddress(1);
 
 	general.io.registerDriver(0,20,new ATmega328(), IOinstant);
 	//general.io.registerDriver(30,31,new DHT(), IOinterrupt);
