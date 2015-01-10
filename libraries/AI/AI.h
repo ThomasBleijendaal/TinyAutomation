@@ -69,10 +69,10 @@ struct AI_data_t {
 	float value;
 
 	float avg;
-	float min;
-	float max;
+	float minValue;
+	float maxValue;
 
-	AI_data_t() {}
+	AI_data_t() : value(0.0), avg(0.0), minValue(0.0), maxValue(0.0) {}
 };
 
 struct AI_commSend_t {

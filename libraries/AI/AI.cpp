@@ -16,12 +16,12 @@ void AI::loop(Time * time, Communication * communication, IO * io) {
 
 		if (_firstCycle) {
 			data.avg = data.value;
-			data.min = data.value;
-			data.max = data.value;
+			data.minValue = data.value;
+			data.maxValue = data.value;
 		}
 		else {
-			data.min = min(data.min, data.value);
-			data.max = max(data.max, data.value);
+			data.minValue = min(data.minValue, data.value);
+			data.maxValue = max(data.maxValue, data.value);
 
 			float delta = (settings.rangeHigh - settings.rangeLow) * 0.01;
 
