@@ -7,7 +7,7 @@ void ATmega328::cycle() {}
 
 void ATmega328::mode(int address, int mode) {
 	// only modify the digital pins
-	if (address < 14)
+	if (address < A0)
 		pinMode(address, mode);
 }
 
