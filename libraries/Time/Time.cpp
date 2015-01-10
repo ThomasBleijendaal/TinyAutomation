@@ -6,15 +6,22 @@ void Time::loop() {
 
 	++_cps;
 
-	_resetTimers();
+	t10ms = false;
+	t100ms = false;
+	t1s = false;
+	t5s = false;
+	t30s = false;
+	t1m = false;
+	t5m = false;
+	t1h = false;
 
 	if (t10ms = (u - 9999U > _ms) || (_ms + 9999U < u)) {
 		_ms = u;
 
-		t100ms = !(_1000ms++ % 10);
+		t100ms = !(_1000ms % 10);
 		_customTimer++;
 
-		if(t1s = ++_1000ms == 100) {
+		if(t1s = (++_1000ms == 100)) {
 			_1000ms = 0;
 
 			if(++_m == 60) {
@@ -37,15 +44,4 @@ void Time::loop() {
 
 bool Time::timer(unsigned int ms) {
 	return !(_customTimer % (int)((ms / 10)));
-}
-
-inline void Time::_resetTimers() {
-	t10ms = false;
-	t100ms = false;
-	t1s = false;
-	t5s = false;
-	t30s = false;
-	t1m = false;
-	t5m = false;
-	t1h = false;
 }
