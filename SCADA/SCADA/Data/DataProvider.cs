@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace SCADA.Data
 {
-	abstract class DataProvider<T> : IDataProvider where T : IDataEntity
+	abstract class DataProvider<T> : IDataProvider where T : IDataEntry
 	{
-		protected List<DataStorage<T>> DataStoragesOutput = new List<DataStorage<T>>();
+		protected List<DataStorage<T>> Destinations = new List<DataStorage<T>>();
 
-		public void AttachDataOutput(DataStorage<T> dataStorage)
+		public void AttachStorageDestination(DataStorage<T> dataStorage)
 		{
-			DataStoragesOutput.Add(dataStorage);
+			Destinations.Add(dataStorage);
 		}
 
 		public abstract void ProvideData();

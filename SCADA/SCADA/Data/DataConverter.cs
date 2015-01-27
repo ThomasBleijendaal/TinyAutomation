@@ -6,23 +6,46 @@ using System.Threading.Tasks;
 
 namespace SCADA.Data
 {
-	abstract class DataConverter<Tin, Tout> : IDataConverter where Tin : IDataEntity where Tout : IDataEntity
+	abstract class DataConverter<SourceEntry, DestinationEntry> : IDataConverter 
+		where SourceEntry : IDataEntry
+		where DestinationEntry : IDataEntry
 	{
-		protected List<DataStorage<Tin>> DataStoragesInput = new List<DataStorage<Tin>>();
-		protected List<DataStorage<Tout>> DataStoragesOutput = new List<DataStorage<Tout>>();
+		protected List<DataStorage<SourceEntry>> Sources = new List<DataStorage<SourceEntry>>();
+		protected List<DataStorage<DestinationEntry>> Destinations = new List<DataStorage<DestinationEntry>>();
 		protected List<DateTime> ConsumedDate = new List<DateTime>();
 
-		public void AttachDataInput(DataStorage<Tin> dataStorage)
+		public void AttachStorageSource(DataStorage<SourceEntry> dataStorage)
 		{
-			DataStoragesInput.Add(dataStorage);
+			Sources.Add(dataStorage);
 			ConsumedDate.Add(DateTime.MinValue);
 		}
 
-		public void AttachDataOutput(DataStorage<Tout> dataStorage)
+		public void AttachStorageDestination(DataStorage<DestinationEntry> dataStorage)
 		{
-			DataStoragesOutput.Add(dataStorage);
+			Destinations.Add(dataStorage);
 		}
 
-		public abstract void ConvertData();
+		public void ConvertData()
+		{
+			for (int i = 0; i < Sources.Count; i++)
+			{
+				DataResult<SourceEntry> result = Sources[i].Get(ConsumedDate[i]);
+				{
+					if (result.Entries.Count > 0)
+					{
+						foreach (SourceEntry entry in result.Entries)
+						{
+							if (!ConvertEntry(entry))
+							{
+								throw new Exception("No conversion of entry");
+							}
+						}
+						ConsumedDate[i] = result.EndTimeStamp;
+					}
+				}
+			}
+		}
+
+		public abstract bool ConvertEntry(SourceEntry entry);
 	}
 }

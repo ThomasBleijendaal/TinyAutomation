@@ -13,7 +13,46 @@ namespace SCADA.RemoteObjects
 {
 	class PLC
 	{
-		public class PLCDataProvider : DataProvider<RawData>
+		public PLCDataProvider Provider;
+
+		public DataStorage<CommunicationData> DataOut;
+		public PLCDataConsumer Consumer;
+
+		private SerialPort Connection;
+
+		private byte CorrectHeaderFlag = 0xAA;
+		private ushort CorrectFooterFlag = 0x5555;
+
+		public byte Address;
+
+		public PLC(byte address, string portName, int baudRate)
+		{
+			try
+			{
+				Connection = new SerialPort(portName, baudRate);
+				Connection.Open();
+			} 
+			catch(Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
+			
+			Provider = new PLCDataProvider(this);
+
+			DataOut = new DataStorage<CommunicationData>();
+			Consumer = new PLCDataConsumer(this);
+
+			Consumer.AttachStorageSource(DataOut);
+
+			Address = address;
+		}
+
+		~PLC()
+		{
+			Connection.Close();
+		}
+
+		public class PLCDataProvider : DataProvider<CommunicationData>
 		{
 			private PLC Parent;
 
@@ -24,6 +63,11 @@ namespace SCADA.RemoteObjects
 
 			public override void ProvideData()
 			{
+				if (!Parent.Connection.IsOpen)
+				{
+					return;
+				}
+
 				byte[] headerData = new byte[6];
 
 				byte headerFlag;
@@ -64,7 +108,7 @@ namespace SCADA.RemoteObjects
 
 						if (footerFlag == Parent.CorrectFooterFlag)
 						{
-							AddData(new RawData(DateTime.Now, comId, id, payload));
+							AddData(new CommunicationData(DateTime.Now, address, remoteAddress, comId, id, payload));
 						}
 						else
 						{
@@ -78,37 +122,31 @@ namespace SCADA.RemoteObjects
 				}
 			}
 
-			private void AddData(RawData entity)
+			private void AddData(CommunicationData data)
 			{
-				foreach (DataStorage<RawData> dataStorage in DataStoragesOutput)
+				foreach (var dataStorage in Destinations)
 				{
-					dataStorage.Add(entity);
+					dataStorage.Add(data);
 				}
 			}
 		}
 
-		public PLCDataProvider Provider;
-
-		private SerialPort Connection;
-
-		private byte CorrectHeaderFlag = 0xAA;
-		private ushort CorrectFooterFlag = 0x5555;
-
-		private byte Address;
-
-		public PLC(byte address, string portName, int baudRate)
+		public class PLCDataConsumer : DataConsumer<CommunicationData>
 		{
-			Connection = new SerialPort(portName, baudRate);
-			Connection.Open();
-			
-			Provider = new PLCDataProvider(this);
+			private PLC Parent;
 
-			Address = address;
+			public PLCDataConsumer(PLC parent)
+			{
+				Parent = parent;
+			}
+
+			public override bool ConsumeEntry(CommunicationData entry)
+			{
+				// todo
+
+				return true;
+			}
 		}
 
-		~PLC()
-		{
-			Connection.Close();
-		}
 	}
 }

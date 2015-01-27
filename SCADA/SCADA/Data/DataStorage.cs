@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace SCADA.Data
 {
-	class DataStorage<T> where T : IDataEntity
+	class DataStorage<T> where T : IDataEntry
 	{
-		public List<T> Entities = new List<T>();
+		public List<T> Entries = new List<T>();
 
 		public void Add(T entity)
 		{
-			Entities.Add(entity);
+			Entries.Add(entity);
 		}
 
 		public DataResult<T> Get(DateTime start)
@@ -25,19 +25,19 @@ namespace SCADA.Data
 
 			if (timeSpan == null)
 			{
-				foreach (T entity in Entities)
+				foreach (T entity in Entries.ToList())
 				{
 					if (entity.TimeStamp() > startTimeSamp)
 					{
-						result.Entities.Add(entity);
+						result.Entries.Add(entity);
 					}
 				}
 			}
 
-			if (result.Entities.Count > 0)
+			if (result.Entries.Count > 0)
 			{
-				result.StartTimeStamp = result.Entities[0].TimeStamp();
-				result.EndTimeStamp = result.Entities.Last().TimeStamp();
+				result.StartTimeStamp = result.Entries[0].TimeStamp();
+				result.EndTimeStamp = result.Entries.Last().TimeStamp();
 			}
 
 			return result;

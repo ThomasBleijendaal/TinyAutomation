@@ -15,11 +15,28 @@ namespace SCADA
 {
 	class Program
 	{
-		static public PLC RedBoard;
+		static public Communication communication;
 		
 		static void Main(string[] args)
 		{
-			DataStorage<RawData> rawDataUpload = new DataStorage<RawData>();
+			communication = new Communication(1);
+			communication.Add(new PLC(2, "COM3", 115200));
+
+			if (communication.Init())
+			{
+				communication.Start();
+			}
+
+			DummyConsumer dummy = new DummyConsumer();
+			dummy.AttachStorageSource(communication.Data);
+
+			DataThread thread = new DataThread();
+
+			thread.AttachConsumer(dummy);
+
+			thread.Start();
+
+		/*	DataStorage<RawData> rawDataUpload = new DataStorage<RawData>();
 		
 			RedBoard = new PLC(2, "COM3", 115200);
 
@@ -34,26 +51,17 @@ namespace SCADA
 			thread.AttachProvider(RedBoard.Provider);
 			thread.AttachConsumer(dummy);
 
-			thread.Start();
+			thread.Start();*/
 		}
 	}
 
-	class DummyConsumer : DataConsumer<RawData>
+	class DummyConsumer : DataConsumer<CommunicationData>
 	{
-		public override void ConsumeData()
+		public override bool ConsumeEntry(CommunicationData entry)
 		{
-			for (int i = 0; i < DataStoragesInput.Count; i++)
-			{
-				DataResult<RawData> result = DataStoragesInput[i].Get(ConsumedDate[i]);
-				if (result.Entities.Count > 0)
-				{
-					foreach (RawData entity in result.Entities)
-					{
-						Console.WriteLine(entity.ToString());
-					}
-					ConsumedDate[i] = result.EndTimeStamp;
-				}
-			}
+			Console.WriteLine(entry.Data.ToString());
+
+			return true;
 		}
 	}
 }

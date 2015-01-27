@@ -11,32 +11,37 @@ namespace SCADA.Threading
 {
 	class DataThread: IDataThread
 	{
-		private List<IDataProvider> providers = new List<IDataProvider>();
-		private List<IDataConverter> converters = new List<IDataConverter>();
-		private List<IDataConsumer> consumers = new List<IDataConsumer>();
+		private List<IDataProvider> Providers = new List<IDataProvider>();
+		private List<IDataConverter> Converters = new List<IDataConverter>();
+		private List<IDataConsumer> Consumers = new List<IDataConsumer>();
 		
-		private Thread hostThread;
+		private Thread HostThread;
 
 		public DataThread()
 		{
-			hostThread = new Thread(new ThreadStart(Run));
+			HostThread = new Thread(new ThreadStart(Run));
 		}
 
 		public void Start()
 		{
-			hostThread.Start();
+			HostThread.Start();
 		}
 
 		private void Run()
 		{
 			while (true)
 			{
-				foreach (IDataProvider provider in providers)
+				foreach (IDataProvider provider in Providers)
 				{
 					provider.ProvideData();
 				}
 
-				foreach(IDataConsumer consumer in consumers)
+				foreach (IDataConverter converter in Converters)
+				{
+					converter.ConvertData();
+				}
+
+				foreach(IDataConsumer consumer in Consumers)
 				{
 					consumer.ConsumeData();
 				}
@@ -47,17 +52,29 @@ namespace SCADA.Threading
 
 		public void AttachProvider(IDataProvider provider)
 		{
-			providers.Add(provider);
+			Providers.Add(provider);
+		}
+		public void AttachProvider(List<IDataProvider> providers)
+		{
+			Providers = Providers.Concat(providers).ToList();
 		}
 
 		public void AttachConverter(IDataConverter converter)
 		{
-			converters.Add(converter);
+			Converters.Add(converter);
+		}
+		public void AttachConverter(List<IDataConverter> converters)
+		{
+			Converters = Converters.Concat(converters).ToList();
 		}
 
 		public void AttachConsumer(IDataConsumer consumer)
 		{
-			consumers.Add(consumer);
+			Consumers.Add(consumer);
+		}
+		public void AttachConverter(List<IDataConsumer> consumers)
+		{
+			Consumers = Consumers.Concat(consumers).ToList();
 		}
 	}
 }

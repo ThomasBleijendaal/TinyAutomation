@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace SCADA.Data
 {
-	class DataResult<T>
+	class DataResult<T> where T : IDataEntry
 	{
 		public DateTime StartTimeStamp = DateTime.MinValue;
 		public DateTime EndTimeStamp = DateTime.MinValue;
 
-		public List<T> Entities = new List<T>();
+		public List<T> Entries = new List<T>();
+
+		//public IEnumerable<T> Entries { get; set; }
 	}
 }
