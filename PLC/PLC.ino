@@ -24,7 +24,7 @@
 
 /* **************************************** */
 // Typicals, IODrivers //
-General general = General(2, 1, 2);
+General general = General(3, 1, 1);
 
 int freeRam() {
     extern int __heap_start, *__brkval;
@@ -33,7 +33,8 @@ int freeRam() {
 }
 
 // TYPICALS //
-AI *heatingPadTemperature = general.add(new AI(A3));
+AI *heatingPadTemperature = general.add(new AI(A0));
+//AI *level = general.add(new AI(A0));
 AO *heatingPad = general.add(new AO(3));
 PID *heatingPadController = general.add(new PID(&heatingPadTemperature, &heatingPad));
 
@@ -56,15 +57,20 @@ DO *M_agitator = general.add(new DO(31));
 M *M_hatch = general.add(new M());
 */
 
-
+DO *led = general.add(new DO(13));
+DI *button = general.add(new DI(8, true));
 
 void setup() {
 	Serial.begin(115200);
+	//Serial.println("START");
 
+	// TODO: this should be automatic
 	general.communication.setAddress(2);
 	general.communication.setRemoteAddress(1);
 
-	general.io.registerDriver(0,20,new ATmega328(), IOinstant);
+
+	general.io.registerDriver(0, 20, new ATmega328(), IOinstant);
+
 	//general.io.registerDriver(30,31,new DHT(), IOinterrupt);
 
 	//general.io.digitalWrite(32,true);
@@ -89,10 +95,38 @@ void setup() {
 	heatingPadController->settings.D = 3000U;
 	heatingPadController->settings.sp = 42.0;
 
+	/*level->settings.rangeLow = 100.0;
+	level->settings.rangeHigh = 0.0;
+	level->settings.rawLow = 0;
+	level->settings.rawHigh = 1023;*/
+	
 	general.begin();
 }
 
 void loop() {
-	heatingPadController->status.active = heatingPadTemperature->data.value < 50.0;
 	general.loop();
+
+	led->status.active = button->status.active;
+
+	//if (general.time.t1s) {
+		//Serial.println("LOOP");
+
+		//Serial.println(heatingPadTemperature->data.value);
+		//Serial.println(heatingPad->data.output);
+
+	//}
+
+	//delay(1000);
+	//Serial.println("LOOP");
+
+	//Serial.println(heatingPadTemperature->data.value);
+
+	//Serial.println(level->data.value);
+	//Serial.println(analogRead(A0));
+	//Serial.println(general.io.analogRead(A0));
+	
+
+
+	heatingPadController->status.active = heatingPadTemperature->data.value < 50.0;
+	
 }
