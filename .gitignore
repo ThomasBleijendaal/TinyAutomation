@@ -1,7 +1,9 @@
 z.ignore/*
 hardware/*
-PLC/Debug/*
-PLC/Visual Micro/*
+RedBoard/Debug/*
+RedBoard/Visual Micro/*
+ProMini/Debug/*
+ProMini/Visual Micro/*
 libraries/Debug/*
 SCADA/SCADA/bin/*
 SCADA/SCADA/obj/*

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PLC", "..\PLC\PLC.vcxproj", "{35A03F47-CFD8-45D1-8D2E-F563F0546B41}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProMini", "..\ProMini\ProMini.vcxproj", "{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RedBoard", "..\RedBoard\RedBoard.vcxproj", "{35A03F47-CFD8-45D1-8D2E-F563F0546B41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,16 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Debug|Win32.Build.0 = Debug|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Release|Any CPU.ActiveCfg = Release|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Release|Win32.ActiveCfg = Release|Win32
+		{21DCFDC4-ED78-419F-A5D2-E0FB9F5275F4}.Release|Win32.Build.0 = Release|Win32
 		{35A03F47-CFD8-45D1-8D2E-F563F0546B41}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{35A03F47-CFD8-45D1-8D2E-F563F0546B41}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{35A03F47-CFD8-45D1-8D2E-F563F0546B41}.Debug|Mixed Platforms.Build.0 = Debug|Win32

@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PLC.ino" />
+    <None Include="ProMini.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Visual Micro\.PLC.vsarduino.h">
+    <ClInclude Include="Visual Micro\.ProMini.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\libraries\AI\AI.h">
@@ -69,10 +69,10 @@
     <ClInclude Include="..\libraries\M\M.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libraries\MCP23016\MCP23016.h">
+    <ClInclude Include="..\libraries\MCP3008\MCP3008.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libraries\MCP3008\MCP3008.h">
+    <ClInclude Include="..\libraries\MCP23016\MCP23016.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\libraries\PID\PID.h">
@@ -89,37 +89,37 @@
     <ClCompile Include="..\libraries\AI\AI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\PID\PID.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\libraries\Time\Time.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\libraries\General\General.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\libraries\Device\Device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\libraries\AO\AO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\libraries\ATmega328\ATmega328.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\libraries\Typical\Typical.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libraries\ATmega32u4\ATmega32u4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\DO\DO.cpp">
+    <ClCompile Include="..\libraries\ATmega328\ATmega328.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\BMP180\BMP180.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\Communication\Communication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\Device\Device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\DHT_old\DHT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\DHT\DHT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libraries\DI\DI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\DHT\DHT.cpp">
+    <ClCompile Include="..\libraries\DO\DO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\General\General.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libraries\HC595\HC595.cpp">
@@ -128,10 +128,10 @@
     <ClCompile Include="..\libraries\IO\IO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\BMP180\BMP180.cpp">
+    <ClCompile Include="..\libraries\IODriver\IODriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\IODriver\IODriver.cpp">
+    <ClCompile Include="..\libraries\M\M.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libraries\MCP3008\MCP3008.cpp">
@@ -140,13 +140,13 @@
     <ClCompile Include="..\libraries\MCP23016\MCP23016.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\Communication\Communication.cpp">
+    <ClCompile Include="..\libraries\PID\PID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\M\M.cpp">
+    <ClCompile Include="..\libraries\Time\Time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libraries\DHT_old\DHT.cpp">
+    <ClCompile Include="..\libraries\Typical\Typical.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
