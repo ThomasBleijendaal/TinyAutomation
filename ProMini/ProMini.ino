@@ -2,7 +2,7 @@
 #include <Communication.h>
 #include <IODriver.h>
 #include <IO.h>
-#include <ATmega328.h>
+#include <ATmega32u4.h>
 
 #include <Typical.h>
 #include <AI.h>
@@ -17,23 +17,24 @@
 #include <General.h>
 
 /* **************************************** */
-General general = General(3, 1, 1);
+General general = General(2, 0, 1);
 
 // TYPICALS //
-DO *led;
 DI *button;
+DO *led;
 
 void setup() {
 	Serial.begin(115200);
 
-	// TODO: this should be automatic
-	general.communication.setAddress(100);
-	general.communication.setRemoteAddress(1);
+	while (!Serial);
 
-	general.io.registerDriver(0, 20, new ATmega328(), IOinstant);
+	general.communication.setLocalAddress(0xa1);
+	general.communication.setNodeAddress(0x01);
 
-	led = general.add(new DO(13));
-	button = general.add(new DI(Communication::remoteAddress(101, 0), true));
+	general.io.registerDriver(0, 20, new ATmega32u4(), IOinstant);
+
+	button = general.add(new DI(Communication::remoteAddress(0xA0, DI_COM_data_ID, 0), true));
+	led = general.add(new DO(10));
 
 	general.begin();
 }
@@ -41,5 +42,9 @@ void setup() {
 void loop() {
 	general.loop();
 
-	led->status.active = button->status.active;
+	if (general.time.t1s)
+		led->status.active = !led->status.active;
+	
+	//led->status.active = button->status.active;
+	
 }
