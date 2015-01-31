@@ -1,26 +1,5 @@
 /*
 General Communication functionality
-
-Serial communication including:
-- dynamic payload size
-
-Byte layout
-
-unsigned int header
-- always 0xAAxx --> 1010 1010 address remoteAddress 
-
-unsigned char payloadSize
-- 0 - 255
-unsigned char comId
-- 0 - 255
-int id
-- 0 - 65535
-	
-byte[] payload
-
-unsigned int footer
-- always 0x5555 --> 0101 0101 0101 0101
-
 */
 
 #ifndef Communication_h
@@ -29,16 +8,16 @@ unsigned int footer
 struct CommunicationHeader
 {
 	unsigned char header : 8;
-	unsigned char address : 4;
-	unsigned char remoteAddress : 4;
-	unsigned char payloadSize : 8;
-	unsigned char comId : 8;
+	unsigned char sourceAddress : 8;
+	unsigned char destinationAddress : 8;
+	unsigned int payloadSize : 16;
+	unsigned int comId : 16;
 	int id : 16;
 
-	CommunicationHeader(unsigned char address, unsigned char remoteAddress, unsigned char payloadSize, unsigned char comId, int id)
+	CommunicationHeader(unsigned char sourceAddress, unsigned char destinationAddress, unsigned int payloadSize, unsigned char comId, int id)
 		: header(0xAA),
-		address(address),
-		remoteAddress(remoteAddress),
+		sourceAddress(sourceAddress),
+		destinationAddress(destinationAddress),
 		payloadSize(payloadSize),
 		comId(comId),
 		id(id) {};
@@ -46,30 +25,50 @@ struct CommunicationHeader
 
 struct CommunicationFooter
 {
-	unsigned int footer : 16;
+	unsigned int footer : 8;
 
-	CommunicationFooter() : footer(0x5555) {};
+	CommunicationFooter() : footer(0x55) {};
+};
+
+struct RemoteCommunication
+{
+	unsigned char header : 8;
+	int communicationId : 16;
+	unsigned char sourceAddress : 8;
+	unsigned int comId : 16;
+	int id : 16;
+	unsigned char footer : 8;
+
+	RemoteCommunication(int communicationId, unsigned char sourceAddress, unsigned int comId, int id) 
+		: header(0xBB),
+		communicationId(communicationId), 
+		sourceAddress(sourceAddress),
+		comId(comId),
+		id(id),
+		footer(0x55) {};
 };
 
 class Communication {
 public:
 	Communication();
 
-	void setAddress(unsigned char address) { _address = address; };
-	void setRemoteAddress(unsigned char remoteAddress) { _remoteAddress = remoteAddress; };
+	void setLocalAddress(unsigned char localAddress) { _localAddress = localAddress; };
+	void setNodeAddress(unsigned char nodeAddress) { _nodeAddress = nodeAddress; };
 
-	void send();
-	void read();
+	void begin();
+	void loop();
 
 	char * readData(int type, int nr);
-		
+
 	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload);
-	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload, unsigned char remoteAddress);
-private: 
-	unsigned char _address;
-	unsigned char _remoteAddress;
+	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload, unsigned char nodeAddress);
+
+	static int remoteAddress(unsigned char remoteAddress, unsigned int comId, int id);
+private:
+	unsigned char _localAddress;
+	unsigned char _nodeAddress;
+
+	static int _RemoteSubscriberId;
 };
-
-
 
 #endif

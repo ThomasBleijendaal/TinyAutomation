@@ -15,6 +15,7 @@ General::General(int typicalCount, int deviceCount, int ioCount) {
 
 void General::begin() {
 	io.begin();
+	communication.begin();
 
 	time.loop();
 
@@ -29,8 +30,7 @@ void General::begin() {
 
 void General::loop() {
 	time.loop();
-
-	communication.read();
+	communication.loop();
 
 	for (int i = 0; i < _typicalCount; i++) {
 		_typicals[i]->loop(&time, &communication, &io);
@@ -46,8 +46,6 @@ void General::loop() {
 	else {
 		io.cycle();
 	}
-
-	communication.send();
 }
 
 void General::_add(Typical * object) {

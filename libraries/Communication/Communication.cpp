@@ -1,12 +1,17 @@
 #include "Arduino.h"
 #include "Communication.h"
 
+int Communication::_RemoteSubscriberId = 0;
+
 Communication::Communication() {
 }
 
-void Communication::send() {
+void Communication::begin() {
+	
 }
-void Communication::read() {
+
+void Communication::loop() {
+
 }
 
 char * Communication::readData(int type, int nr) {
@@ -15,30 +20,35 @@ char * Communication::readData(int type, int nr) {
 }
 void Communication::sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload)
 {
-	sendData(payloadSize, comId, id, payload, _remoteAddress);
+	sendData(payloadSize, comId, id, payload, _nodeAddress);
 }
-void Communication::sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload, unsigned char remoteAddress)
+void Communication::sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload, unsigned char nodeAddress)
 {
-	CommunicationHeader header = CommunicationHeader(_address, remoteAddress, payloadSize, comId, id);
+	CommunicationHeader header = CommunicationHeader(_localAddress, nodeAddress, payloadSize, comId, id);
 	CommunicationFooter footer = CommunicationFooter();
 
 	unsigned char * buffer = new unsigned char[(payloadSize + sizeof(header) + sizeof(footer))];
 
-	memcpy(buffer, &header, 6);
-	memcpy(buffer + 6, payload, payloadSize);
-	memcpy(buffer + (payloadSize + 6), &footer, 2);
+	memcpy(buffer, &header, 9);
+	memcpy(buffer + 9, payload, payloadSize);
+	memcpy(buffer + (payloadSize + 9), &footer, 2);
 
-#ifndef COMM_DEBUG
-	Serial.write(buffer, payloadSize + 8);
-#else
-	for (int i = 0; i < (payloadSize + 8); i++) {
-		Serial.print((unsigned char) buffer[i],HEX);
-		Serial.print(".");
-	}
-	Serial.print("....");
-	Serial.println(payloadSize);
-#endif
-	
+	Serial.write(buffer, payloadSize + 11);
 
 	delete[] buffer;
+}
+
+int Communication::remoteAddress(unsigned char sourceAddress, unsigned int comId, int id) {
+
+	RemoteCommunication info = RemoteCommunication(--_RemoteSubscriberId, sourceAddress, comId, id);
+
+	unsigned char * buffer = new unsigned char[(sizeof(info))];
+
+	memcpy(buffer, &info, 0);
+
+	Serial.write(buffer, sizeof(buffer));
+
+	delete[] buffer;
+
+	return _RemoteSubscriberId;
 }
