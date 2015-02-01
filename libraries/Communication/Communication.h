@@ -55,16 +55,17 @@ public:
 	void setLocalAddress(unsigned char localAddress) { _localAddress = localAddress; };
 	void setNodeAddress(unsigned char nodeAddress) { _nodeAddress = nodeAddress; };
 
-	void begin();
 	void loop();
-
-	char * readData(int type, int nr);
+	void begin();
+	void setup();
 
 	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload);
 	void sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload, unsigned char nodeAddress);
 
 	static int remoteAddress(unsigned char remoteAddress, unsigned int comId, int id);
 private:
+	bool started;
+
 	unsigned char _localAddress;
 	unsigned char _nodeAddress;
 

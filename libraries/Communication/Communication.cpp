@@ -4,6 +4,27 @@
 int Communication::_RemoteSubscriberId = 0;
 
 Communication::Communication() {
+	started = false;
+}
+
+void Communication::setup() {
+	Serial.begin(115200);
+
+	char * data = new char[1];
+	char correctData = 0xAA;
+	
+	while (!started) {
+		while (Serial.available()) {
+			Serial.readBytes(data, 1);
+			started = data[0] == correctData || started;
+		}
+		delay(10);
+		if (started) {
+			Serial.write(correctData);
+		}
+	}
+
+	delete[] data;
 }
 
 void Communication::begin() {
@@ -14,10 +35,6 @@ void Communication::loop() {
 
 }
 
-char * Communication::readData(int type, int nr) {
-	char * buffer = new char[10];
-	return buffer;
-}
 void Communication::sendData(unsigned int payloadSize, unsigned int comId, int id, const char * payload)
 {
 	sendData(payloadSize, comId, id, payload, _nodeAddress);
