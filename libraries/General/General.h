@@ -29,6 +29,7 @@ class General {
 
 		void loop();
 		void begin();
+		void setup();
 
 		Communication communication;
 		Time time;

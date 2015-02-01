@@ -13,6 +13,10 @@ General::General(int typicalCount, int deviceCount, int ioCount) {
 	_deviceCount = 0;
 }
 
+void General::setup() {
+	communication.setup();
+}
+
 void General::begin() {
 	io.begin();
 	communication.begin();
