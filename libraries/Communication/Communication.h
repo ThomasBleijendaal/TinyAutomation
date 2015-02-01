@@ -25,7 +25,7 @@ struct CommunicationHeader
 
 struct CommunicationFooter
 {
-	unsigned int footer : 8;
+	unsigned char footer : 8;
 
 	CommunicationFooter() : footer(0x55) {};
 };

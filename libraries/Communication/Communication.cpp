@@ -24,6 +24,8 @@ void Communication::setup() {
 		}
 	}
 
+	delay(1000);
+
 	delete[] data;
 }
 
@@ -59,11 +61,11 @@ int Communication::remoteAddress(unsigned char sourceAddress, unsigned int comId
 
 	RemoteCommunication info = RemoteCommunication(--_RemoteSubscriberId, sourceAddress, comId, id);
 
-	unsigned char * buffer = new unsigned char[(sizeof(info))];
+	unsigned char * buffer = new unsigned char[9];
 
-	memcpy(buffer, &info, 0);
+	memcpy(buffer, &info, 9);
 
-	Serial.write(buffer, sizeof(buffer));
+	Serial.write(buffer, 9);
 
 	delete[] buffer;
 
