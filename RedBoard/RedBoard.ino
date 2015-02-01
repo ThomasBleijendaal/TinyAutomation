@@ -24,9 +24,7 @@ DI *button;
 DO *led;
 
 void setup() {
-	Serial.begin(115200);
-
-	while (!Serial);
+	general.setup();
 
 	general.communication.setLocalAddress(0xA0);
 	general.communication.setNodeAddress(0x01);

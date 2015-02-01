@@ -24,11 +24,9 @@ DI *button;
 DO *led;
 
 void setup() {
-	Serial.begin(115200);
+	general.setup();
 
-	while (!Serial);
-
-	general.communication.setLocalAddress(0xa1);
+	general.communication.setLocalAddress(0xA1);
 	general.communication.setNodeAddress(0x01);
 
 	general.io.registerDriver(0, 20, new ATmega32u4(), IOinstant);
