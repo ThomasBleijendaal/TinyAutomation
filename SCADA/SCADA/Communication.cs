@@ -25,7 +25,8 @@ namespace SCADA
 		public DataStorage<CommunicationData> NodeDataIn;
 		public DataStorage<CommunicationData> NodeDataOut;
 
-		private CommunicationDispatcher Dispatcher;
+		public CommunicationDispatcher Dispatcher;
+		public RemoteSubscriberProcessor RemoteSubscriber;
 
 		private List<Type> ObjectDataTypes;
 		private List<DataStorage<ObjectData<IObjectData>>> ObjectDataTypesInput;
@@ -46,31 +47,24 @@ namespace SCADA
 			Dispatcher = new CommunicationDispatcher(this);
 			Dispatcher.AttachStorageSource(CommDataIn);
 
-			//ObjDataOutput = new DataStorage<ObjectData>();
+			RemoteSubscriber = new RemoteSubscriberProcessor(this);
 
 			DataHandlingThread = new DataThread();
-
-			//CommToObj = new DataConverter<CommunicationData, ObjectData>();
-			//CommToObj.AttachStorageSource(CommDataInput);
-			//CommToObj.AttachStorageDestination(ObjDataInput);
-
-			//DataHandlingThread.AttachConverter(CommToObj);
-
 			DataHandlingThread.AttachConsumer(Dispatcher);
+			DataHandlingThread.AttachConsumer(RemoteSubscriber);
 		}
 
 		public bool Init()
 		{
-			PLCs.ForEach(
-				p =>
-				{
-					p.Provider.AttachStorageDestination(CommDataIn);
-					DataHandlingThread.AttachProvider(p.Provider);
+			foreach (PLC plc in PLCs)
+			{
+				plc.Provider.AttachStorageDestination(CommDataIn);
+				RemoteSubscriber.AttachStorageSource(plc.RemoteSubscribers);
 
-
-				}
-			);
-
+				DataHandlingThread.AttachProvider(plc.Provider);
+				DataHandlingThread.AttachConsumer(plc.Consumer);
+			};
+			
 			return true;
 		}
 
@@ -83,32 +77,83 @@ namespace SCADA
 			PLCs.Add(plc);
 		}
 
-		private class CommunicationDispatcher : DataConsumer<CommunicationData>
+		public void AddRemoteSubscriber(RemoteSubscriberData entry)
+		{
+			Console.WriteLine("Remote Subscriber added!");
+
+			short address = entry.DestinationAddress;
+
+			if (!Dispatcher.ForwardingRules.ContainsKey(address))
+			{
+				Dispatcher.ForwardingRules.Add(address, new List<RemoteSubscriberData>());
+			}
+
+			Dispatcher.ForwardingRules[address].Add(entry);
+		}
+
+		public class CommunicationDispatcher : DataConsumer<CommunicationData>
 		{
 			private Communication Parent;
+
+			public Dictionary<short, List<RemoteSubscriberData>> ForwardingRules;
 
 			public CommunicationDispatcher(Communication parent)
 			{
 				Parent = parent;
+				ForwardingRules = new Dictionary<short, List<RemoteSubscriberData>>();
 			}
 
 			public override bool ConsumeEntry(CommunicationData entry)
 			{
+				bool consumed = false;
+
 				foreach (PLC plc in Parent.PLCs)
 				{
-					if(entry.Address == Parent.Address)
+					if(entry.DestinationAddress == Parent.Address)
 					{
 						Parent.Data.Add(entry);
 
-						return true;
+						consumed = true;
 					}
-					else if (entry.Address == plc.Address)
+					else if (entry.DestinationAddress == plc.Address)
 					{
-						plc.DataOut.Add(entry);
+						plc.DataIn.Add(entry);
 
-						return true;
+						consumed = true;
+					}
+
+					if (ForwardingRules.ContainsKey(plc.Address)) {
+						foreach (RemoteSubscriberData rsdata in ForwardingRules[plc.Address])
+						{
+							if (rsdata.Matches(entry))
+							{
+								Console.WriteLine("Duplicating entry");
+								plc.DataIn.Add(entry);
+
+								consumed = true;
+							}
+						}
+
 					}
 				}
+
+				return consumed;
+			}
+		}
+
+		public class RemoteSubscriberProcessor : DataConsumer<RemoteSubscriberData>
+		{
+			private Communication Parent;
+
+			public RemoteSubscriberProcessor(Communication parent)
+			{
+				Parent = parent;
+			}
+
+			public override bool ConsumeEntry(RemoteSubscriberData entry)
+			{
+				Console.WriteLine("RemoteSubscriber registered.");
+				Parent.AddRemoteSubscriber(entry);
 
 				return false;
 			}

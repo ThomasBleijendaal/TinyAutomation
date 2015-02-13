@@ -5,8 +5,8 @@ namespace SCADA.Data.Types
 	class CommunicationData : IDataEntry
 	{
 		private DateTime _TimeStamp;
-		public byte Address;
-		public byte RemoteAddress;
+		public byte SourceAddress;
+		public byte DestinationAddress;
 		public ushort ComId;
 		public short Id;
 		public byte[] Data;
@@ -21,11 +21,12 @@ namespace SCADA.Data.Types
 			// do nothing
 		}
 
-		public CommunicationData(DateTime timeStamp, byte address, byte remoteAddress, ushort comId, short id, byte[] data)
+		public CommunicationData(byte sourceAddress, byte destinationAddress, ushort comId, short id, byte[] data)
 		{
-			_TimeStamp = timeStamp;
-			Address = address;
-			RemoteAddress = remoteAddress;
+			_TimeStamp = DateTime.Now;
+
+			SourceAddress = sourceAddress;
+			DestinationAddress = destinationAddress;
 			ComId = comId;
 			Id = id;
 			Data = data;
@@ -34,6 +35,43 @@ namespace SCADA.Data.Types
 		public void ConvertFrom(IDataEntry entry)
 		{
 			throw new InvalidCastException();
+		}
+
+		public static CommunicationData CreateFromRawData(byte[] data)
+		{
+			CommunicationData entry = new CommunicationData();
+
+
+
+			return entry;
+		}
+
+		public byte[] ConvertToRawData()
+		{
+			
+			byte[] headerData = new byte[9];
+			byte[] payload = Data;
+			byte[] footerData = new byte[1];
+
+			headerData[0] = (byte)0xAA;
+			headerData[1] = (byte)0xFF;
+			headerData[2] = (byte)0xFF;
+			headerData[3] = 0; // (byte)((Data.Length & 0xFF00) >> 8);
+			headerData[4] = 9; // (byte)(Data.Length & 0x00FF);
+			headerData[5] = 0; // (byte)((ComId & 0xFF00) >> 8);
+			headerData[6] = 8; // (byte)(ComId & 0x00FF);
+			headerData[7] = 0; // (byte)((Id & 0xFF00) >> 8);
+			headerData[8] = 0; // (byte)(Id & 0x00FF);
+
+			footerData[0] = (byte)0x55;
+
+			byte[] result = new byte[10 + Data.Length];
+
+			headerData.CopyTo(result, 0);
+			payload.CopyTo(result, 9);
+			footerData.CopyTo(result, 9 + Data.Length);
+
+			return result;
 		}
 	}
 }

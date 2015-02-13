@@ -49,6 +49,8 @@ public:
 	void begin(Time * time, Communication * communication, IO * io);
 	void loop(Time * time, Communication * communication, IO * io);
 
+	void receiveData(unsigned int payloadSize, const char * data);
+
 	DI_settings_t settings;
 	DI_data_t data;
 	DI_status_t status;

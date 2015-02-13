@@ -41,7 +41,8 @@ public:
 
 private:
 	int _driverCount;
-	int _filledSlot;
+	int _cycleDriverCount;
+	int _interruptDriverCount;
 
 	IODriver ** _drivers;
 	int * _addressLow;

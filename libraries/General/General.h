@@ -7,6 +7,7 @@ Main object of the PLC which provides a place to store Typicals, Devices and whi
 #ifndef General_h
 #define General_h
 
+#include <Application.h>
 #include <Communication.h>
 #include <Time.h>
 #include <IO.h>
@@ -19,6 +20,8 @@ Main object of the PLC which provides a place to store Typicals, Devices and whi
 //#include <M.h>
 #include <PID.h>
 
+class Communication;
+class Application;
 
 class General {
     public:
@@ -28,13 +31,16 @@ class General {
 		T * add(T * object);
 
 		void loop();
-		void begin();
 		void setup();
 
 		Communication communication;
 		Time time;
 		IO io;
 
+		Typical * getTypical(int id);
+
+		static void setProgram(Application * app);
+		static Application * _app;
 	private:
 		Typical ** _typicals;
 		Device ** _devices;
@@ -44,6 +50,10 @@ class General {
 
 		int _typicalCount;
 		int _deviceCount;
+
+		bool _communicationLost;
+		bool _canContinueWithoutCommunication;
+
 };
 
 #endif

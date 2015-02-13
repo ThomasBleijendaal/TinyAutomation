@@ -1,5 +1,7 @@
 z.ignore/*
 hardware/*
+CommTest/*
+SCADA/CommTest/*
 RedBoard/Debug/*
 RedBoard/Visual Micro/*
 ProMini/Debug/*
@@ -11,3 +13,4 @@ SCADA/SCADA/obj/*
 *.suo
 *.atsuo
 *.sdf
+OldPLC.txt

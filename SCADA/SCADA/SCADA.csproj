@@ -51,11 +51,15 @@
     <Compile Include="Data\IDataConverter.cs" />
     <Compile Include="Data\IDataEntry.cs" />
     <Compile Include="Data\IDataProvider.cs" />
+    <Compile Include="Data\Types\RemoteSubscriberData.cs" />
     <Compile Include="Data\Types\ObjectData.cs" />
     <Compile Include="Data\Types\CommunicationData.cs" />
     <Compile Include="RemoteObjects\PLC.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteObjects\PLC\PLCConnection.cs" />
+    <Compile Include="RemoteObjects\PLC\PLCDataConsumer.cs" />
+    <Compile Include="RemoteObjects\PLC\PLCDataProvider.cs" />
     <Compile Include="Threading\DataThread.cs" />
     <Compile Include="Threading\IDataThread.cs" />
   </ItemGroup>

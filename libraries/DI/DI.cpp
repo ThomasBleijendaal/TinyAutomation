@@ -36,3 +36,19 @@ void DI::loop(Time * time, Communication * communication, IO * io) {
 		communication->sendData(sizeof(sendData), DI_COM_data_ID, _id, (char*)&sendData);
 	}
 }
+void DI::receiveData(unsigned int payloadSize, const char * data) {
+	// remote communicating
+	if (_address < 0) {
+		DI_commSend_t * buffer = new DI_commSend_t();
+
+		memcpy(buffer, &data, payloadSize);
+
+		this->data = buffer->data;
+		this->status = buffer->status;
+
+		delete[] buffer;
+	}
+	else {
+
+	}
+}

@@ -29,7 +29,7 @@ namespace SCADA.Data
 						{
 							if (!ConsumeEntry(entry))
 							{
-								throw new Exception("No consumption of entry");
+								Console.WriteLine("No consumption of entry");
 							}
 						}
 						ConsumedDate[i] = result.EndTimeStamp;

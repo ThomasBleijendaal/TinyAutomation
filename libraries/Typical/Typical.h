@@ -19,6 +19,8 @@ public:
 
 	virtual void begin(Time * time, Communication * communication, IO * io);
 	virtual void loop(Time * time, Communication * communication, IO * io);
+
+	virtual void receiveData(unsigned int payloadSize, const char * data);
 protected:
 	int _id;
 };

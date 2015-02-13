@@ -14,34 +14,40 @@
 #include <Device.h>
 #include <PID.h>
 
+#include <Application.h>
 #include <General.h>
 
 /* **************************************** */
+// todo removal
 General general = General(2, 0, 1);
 
-// TYPICALS //
-DI *button;
-DO *led;
+class Program : public Application {
+public:
+	DI * button;
+	DO * led;
 
-void setup() {
-	general.setup();
+	void setup() {
+		general.communication.setLocalAddress(0xA0);
+		general.communication.setNodeAddress(0x01);
 
-	general.communication.setLocalAddress(0xA0);
-	general.communication.setNodeAddress(0x01);
+		general.io.registerDriver(0, 20, new ATmega328(), IOinstant);
 
-	general.io.registerDriver(0, 20, new ATmega328(), IOinstant);
+		button = general.add(new DI(8, true));
+		led = general.add(new DO(13));
+	}
 
-	button = general.add(new DI(8, true));
-	led = general.add(new DO(13));
+	void onStart() {
 
-	general.begin();
-}
+	}
 
-void loop() {
-	general.loop();
+	bool onSerialError() {
+		return true;
+	}
 
-	if (general.time.t1s)
-		led->status.active = !led->status.active;
-	
-	//led->status.active = button->status.active;
-}
+	void loop() {
+
+		led->status.active = button->status.active;
+
+	}
+};
+Program program = Program();

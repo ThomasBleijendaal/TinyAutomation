@@ -16,5 +16,13 @@ namespace SCADA.Data
 		}
 
 		public abstract void ProvideData();
+
+		protected void AddData(T data)
+		{
+			foreach (var dataStorage in Destinations)
+			{
+				dataStorage.Add(data);
+			}
+		}
 	}
 }

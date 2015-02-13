@@ -19,8 +19,9 @@ namespace SCADA
 		
 		static void Main(string[] args)
 		{
-			communication = new Communication(1);
-			communication.Add(new PLC(2, "COM3", 115200));
+			communication = new Communication(0x01);
+			communication.Add(new PLC(0xA0, "COM3", 115200));
+			communication.Add(new PLC(0XA1, "COM5", 115200));
 
 			if (communication.Init())
 			{
@@ -35,23 +36,6 @@ namespace SCADA
 			thread.AttachConsumer(dummy);
 
 			thread.Start();
-
-		/*	DataStorage<RawData> rawDataUpload = new DataStorage<RawData>();
-		
-			RedBoard = new PLC(2, "COM3", 115200);
-
-			RedBoard.Provider.AttachDataOutput(rawDataUpload);
-
-			DummyConsumer dummy = new DummyConsumer();
-
-			dummy.AttachDataInput(rawDataUpload);
-
-			DataThread thread = new DataThread();
-
-			thread.AttachProvider(RedBoard.Provider);
-			thread.AttachConsumer(dummy);
-
-			thread.Start();*/
 		}
 	}
 
@@ -59,7 +43,7 @@ namespace SCADA
 	{
 		public override bool ConsumeEntry(CommunicationData entry)
 		{
-			Console.WriteLine(entry.Data.ToString());
+			Console.WriteLine("DummyConsumer: {0} {1} {2} {3} {4}", entry.SourceAddress, entry.DestinationAddress, entry.ComId, entry.Id, entry.Data.Length);
 
 			return true;
 		}
