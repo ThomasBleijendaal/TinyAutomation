@@ -3,72 +3,108 @@
 
 IO::IO() {}
 IO::IO(int driverCount) {
-	_driverCount = driverCount;
-	_filledSlot = -1;
-
-	_drivers = new IODriver*[_driverCount];
-	_addressLow = new int[_driverCount];
-	_addressHigh = new int[_driverCount];
-
-	_cycleDrivers = new int[_driverCount];
-	_interruptDrivers = new int[_driverCount];
-
-	for (int i = 0; i < _driverCount; i++) {
-		_addressLow[i] = 0;
-		_addressHigh[i] = 0;
-		_cycleDrivers[i] = 0;
-		_interruptDrivers[i] = 0;
-	}
+	_driverCount = 0; 
+	_cycleDriverCount = 0;
+	_interruptDriverCount = 0;
 }
 
+// TODO: driver type
 void IO::registerDriver(int rangeLow, int rangeHigh, IODriver * driver, int driverType) {
-	if (_filledSlot > -1 && _addressLow[_filledSlot] > rangeLow)
+	int newId = _driverCount;
+
+	if (_driverCount > 0 && _addressLow[_driverCount] > rangeLow)
 		return;
 
-	_drivers[++_filledSlot] = driver;
-	_addressLow[_filledSlot] = rangeLow;
-	_addressHigh[_filledSlot] = rangeHigh;
-
-	if (_filledSlot > 0) {
+	if (_driverCount > 0) {
 		driver->baseDriver = _drivers[0];
+
+		IODriver ** oldArray = new IODriver*[_driverCount];
+
+		int * oldArrayL = new int[_driverCount];
+		int * oldArrayH = new int[_driverCount];
+		//int * oldArrayType = new int[(driverType == IOinstantCycle) ? _cycleDriverCount : _interruptDriverCount];
+
+		for (int i = 0; i < _driverCount; i++) {
+			oldArray[i] = _drivers[i];
+
+			oldArrayL[i] = _addressLow[i];
+			oldArrayH[i] = _addressHigh[i];
+
+			//oldArrayType[i] = (driverType == IOinstantCycle) ? _cycleDrivers[i] : _interruptDrivers[i];
+		}
+		
+		delete[] _drivers, _addressLow, _addressHigh;
+		
+		//if (driverType == IOinstantCycle) {
+		//	delete[] _cycleDrivers;
+		//}
+		//else {
+		//	delete[] _interruptDrivers;
+		//}
+
+		_drivers = new IODriver*[++_driverCount];
+
+		_addressLow = new int[_driverCount];
+		_addressHigh = new int[_driverCount];
+
+		for (int i = 0; i < _driverCount; i++) {
+			_drivers[i] = oldArray[i];
+
+			_addressLow[i] = oldArrayL[i];
+			_addressHigh[i] = oldArrayH[i];
+		}
+
+		delete[] oldArray, oldArrayL, oldArrayH;// , oldArrayType;
+	}
+	else {
+		_drivers = new IODriver*[++_driverCount];
+
+		_addressLow = new int[_driverCount];
+		_addressHigh = new int[_driverCount];
+
+		_cycleDrivers = new int[max(1,_cycleDriverCount)];
+		_interruptDrivers = new int[max(1,_interruptDriverCount)];
 	}
 
 	if (driverType == IOinstantCycle) {
-		int i = -1;
-		while (_cycleDrivers[++i] > 0) {}
-		_cycleDrivers[i] = _filledSlot;
+		++_cycleDriverCount;
 	}
-	else if (driverType == IOinterrupt) {
-		int i = -1;
-		while (_interruptDrivers[++i] > 0) {}
-		_interruptDrivers[i] = _filledSlot;
+	else {
+		++_interruptDriverCount;
+	}
+
+	_drivers[newId] = driver;
+	_addressLow[newId] = rangeLow;
+	_addressHigh[newId] = rangeHigh;
+
+	if (driverType == IOinstantCycle) {
+		_cycleDrivers[_cycleDriverCount] = newId;
+	}
+	else {
+		_interruptDrivers[_interruptDriverCount] = newId;
 	}
 }
 
 void IO::begin() {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		_drivers[i]->begin();
 	}
 }
 
 void IO::cycle() {
-	int i = 0;
-
-	while (_cycleDrivers[i] > 0) {
-		_drivers[_cycleDrivers[i++]]->cycle();
+	for (int i = 0; i < _cycleDriverCount; i++) {
+		_drivers[_cycleDrivers[i]]->cycle();
 	}
 }
 
 void IO::interrupt() {
-	int i = 0;
-
-	while (_interruptDrivers[i] > 0) {
-		_drivers[_interruptDrivers[i++]]->cycle();
+	for (int i = 0; i < _interruptDriverCount; i++) {
+		_drivers[_interruptDrivers[i]]->cycle();
 	}
 }
 
 void IO::mode(int address, int mode) {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		if (address <= _addressHigh[i]) {
 			_drivers[i]->mode(address - _addressLow[i], mode);
 		}
@@ -76,7 +112,7 @@ void IO::mode(int address, int mode) {
 }
 
 bool IO::digitalRead(int address) {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		if (address <= _addressHigh[i]) {
 			return _drivers[i]->digitalRead(address - _addressLow[i]);
 		}
@@ -84,7 +120,7 @@ bool IO::digitalRead(int address) {
 }
 
 void IO::digitalWrite(int address, bool data) {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		if (address <= _addressHigh[i]) {
 			_drivers[i]->digitalWrite(address - _addressLow[i], data);
 			break;
@@ -93,7 +129,7 @@ void IO::digitalWrite(int address, bool data) {
 }
 
 int IO::analogRead(int address) {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		if (address <= _addressHigh[i]) {
 			return _drivers[i]->analogRead(address - _addressLow[i]);
 		}
@@ -101,7 +137,7 @@ int IO::analogRead(int address) {
 }
 
 float IO::formattedRead(int address) {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		if (address <= _addressHigh[i]) {
 			return _drivers[i]->formattedRead(address - _addressLow[i]);
 		}
@@ -109,7 +145,7 @@ float IO::formattedRead(int address) {
 }
 
 void IO::analogWrite(int address, int data) {
-	for (int i = 0; i <= _filledSlot; i++) {
+	for (int i = 0; i < _driverCount; i++) {
 		if (address <= _addressHigh[i]) {
 			_drivers[i]->analogWrite(address - _addressLow[i], data);
 			break;

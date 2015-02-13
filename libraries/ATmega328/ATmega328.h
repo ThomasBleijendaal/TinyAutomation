@@ -1,7 +1,7 @@
 /*
 IO Driver for default ports of ATmega328
 
-Analog pins are moved to 20 - 27, since each pin requires to be unique.
+Analog pins are moved to 14 - 20, since each pin requires to be unique.
 Digital pins are written directly into the port, as it is 3 times faster. Analog pins are too slow to optimise significantly.
 
 */

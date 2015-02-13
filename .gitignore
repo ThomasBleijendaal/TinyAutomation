@@ -1,12 +1,16 @@
-*.sublime-project
-*.sublime-workspace
-RaspberryPi/SCADA/sftp-config.json
-*.idea
-*.pyc
 z.ignore/*
 hardware/*
-PLC/Debug/*
-PLC/Visual Micro/*
-*.atsln
+CommTest/*
+SCADA/CommTest/*
+RedBoard/Debug/*
+RedBoard/Visual Micro/*
+ProMini/Debug/*
+ProMini/Visual Micro/*
+libraries/Debug/*
+SCADA/SCADA/bin/*
+SCADA/SCADA/obj/*
+*.opensdf
+*.suo
 *.atsuo
-*.cppproj
+*.sdf
+OldPLC.txt

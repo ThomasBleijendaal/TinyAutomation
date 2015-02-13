@@ -7,81 +7,66 @@ Writes an analog output (PWM). Recieves a 0 - 100 % input which is converted to 
 #ifndef AO_h
 #define AO_h
 
+#define AO_COM_settings_ID 0x03
+#define AO_COM_status_ID 0x04
+#define AO_COM_data_ID 0x05
+
 #include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
 #include <IO.h>
 
-// char, char, int, float, float =2h2f
-struct AOdataStruct {
-	struct status {
-		bool active : 1;
-		bool interlock : 1;
-		char spare : 6;
-		status() {
-			active = false;
-			interlock = false;
-			spare = 0;
-		}
-	} status;
-	struct cmd {
-		char spare : 8;
-		cmd() {
-			spare = 0;
-		}
-	} cmd;
-	int startCount;
-	float activeTime;
-	float output;
-	float average;
+struct AO_settings_t {
+	float minOutput;
+	float maxOutput;
+	float rateOfChange;
 
-	AOdataStruct() {
-		startCount = 0;
-		activeTime = 0.0;
-		output = 0.0;
-		average = 0.0;
-	}
+	AO_settings_t() : minOutput(0.0), maxOutput(100.0), rateOfChange(-1.0) {};
+};
+struct AO_status_t {
+	bool interlock : 1;
+	bool active : 1;
+	bool wasActive : 1;
+
+	AO_status_t() : interlock(false), active(false), wasActive(false) {};
+
+};
+struct AO_data_t {
+	float avg;
+
+	float activeTime;
+	unsigned int startCount;
+
+	float output;
+	float currentOutput;
+
+	AO_data_t()
+		: avg(0.0),
+		activeTime(0.0),
+		startCount(0),
+		output(0.0),
+		currentOutput(0.0) {}
+};
+
+// char, char, int, float, float =2h2f
+struct AO_commSend_t {
+	AO_status_t status;
+	AO_data_t data;
 };
 
 class AO : public Typical {
 public:
 	AO();
-	AO(int pin);
-	AO(int pin, float min, float max);
-	AO(int pin, float min, float max, float rate);
-
-	void output(float output);
-	void activate(bool activate);
-
-	float output();
-	float average();
-	float activeTime();
-
-	void interlock(bool i0, bool i1, bool i2);
+	AO(int address) : _address(address) {};
 
 	void begin(Time * time, Communication * communication, IO * io);
 	void loop(Time * time, Communication * communication, IO * io);
 
+	AO_settings_t settings;
+	AO_status_t status;
+	AO_data_t data;
 private:
-	void _init(int pin, float min, float max, float rate);
-
-	int _pin;
-	int _raw;
-
-	bool _interlock;
-	bool _active;
-	bool _wasActive;
-
-	float _output;
-	float _currentOutput;
-
-	float _avg;
-	float _min;
-	float _max;
-	float _rate;
-
-	unsigned int _activeTime;
-	unsigned int _startCount;
+	int _address;
 };
 
 #endif

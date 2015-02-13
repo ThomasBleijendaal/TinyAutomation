@@ -1,119 +1,67 @@
- #include "Arduino.h"
+#include "Arduino.h"
 #include "AO.h"
 
-AO::AO() {}
-AO::AO(int pin) {
-	_init(pin, 0.0, 100.0, -1.0);
-}
-AO::AO(int pin, float min, float max) {
-	_init(pin, min, max, -1.0);
-}
-AO::AO(int pin, float min, float max, float rate) {
-	_init(pin, min, max, rate);
-}
-void AO::_init(int pin, float min, float max, float rate) {
-	_pin = pin;
-
-	_min = min;
-	_max = max;
-	_rate = rate;
-
-	_active = false;
-
-	_raw = (int)(_min * 2.55);
-	_output = 0.0;
-	_currentOutput = min;
-}
-
-void AO::activate(bool activate) {
-	_active = activate;
-}
-
-void AO::output(float output) {
-	_output = output;
-}
-
-float AO::output() {
-	if (_active) {
-		return _currentOutput;
-	}
-	else{
-		return 0.0;
-	}
-}
-
-float AO::average() {
-	return _avg;
-}
-
-float AO::activeTime() {
-	return ((float)_activeTime) / 10.0;
-}
-
-void AO::interlock(bool i0, bool i1, bool i2) {
-	_interlock = i0 || i1 || i2;
-	if (_interlock)
-		_active = false;
-}
-
 void AO::begin(Time * time, Communication * communication, IO * io) {
-	io->mode(_pin, OUTPUT);
+	io->mode(_address, OUTPUT);
+
+	data.output = settings.minOutput;
 }
+
 void AO::loop(Time * time, Communication * communication, IO * io) {
-	int sp = max(_min, min(_max, _output));
+	float sp = max(settings.minOutput, min(settings.maxOutput, data.output));
 	bool stateChanged = false;
 
-	if (_active) {
-		if (_rate != -1 && time->t100ms) {
-			
-			float delta = _rate / 10.0;
+	if(status.interlock) {
+		status.active = false;
+	}
 
-			if (sp > _currentOutput) {
-				_currentOutput = min(sp, _currentOutput + delta);
+	if (status.active) {
+		if (settings.rateOfChange != -1.0 && sp != data.currentOutput && time->t100ms) {
+
+			float delta = settings.rateOfChange / 10.0;
+
+			if (sp > data.currentOutput) {
+				data.currentOutput = min(sp, data.currentOutput + delta);
 			}
-			else if (sp < _currentOutput) {
-				_currentOutput = max(sp, _currentOutput - delta);
+			else if (sp < data.currentOutput) {
+				data.currentOutput = max(sp, data.currentOutput - delta);
 			}
 		}
-		else if (_rate == -1) {
-			_currentOutput = max(_min, min(_max, _output));
+		else if (settings.rateOfChange == -1.0) {
+			data.currentOutput = sp;
 		}
 
 		if (time->t100ms) {
-			_avg = ((_avg * 99.0) + _currentOutput) / 100.0;
+			data.avg = ((data.avg * 99.0) + data.currentOutput) / 100.0;
 
-			if (_active)
-				_activeTime++;
+			if (status.active) {
+				data.activeTime += 0.1;
+			}
 		}
 
-		io->analogWrite(_pin, (int)(_currentOutput * 2.55));
+		io->analogWrite(_address, (int)(data.currentOutput * 2.55));
 
-		if (!_wasActive) {
-			_startCount++;
+		if (!status.wasActive) {
+			data.startCount++;
 			stateChanged = true;
-			_wasActive = true;
+			status.wasActive = true;
 		}
 	}
-	else if (_wasActive) {
+	else if (status.wasActive) {
 		stateChanged = true;
-		_wasActive = false;
+		status.wasActive = false;
 
-		_currentOutput = _min;
+		data.currentOutput = settings.minOutput;
 
-		io->analogWrite(_pin, 0);
+		io->analogWrite(_address, 0);
 	}
-	
+
 	if (stateChanged || time->t1s) {
-		AOdataStruct data;
+		AO_commSend_t sendData;
 
-		data.status.active = _active;
-		data.status.interlock = _interlock;
+		sendData.data = data;
+		sendData.status = status;
 
-		data.startCount = _startCount;
-		data.activeTime = activeTime();
-		data.output = _currentOutput;
-		data.average = _avg;
-
-		communication->sendData(sizeof(data), typeAO, _id, (char*)&data);
+		communication->sendData(sizeof(sendData), AO_COM_data_ID, _id, (char*)&sendData);
 	}
 }

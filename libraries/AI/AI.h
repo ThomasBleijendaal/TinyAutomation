@@ -1,131 +1,100 @@
 /*
 Analog Input
 
-Reads an analog input. Maps the raw input to the configured range and determines if the input is out of range (bta, broken transmitter), 
+Reads an analog input. Maps the raw input to the configured range and determines if the input is out of range (bta, broken transmitter),
 too high (hihi), high (hi), low (lo) or too low (lolo). Also computes a rolling average per 100ms.
 
 */
 #ifndef AI_h
 #define AI_h
 
+#define AI_COM_settings_ID 0x00
+#define AI_COM_status_ID 0x01
+#define AI_COM_data_ID 0x02
+
 #include <Typical.h>
 #include <Time.h>
 #include <Communication.h>
 #include <IO.h>
 
-// char, char, float, float, float, float =h4f
-struct AIdataStruct {
-	struct status {
-		bool lolo : 1;
-		bool lo : 1;
-		bool hi : 1;
-		bool hihi : 1;
-		bool bta : 1;
-		char spare : 3;
-		status() {
-			lolo = false;
-			lo = false;
-			hi = false;
-			hihi = false;
-			bta = false;
-			spare = 0;
-		}
-	} status;
-	struct cmd {
-		char spare : 8;
-		cmd() {
-			spare = 0;
-		}
-	} cmd;
-	float value;
-	float min;
-	float max;
-	float average;
+struct AI_settings_t {
+	bool enable : 1;
+	bool enableLolo : 1;
+	bool enableLo : 1;
+	bool enableHi : 1;
+	bool enableHihi : 1;
+	bool enableBTA : 1;
+	bool useFormatted : 1;
+	bool useExternalValue : 1;
 
-	AIdataStruct() {
-		value = 0.0;
-		min = 0.0;
-		max = 0.0;
-		average = 0.0;
-	}
+	int rawLow;
+	int rawHigh;
+
+	float rangeLow;
+	float rangeHigh;
+
+	float lolo;
+	float lo;
+	float hi;
+	float hihi;
+
+	AI_settings_t()
+		: enable(true),
+		enableLolo(false),
+		enableLo(false),
+		enableHi(false),
+		enableHihi(false),
+		enableBTA(false),
+		useFormatted(false),
+		useExternalValue(false),
+		rawLow(0),
+		rawHigh(1023),
+		rangeLow(0.0),
+		rangeHigh(100.0),
+		lolo(0.0),
+		lo(0.0),
+		hi(0.0),
+		hihi(0.0) {}
 };
-/*struct AIcmdStruct {
-	struct cmd {
-		char spare : 8;
-		cmd() {
-			spare = 0;
-		}
-	};
+struct AI_status_t {
+	bool isLolo : 1;
+	bool isLo : 1;
+	bool isHi : 1;
+	bool isHihi : 1;
+	bool isBTA : 1;
 
-};*/
+	AI_status_t() {}
+};
+struct AI_data_t {
+	float value;
+
+	float avg;
+	float minValue;
+	float maxValue;
+
+	AI_data_t() : value(0.0), avg(0.0), minValue(0.0), maxValue(0.0) {}
+};
+
+struct AI_commSend_t {
+	AI_status_t status;
+	AI_data_t data;
+};
 
 class AI : public Typical {
 public:
-	AI();
-	AI(int pin);
-	AI(int pin, float rangeLow, float rangeHigh);
-	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi);
-	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh);
-	AI(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
-
-	bool lolo();
-	bool lo();
-	bool hi();
-	bool hihi();
-	bool bta();
-
-	void enable(bool enable);
-
-	float value();
-	void setValue(float value);
-	float average();
-	float minimum();
-	float maximum();
-
-	float voltage();
-	float rangeLow();
-	float rangeHigh();
+	AI() : _firstCycle(false) {};
+	AI(int address) : _address(address), _firstCycle(false) {};
 
 	void begin(Time * time, Communication * communication, IO * io);
 	void loop(Time * time, Communication * communication, IO * io);
+
+	AI_settings_t settings;
+	AI_status_t status;
+	AI_data_t data;
 private:
-	void _init(int pin, float rangeLow, float rangeHigh, float lolo, float lo, float hi, float hihi, bool enableBTA, int rawLow, int rawHigh, bool damping);
+	int _address;
 
-	int _pin : 2;
-
-	int _raw : 2;
-	int _rawLow : 2;
-	int _rawHigh : 2;
-
-	float _value;
-	float _rangeLow;
-	float _rangeHigh;
-
-	float _lolo;
-	float _lo;
-	float _hi;
-	float _hihi;
-
-	float _avg;
-	float _min;
-	float _max;
-
-	bool _enable : 1;
-	bool _enableLolo : 1;
-	bool _enableLo : 1;
-	bool _enableHi : 1;
-	bool _enableHihi : 1;
-	bool _enableBTA : 1;
-	bool _damping : 1;
-
-	bool _isLolo : 1;
-	bool _isLo : 1;
-	bool _isHi : 1;
-	bool _isHihi : 1;
-	bool _isBTA : 1;
-
-	bool _firstCycle : 1;
-	bool _firstValueSet : 1;
+	bool _firstCycle;
 };
 
 #endif

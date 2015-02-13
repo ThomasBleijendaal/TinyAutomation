@@ -7,116 +7,98 @@ Basic implementation of a very naive PID controller.
 #ifndef PID_h
 #define PID_h
 
-#include <Typical.h>
+#define PID_COM_settings_ID 0xA0
+#define PID_COM_status_ID 0xA1
+#define PID_COM_data_ID 0xA2
+
+#include <Device.h>
 #include <Time.h>
 #include <Communication.h>
 #include <AI.h>
 #include <AO.h>
 
-// char, char, 7 x float =1h7f
-struct PIDsendStruct {
-	struct status {
-		bool active : 1;
-		bool deviated : 1;
-		bool fast : 1;
-		char spare : 5;
-		status() {
-			active = false;
-			deviated = false;
-			fast = false;
-			spare = 0;
-		}
-	} status;
-	char spare;
-	float input;
-	float sp;
-	float output;
+struct PID_settings_t {
 	float P;
-	float I;
-	float D; 
-	float deviationLimit;
-
-	PIDsendStruct() {
-		sp = input = output = P = I = D = deviationLimit = 0.0;
-	}
-};
-// char, char, 5 x float
-struct PIDrecStruct {
-	struct cmd {
-		bool setFast : 1;
-		bool resetFast : 1;
-		char spare : 6;
-
-		cmd() {
-			setFast = false;
-			resetFast = false;
-			spare = 0;
-		}
-	};
-	char spare;
-	float sp;
-	float P;
-	float I;
+	unsigned long I;
 	float D;
+
+	float sp;
+
+	float minOutput;
+	float maxOutput;
+
 	float deviationLimit;
 
-	PIDrecStruct() {
-		sp = P = I = D = deviationLimit = 0.0;
-	}
+	PID_settings_t() : P(0.0), I(0.0), D(0.0), sp(0.0), minOutput(0.0), maxOutput(100.0), deviationLimit(0.0) {};
 };
 
-class PID : public Typical {
+struct PID_status_t {
+	bool deviated : 1;
+	bool wasDeviated : 1;
+	bool active : 1;
+	bool wasActive : 1;
+
+	PID_status_t() : deviated(false), wasDeviated(false), active(false), wasActive(false) {};
+};
+
+struct PID_data_t {
+	float previousError;
+
+	int deviationDelay;
+
+	PID_data_t() : previousError(0.0), deviationDelay(0) {};
+
+};
+
+struct PID_history_t {
+	float entry[10];
+
+	PID_history_t() {
+		for (int i = 0; i < 10; ++i)
+			entry[i] = 0.0;
+	};
+
+	void add(float value) {
+		for(int i = 9; i > 0; --i)
+			entry[i] = entry[i - 1];
+		entry[0] = value;
+	};
+	float total() {
+		float result = 0.0;
+		for(int i = 0; i < 10; ++i)
+			result += entry[i];
+		return result;
+	};
+	float delta() {
+		return entry[0] - entry[9];
+	};
+};
+
+struct PID_commSend_t {
+	PID_status_t status;
+	PID_data_t data;
+};
+
+class PID : public Device {
 public:
 	PID();
-	PID(AI **input, float min, float max, AO **output, float P, float I, float D);
-	PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit);
-	PID(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast);
+	PID(AI **input, AO **output) : _AI(*input), _AO(*output) {};
 
-	void setId(int id);
+	void begin(Time * time, Communication * communication);
+	void loop(Time * time, Communication * communication);
 
-	float sp();
+	PID_settings_t settings;
+	PID_status_t status;
+	PID_data_t data;
 
-	bool isActive();
-	bool isDeviated();
-
-	void sp(float sp);
-	void activate(bool activate);
-
-	void begin(Time * time, Communication * communication, IO * io);
-	void loop(Time * time, Communication * communication, IO * io);
-
+	PID_history_t history;
+	PID_history_t historyDelta;
 private:
-	void _init(AI **input, float min, float max, AO **output, float P, float I, float D, float deviationLimit, bool fast);
-
-	int _id;
-
-	float _min;
-	float _max;
-
-	bool _fast;
-
-	float _deviationLimit;
-	bool _deviated;
-	bool _wasDeviated;
-	int _devDelay;
-
-	float _P;
-	float _I;
-	float _D;
+	bool iTimer;
+	bool dTimer;
 
 	AI *_AI;
 	AO *_AO;
-
-	float _value;
-	float _totalError;
-	float _previousError;
-
-	float _output;
-
-	float _sp;
-
-	bool _active;
-	bool _wasActive;
 };
 
 #endif

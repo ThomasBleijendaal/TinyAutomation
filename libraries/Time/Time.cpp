@@ -1,77 +1,47 @@
 #include "Arduino.h"
 #include "Time.h"
 
-Time::Time() {
-	t2_5ms = false;
-	_t2_5ms = micros();
-
-	t100ms = false;
-	_t100ms = 0;
-
-	t250ms = false;
-	_t250ms = 0;
-	
-	t1s = false;
-	b1s = false;
-	_t1s = 0;
-	
-	t5s = false;
-	_t5s = 0;
-
-	t1m = false;
-	_t1m = 0;
-
-	t5m = false;
-	_t5m = 0;
-
-	cps = 0;
-	_cps = 0;
-}
-	
 void Time::loop() {
 	unsigned long u = micros();
 
 	++_cps;
 
+	t10ms = false;
 	t100ms = false;
-	t250ms = false;
 	t1s = false;
 	t5s = false;
+	t30s = false;
 	t1m = false;
 	t5m = false;
+	t1h = false;
 
-	t2_5ms = u - _t2_5ms >= 1800U;
-	if (t2_5ms || u < _t2_5ms) {
-		_t2_5ms = u;
+	if (t10ms = (u - 9999U > _ms) || (_ms + 9999U < u)) {
+		_ms = u;
 
-		t100ms = ++_t100ms == 40;
-		if (t100ms) {
-			_t100ms = 0;
+		t100ms = !(_1000ms % 10);
+		_customTimer++;
 
-			t1s = ++_t1s == 10;
-			if (t1s) {
-				_t1s = 0;
-				b1s = !b1s;
+		if(t1s = (++_1000ms == 100)) {
+			_1000ms = 0;
 
-				cps = _cps;
-				_cps = 0;
+			if(++_m == 60) {
+				_m = 0;
+				t1m = true;
 
-				t5s = ++_t5s == 5;
-				if (t5s)
-					_t5s = 0;
+				t5s = !(_m % 5);
+				t30s = !(_m % 30);
 
-				t1m = ++_t1m == 60;
-				if (t1m)
-					_t1m = 0;
+				if(++_h == 60) {
+					_h = 0;
+					t1h = true;
 
-				t5m = ++_t5m == 300;
-				if (t5m)
-					_t5m = 0;
+					t5m = !(_h % 5);
+				}
 			}
 		}
-
-		t250ms = ++_t250ms > 100;
-		if (t250ms)
-			_t250ms = 0;
 	}
+}
+
+bool Time::timer(unsigned int ms) {
+	return !(_customTimer % (int)((ms / 10)));
 }

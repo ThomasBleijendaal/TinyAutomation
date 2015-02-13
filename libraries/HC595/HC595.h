@@ -2,7 +2,7 @@
 IO Driver for HC595 
 Shift Register (8 bit out)
 
-Requires communicating via on-board pins
+Requires communicating via on-board pins (baseDriver)
 
 TODO:
 	replace dependency on PORTD to dynamic port.
