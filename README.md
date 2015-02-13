@@ -1,7 +1,7 @@
-TinyAutomation 0.2 beta
+TinyAutomation 0.3 beta
 ==================
 
-This 0.2 beta branch. The code does not compile and does not work yet. This documentation is also not finished.
+This 0.3 beta version.
 
 ---
 
@@ -35,7 +35,7 @@ To provides some abstraction from the Arduino controller, a Base IO Driver is ne
 The first IO driver that is being registered to the General object, is the Base IO driver. Any driver can be the Base IO driver, there is no special class for it.
 
 **IO Drivers**
-Every other IO driver that is registered to the General object, is an IO driver. An IO driver is used to communicate with an external chip, for example a shift register or an IO expander. The rest of the program can access these extra IO options as if it were part of the Arduino, there is no difference in how an onboard pin is accessed compared to accessing a pin on an IO expander. 
+Every other IO driver that is registered to the General object, is an IO driver. An IO driver is used to communicate with an external chip, for example a shift register or an IO expander. The rest of the program can access these extra IO options as if it were part of the Arduino, there is no difference in how an onboard pin is accessed compared to accessing a pin on an IO expander.
 
 **Typicals**
 Typicals are objects that behave very typical. There are four different typicals: analog in and out, and digital in and out. These four object make up an abstract representation of almost any object used: for example, a temperature sensor is an analog in while an motor is a digital out.
